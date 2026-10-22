@@ -1,0 +1,1282 @@
+// Question bank for Modules 1-3 (MCAI/CSAI 500 Machine Learning).
+// Schema:
+//   mc:   { id, module, type: "mc", kind: "theory"|"code", prompt, code?, options[4], answer (index), explanation }
+//   open: { id, module, type: "open", kind, prompt, code?, modelAnswer, keyPoints: [{ text, keywords[] }] }
+// Options are shuffled at runtime, so never write "all/none of the above".
+
+const QUESTIONS = [
+  // ───────────────────────── Module 1: The Machine Learning Landscape ─────────────────────────
+  {
+    id: "m1-01", module: 1, type: "mc", kind: "theory",
+    prompt: "Using Tom Mitchell's definition (task T, experience E, performance P), a chess program improves by playing thousands of practice games against itself. What is the experience E?",
+    options: [
+      "The practice games the program plays against itself",
+      "The percentage of games the program wins against human opponents",
+      "Playing chess at a competitive level against new opponents",
+      "The rules of chess encoded by the programmer",
+    ],
+    answer: 0,
+    explanation: "E is the data the system learns from (the practice games). Win percentage is P, playing chess is T, and hand-coded rules are not learning experience.",
+  },
+  {
+    id: "m1-02", module: 1, type: "mc", kind: "theory",
+    prompt: "Which statement best describes how machine learning differs from traditional programming?",
+    options: [
+      "In ML, data and the desired outputs are given to a learning algorithm, which produces a model that captures the rules",
+      "In ML, data and hand-written rules are combined to produce outputs more efficiently than conventional code",
+      "In ML, the programmer still defines every decision rule, but the algorithm chooses which rule to apply at run time",
+      "In ML, rules are inferred from the problem description, so labelled data is only needed for evaluation",
+    ],
+    answer: 0,
+    explanation: "Traditional: Data + Rules → Output. ML reverses it: Data + Desired Outputs → Learning Algorithm → Model.",
+  },
+  {
+    id: "m1-03", module: 1, type: "mc", kind: "theory",
+    prompt: "A model reaches 99% accuracy on its training data but only 71% on new data from the same population. What is the MOST likely diagnosis?",
+    options: [
+      "Overfitting: the model learned noise and specific details of the training set",
+      "Underfitting: the model is too simple to capture the underlying pattern",
+      "The test set is too large relative to the training set",
+      "The data is nonrepresentative because the new data comes from a different population",
+    ],
+    answer: 0,
+    explanation: "A large gap between excellent training performance and poor unseen-data performance is the classic sign of overfitting. Underfitting would show poor training performance too. The question states the new data comes from the same population, which rules out nonrepresentative data.",
+  },
+  {
+    id: "m1-04", module: 1, type: "mc", kind: "theory",
+    prompt: "Training error and validation error are both high and very close to each other. Which action is MOST likely to improve the model?",
+    options: [
+      "Use a more complex model or add more informative features",
+      "Increase the regularization strength to stabilise the model",
+      "Collect more training examples of the same kind",
+      "Remove features to reduce model complexity",
+    ],
+    answer: 0,
+    explanation: "High, similar errors indicate underfitting. You need more capacity or better features. Regularization and removing features reduce capacity further, and more data of the same kind does not help a model that is too simple.",
+  },
+  {
+    id: "m1-05", module: 1, type: "mc", kind: "theory",
+    prompt: "Which of the following is NOT a typical technique for reducing overfitting?",
+    options: [
+      "Increasing the polynomial degree of the model",
+      "Applying regularization",
+      "Removing irrelevant features (feature selection)",
+      "Collecting additional training data",
+    ],
+    answer: 0,
+    explanation: "Increasing model complexity makes overfitting worse. Regularization, feature selection, cross-validation and more data are the remedies listed in the module.",
+  },
+  {
+    id: "m1-06", module: 1, type: "mc", kind: "theory",
+    prompt: "Which characteristic applies to instance-based learning (e.g., KNN) but NOT to model-based learning?",
+    options: [
+      "It compares each new point with stored examples at prediction time",
+      "It stores learned parameters rather than the training examples",
+      "It needs labelled training data to make supervised predictions",
+      "It can make predictions for observations it has never seen",
+    ],
+    answer: 0,
+    explanation: "Instance-based learners store examples and compute similarity at prediction time, so they learn locally. Storing parameters describes model-based learning. Both approaches use labelled data and predict on unseen data.",
+  },
+  {
+    id: "m1-07", module: 1, type: "mc", kind: "theory",
+    prompt: "A batch (offline) learning system is in production. Six months later a large amount of new labelled data becomes available. What is the typical way to use it?",
+    options: [
+      "Train a new model from scratch on the old and new data, then replace the deployed model",
+      "Feed only the new instances to the deployed model so it updates incrementally",
+      "Discard the old data and retrain only on the new data",
+      "Do nothing; batch models adapt automatically as they make predictions",
+    ],
+    answer: 0,
+    explanation: "Batch learning trains on the full dataset at once and separately from deployment. When new data arrives, the model is usually retrained from scratch on old + new data. Incremental updates describe online learning.",
+  },
+  {
+    id: "m1-08", module: 1, type: "mc", kind: "theory",
+    prompt: "Which scenario is the BEST fit for online learning?",
+    options: [
+      "A trading system fed a continuous price stream that must adapt quickly",
+      "A model that is retrained once a year on a fixed historical dataset",
+      "A small dataset that fits comfortably in memory and almost never changes over time",
+      "A medical-imaging dataset labelled once by experts and archived",
+    ],
+    answer: 0,
+    explanation: "Online learning updates the model incrementally as data arrives, which suits continuous streams and fast-changing environments. The other three are natural batch-learning settings.",
+  },
+  {
+    id: "m1-09", module: 1, type: "mc", kind: "theory",
+    prompt: "A retailer has purchase histories for 2 million customers but no labels. They want to discover groups of customers with similar behaviour. Which formulation fits best?",
+    options: [
+      "Unsupervised learning (clustering)",
+      "Supervised classification, using the customer ID as the label",
+      "Supervised regression predicting each customer's total spend",
+      "Binary classification of high-spending vs low-spending customers",
+    ],
+    answer: 0,
+    explanation: "With no labels and a goal of finding groups, this is clustering, an unsupervised task. The other options invent a target that the business did not ask for.",
+  },
+  {
+    id: "m1-10", module: 1, type: "mc", kind: "theory",
+    prompt: "Which of the following is a regression task?",
+    options: [
+      "Predicting how many minutes late a delivery will arrive",
+      "Predicting whether a delivery will be late (yes / no)",
+      "Predicting which of five warehouses will ship an order",
+      "Predicting delivery risk as low, medium or high",
+    ],
+    answer: 0,
+    explanation: "Regression predicts a continuous numeric value. Low/medium/high is ordered but still a set of categories, so it is classification.",
+  },
+  {
+    id: "m1-11", module: 1, type: "mc", kind: "theory",
+    prompt: "Which statement about labels is correct?",
+    options: [
+      "Labels are the desired outputs; supervised learning requires them, unsupervised learning does not",
+      "Labels are the measurable input characteristics used to describe each observation",
+      "Labels must always be numeric so that the algorithm can compute an error",
+      "Labels are the internal parameters the model adjusts during training",
+    ],
+    answer: 0,
+    explanation: "Features are inputs; labels are the targets. Labels can be categorical (e.g., 'spam'). Parameters are what the model learns, not the labels.",
+  },
+  {
+    id: "m1-12", module: 1, type: "mc", kind: "theory",
+    prompt: "Two hospital datasets are merged. One records patient weight in kilograms and the other in pounds, in the same column. Which data-quality problem is this?",
+    options: [
+      "Inconsistent data",
+      "Noise in the data",
+      "Measurement error",
+      "Nonrepresentative data",
+    ],
+    answer: 0,
+    explanation: "Inconsistencies come from combining sources with different units, naming conventions or formats. Measurement error refers to faulty sensors or instruments recording wrong values.",
+  },
+  {
+    id: "m1-13", module: 1, type: "mc", kind: "theory",
+    prompt: "A face-recognition model was trained mostly on photos of people aged 20–35. It performs poorly for users over 65. What is the primary cause?",
+    options: [
+      "Nonrepresentative training data (sampling bias)",
+      "Overfitting caused by excessive model complexity",
+      "Noise in the training images",
+      "Underfitting caused by too few model parameters",
+    ],
+    answer: 0,
+    explanation: "The training data does not reflect the population the model serves. ML assumes future data resembles training data, and here that assumption fails.",
+  },
+  {
+    id: "m1-14", module: 1, type: "mc", kind: "theory",
+    prompt: "Which of these is NOT one of the common strategies for handling missing values?",
+    options: [
+      "Duplicating complete records to outweigh the incomplete ones",
+      "Removing the incomplete records",
+      "Replacing missing values with the mean or median",
+      "Estimating missing values with statistical techniques",
+    ],
+    answer: 0,
+    explanation: "Removal, mean/median imputation and statistical estimation are the listed strategies. Duplicating records biases the data and does not address the missing values.",
+  },
+  {
+    id: "m1-15", module: 1, type: "mc", kind: "theory",
+    prompt: "What is the main purpose of the validation set?",
+    options: [
+      "To compare candidate models and tune hyperparameters during development",
+      "To fit the model's internal parameters, such as its weights",
+      "To give the final unbiased estimate of performance after the model is chosen",
+      "To add more data to the training set when the training set is small",
+    ],
+    answer: 0,
+    explanation: "Training data fits parameters, validation data drives model and hyperparameter selection, and the test set is kept for the final unbiased estimate.",
+  },
+  {
+    id: "m1-16", module: 1, type: "mc", kind: "theory",
+    prompt: "A team tries 40 hyperparameter settings and keeps whichever one scores best on the TEST set. What is the main problem?",
+    options: [
+      "The test score is now optimistically biased, since the test set chose the model",
+      "The model will underfit, because the hyperparameters were tuned on too little data overall",
+      "Nothing is wrong; the test set exists to choose the best hyperparameters",
+      "Training will take longer, because the test set must be refit 40 times",
+    ],
+    answer: 0,
+    explanation: "Once the test set influences model selection it no longer measures performance on unseen data. Tuning belongs on the validation set or in cross-validation.",
+  },
+  {
+    id: "m1-17", module: 1, type: "mc", kind: "theory",
+    prompt: "Which of the following is a hyperparameter rather than a parameter learned from data?",
+    options: [
+      "The maximum depth allowed for a decision tree",
+      "The coefficient of each feature in a linear regression",
+      "The intercept of a linear regression",
+      "The threshold value chosen at each split of a decision tree",
+    ],
+    answer: 0,
+    explanation: "Hyperparameters are set before training. Coefficients, intercepts and split thresholds are all learned from the training data.",
+  },
+  {
+    id: "m1-18", module: 1, type: "mc", kind: "theory",
+    prompt: "Why do practitioners use cross-validation instead of a single validation split?",
+    options: [
+      "Averaging over several splits gives a more reliable, less split-dependent estimate",
+      "It removes the need for a separate held-out test set at the end of the project",
+      "It trains the final model faster because each fold is smaller",
+      "It guarantees that the final model will not overfit the training data",
+    ],
+    answer: 0,
+    explanation: "Cross-validation reduces the variance of the performance estimate. It costs more compute, guarantees nothing about overfitting, and a held-out test set is still good practice.",
+  },
+  {
+    id: "m1-19", module: 1, type: "mc", kind: "theory",
+    prompt: "Which library provides efficient multi-dimensional arrays and vectorised numerical operations, and is the base that most Python ML libraries are built on?",
+    options: ["NumPy", "Pandas", "Scikit-Learn", "Matplotlib"],
+    answer: 0,
+    explanation: "NumPy provides the ndarray and fast numerical computation. Pandas builds DataFrames on top of it, Scikit-Learn consumes NumPy arrays, and Matplotlib plots them.",
+  },
+  {
+    id: "m1-20", module: 1, type: "mc", kind: "theory",
+    prompt: "Which set contains ONLY regression metrics?",
+    options: [
+      "MSE, RMSE, MAE",
+      "MAE, F1 Score, RMSE",
+      "Accuracy, MSE, Recall",
+      "ROC-AUC, RMSE, MAE",
+    ],
+    answer: 0,
+    explanation: "MSE, RMSE and MAE measure numeric prediction errors. F1, Accuracy, Recall and ROC-AUC are classification metrics.",
+  },
+  {
+    id: "m1-21", module: 1, type: "mc", kind: "theory",
+    prompt: "In K-Nearest Neighbors, how does the value of k relate to model complexity?",
+    options: [
+      "Small k is very flexible and tends to overfit; large k is smoother but may underfit",
+      "Small k gives smoother predictions; large k follows individual training points more closely",
+      "k only affects training time; complexity is controlled by the distance metric",
+      "Larger k is always better because each prediction uses more of the data",
+    ],
+    answer: 0,
+    explanation: "With k=1 each prediction copies the single closest example, so the model is noisy and flexible. Averaging over many neighbours smooths the predictions but can wash out real local patterns.",
+  },
+  {
+    id: "m1-22", module: 1, type: "mc", kind: "theory",
+    prompt: "Why do experienced practitioners often spend more time on data preparation than on training models?",
+    options: [
+      "Because model quality is limited by data quality, so cleaning and transforming data has a large effect",
+      "Because Scikit-Learn training algorithms cannot run on raw numeric data without first converting it",
+      "Because data preparation replaces the need for a validation set",
+      "Because clean data always allows even a simple algorithm to reach 100% accuracy on the test set",
+    ],
+    answer: 0,
+    explanation: "Poor-quality data (missing values, noise, inconsistencies, measurement errors) limits any algorithm. Clean data is a stronger foundation, but it does not guarantee perfect accuracy.",
+  },
+  {
+    id: "m1-c1", module: 1, type: "mc", kind: "code",
+    prompt: "Why is the argument to predict() written with double brackets?",
+    code: `model = DecisionTreeClassifier()
+model.fit(X, y)
+prediction = model.predict([[5.1, 3.5, 1.4, 0.2]])`,
+    options: [
+      "predict() expects a 2-D input (n_samples, n_features): one sample, four features",
+      "The outer list holds the label and the inner list holds the features",
+      "Double brackets tell Scikit-Learn to return class probabilities instead of a label",
+      "The inner list is converted into four separate samples of one feature each",
+    ],
+    answer: 0,
+    explanation: "Scikit-Learn estimators always take a 2-D input: each row is a sample and each column is a feature. [[...]] is one row with 4 features.",
+  },
+  {
+    id: "m1-c2", module: 1, type: "mc", kind: "code",
+    prompt: "Running this code prints Dataset Shape: (150, 4). What does the shape mean?",
+    code: `from sklearn.datasets import load_iris
+iris = load_iris()
+print("Dataset Shape:", iris.data.shape)`,
+    options: [
+      "150 observations (flowers), each described by 4 features",
+      "150 observations and 4 target classes",
+      "150 features measured on 4 flowers",
+      "150 observations with 3 features plus 1 label column",
+    ],
+    answer: 0,
+    explanation: "iris.data holds only the feature matrix: 150 rows (samples) × 4 columns (sepal/petal length and width). Labels are stored separately in iris.target, and there are 3 classes.",
+  },
+  {
+    id: "m1-c3", module: 1, type: "mc", kind: "code",
+    prompt: "What does model.coef_[0] represent?",
+    code: `X = data[["GDP_per_capita"]]
+y = data["Life_satisfaction"]
+model = LinearRegression().fit(X, y)
+print(model.intercept_, model.coef_[0])`,
+    options: [
+      "The estimated change in life satisfaction for each one-unit increase in GDP per capita",
+      "The predicted life satisfaction for a country with a GDP per capita of zero",
+      "The correlation coefficient between GDP per capita and life satisfaction",
+      "The proportion of variance in life satisfaction explained by GDP (R²)",
+    ],
+    answer: 0,
+    explanation: "The coefficient is the slope. The intercept is the prediction when the feature is 0. Correlation and R² are different statistics.",
+  },
+  {
+    id: "m1-c4", module: 1, type: "mc", kind: "code",
+    prompt: "Assuming no two training points share the same X value, what will you most likely see printed for k = 1?",
+    code: `for k in [1, 3, 7, 15]:
+    knn = KNeighborsRegressor(n_neighbors=k).fit(X_train, y_train)
+    train_mse = mean_squared_error(y_train, knn.predict(X_train))
+    print(k, train_mse)`,
+    options: [
+      "A training MSE of 0, because each training point is its own nearest neighbour",
+      "The highest training MSE of the four values of k",
+      "An error, because k must be odd and greater than 1 for regression",
+      "The same training MSE as k = 15, because training error does not depend on k",
+    ],
+    answer: 0,
+    explanation: "Evaluated on its own training data, 1-NN returns each point's own target, so the training error is zero. That is a textbook example of why training error is misleading.",
+  },
+  {
+    id: "m1-c5", module: 1, type: "mc", kind: "code",
+    prompt: "Polynomial models of different degrees were evaluated on training data and held-out data. Which degree generalises best?",
+    code: `degree  train_MSE  test_MSE
+1       0.21       0.24
+2       0.15       0.18
+4       0.09       0.31
+10      0.00       4.87`,
+    options: [
+      "Degree 2: it has the lowest error on held-out data",
+      "Degree 10: it has the lowest training error",
+      "Degree 1: it has the smallest gap between training and test error",
+      "Degree 4: it balances training and test error",
+    ],
+    answer: 0,
+    explanation: "Generalisation is judged on unseen data. Degree 2 has the lowest test MSE. A small train-test gap alone is not enough, since degree 1 is simply worse on both. Degree 10 is clearly overfitting.",
+  },
+  {
+    id: "m1-o1", module: 1, type: "open", kind: "theory",
+    prompt: "State Tom Mitchell's definition of machine learning and illustrate T, E and P with an example of your own (not spam filtering).",
+    modelAnswer: "A program learns from experience E with respect to task T and performance measure P if its performance at T, measured by P, improves with E. Example: a house-price model. T = predicting the sale price of a house; E = a dataset of past sales with their features and prices; P = RMSE on unseen houses. As it sees more sales its RMSE should decrease.",
+    keyPoints: [
+      { text: "Identifies the task T", keywords: ["task"] },
+      { text: "Identifies experience E as the data the system learns from", keywords: ["experience", "data", "examples"] },
+      { text: "Identifies a performance measure P (a metric)", keywords: ["performance", "accuracy", "rmse", "metric", "error", "precision", "recall"] },
+      { text: "States that performance improves with experience", keywords: ["improve", "better", "increase"] },
+    ],
+  },
+  {
+    id: "m1-o2", module: 1, type: "open", kind: "theory",
+    prompt: "Explain the difference between overfitting and underfitting. How would you detect each one using training and validation error, and what is one remedy for each?",
+    modelAnswer: "Overfitting: the model learns the training data too closely, including its noise, so training error is low but validation error is much higher (a large gap). Remedies: regularization, a simpler model, feature selection, more data, cross-validation. Underfitting: the model is too simple to capture the pattern, so both training and validation errors are high and similar. Remedies: a more complex model, better features, less regularization.",
+    keyPoints: [
+      { text: "Overfitting = memorises training data/noise, poor on unseen data", keywords: ["noise", "memoriz", "memoris", "too closely", "unseen"] },
+      { text: "Underfitting = model too simple to capture patterns", keywords: ["too simple", "simple", "capture"] },
+      { text: "Detection: low train / high validation error vs both high", keywords: ["gap", "training error", "validation error", "both high", "train"] },
+      { text: "A valid remedy for overfitting (regularization, more data, simpler model…)", keywords: ["regulariz", "regularis", "more data", "simpler", "feature selection", "cross-validation"] },
+      { text: "A valid remedy for underfitting (more complex model, better features…)", keywords: ["more complex", "complex model", "more features", "better features", "less regular"] },
+    ],
+  },
+  {
+    id: "m1-o3", module: 1, type: "open", kind: "theory",
+    prompt: "Why are datasets usually split into training, validation and test sets? Describe the role of each and what goes wrong if the test set is used during development.",
+    modelAnswer: "Training set: fits the model's parameters. Validation set: compares models and tunes hyperparameters without touching the test data. Test set: used once at the end for an unbiased estimate of performance on unseen data. If the test set is used during development, information leaks into model selection and the final estimate becomes optimistic, so it no longer reflects real-world performance. A typical split is 70/15/15.",
+    keyPoints: [
+      { text: "Training set fits/learns the parameters", keywords: ["training", "fit", "learn"] },
+      { text: "Validation set tunes hyperparameters / selects models", keywords: ["hyperparameter", "select", "compare", "tune", "tuning"] },
+      { text: "Test set gives final unbiased estimate on unseen data", keywords: ["unbiased", "final", "unseen"] },
+      { text: "Using the test set during development causes an optimistic/biased estimate (leakage)", keywords: ["optimistic", "biased", "leak", "overestimate"] },
+    ],
+  },
+  {
+    id: "m1-o4", module: 1, type: "open", kind: "theory",
+    prompt: "Compare instance-based learning and model-based learning. Give an algorithm example for each and one advantage of each.",
+    modelAnswer: "Instance-based learning stores the training examples and predicts by measuring similarity (a distance metric) between a new observation and stored examples at query time, e.g., KNN. It learns locally and needs no explicit training phase. Model-based learning builds a mathematical model and stores learned parameters instead of the examples, e.g., linear regression or a decision tree. Predictions are fast, and the model captures general relationships.",
+    keyPoints: [
+      { text: "Instance-based stores examples and uses similarity/distance", keywords: ["similar", "distance", "store"] },
+      { text: "Instance-based example (KNN)", keywords: ["knn", "nearest neighbo", "k-nearest"] },
+      { text: "Model-based learns parameters / a generalised model", keywords: ["parameter", "mathematical", "generaliz", "generalis"] },
+      { text: "Model-based example (linear regression, decision tree…)", keywords: ["linear regression", "regression", "decision tree", "logistic"] },
+      { text: "Mentions an advantage/trade-off (fast predictions, no training, local learning…)", keywords: ["fast", "efficient", "query time", "local", "no training"] },
+    ],
+  },
+  {
+    id: "m1-o5", module: 1, type: "open", kind: "code",
+    prompt: "A classmate runs the code below and says: \"My model is 100% accurate!\" Explain why this number is misleading and how you would change the evaluation.",
+    code: `iris = load_iris()
+X, y = iris.data, iris.target
+model = DecisionTreeClassifier()
+model.fit(X, y)
+print("Accuracy:", model.score(X, y))   # 1.0`,
+    modelAnswer: "The model is evaluated on the same data it was trained on. An unconstrained decision tree can memorise the training set, so 100% training accuracy says nothing about generalisation and may hide overfitting. Instead, split the data with train_test_split (e.g., 80/20) and score on the held-out test set, or use cross_val_score with k folds for a more reliable estimate. Limiting max_depth could also reduce overfitting.",
+    keyPoints: [
+      { text: "Evaluated on the same data used for training", keywords: ["same data", "training data", "trained on", "same"] },
+      { text: "Mentions memorisation / overfitting / generalisation", keywords: ["overfit", "memoriz", "memoris", "generaliz", "generalis"] },
+      { text: "Proposes a held-out test set (train_test_split)", keywords: ["train_test_split", "test set", "split", "held-out", "holdout"] },
+      { text: "Mentions cross-validation or limiting tree complexity", keywords: ["cross", "cv", "max_depth", "depth"] },
+    ],
+  },
+  {
+    id: "m1-o6", module: 1, type: "open", kind: "theory",
+    prompt: "Explain what generalization means in machine learning and why it, rather than training accuracy, is the real objective.",
+    modelAnswer: "Generalization is a model's ability to perform well on new, unseen data drawn from the same problem. The goal of ML is to learn underlying patterns, not to memorise the training examples. Training accuracy can be made arbitrarily high by memorising, including noise, which leads to overfitting, so the practical value of a model depends on its performance on new data. That is why we evaluate on validation/test sets or with cross-validation.",
+    keyPoints: [
+      { text: "Defines generalization as performance on new/unseen data", keywords: ["unseen", "new data", "new observ"] },
+      { text: "Contrasts learning patterns with memorising", keywords: ["memoriz", "memoris", "pattern"] },
+      { text: "Links high training accuracy to overfitting", keywords: ["overfit"] },
+      { text: "Mentions evaluating on validation/test data or CV", keywords: ["test", "validation", "cross"] },
+    ],
+  },
+
+  // ───────────────────────── Module 2: End-to-End ML Workflow ─────────────────────────
+  {
+    id: "m2-01", module: 2, type: "mc", kind: "theory",
+    prompt: "Which sequence best reflects the end-to-end machine learning workflow described in Module 2?",
+    options: [
+      "Frame the problem → explore the data → prepare the data → train and evaluate → fine-tune → deploy and monitor",
+      "Explore the data → frame the problem → train a model → prepare the data → fine-tune → deploy",
+      "Frame the problem → prepare the data → explore the data → fine-tune → train → deploy",
+      "Frame the problem → explore → train → evaluate on the test set → tune on the test set → deploy",
+    ],
+    answer: 0,
+    explanation: "You define objectives first, then understand the data (EDA), prepare it, train/evaluate, optimise hyperparameters, and finally deploy and monitor. Tuning on the test set is never part of the workflow.",
+  },
+  {
+    id: "m2-02", module: 2, type: "mc", kind: "theory",
+    prompt: "An email provider finds that sending a legitimate customer email to the spam folder is very costly. Which metric should they prioritise for the spam class?",
+    options: ["Precision", "Recall", "Accuracy", "False negative rate"],
+    answer: 0,
+    explanation: "Legitimate email flagged as spam is a false positive. Precision = TP/(TP+FP) drops when false positives rise, so it is the metric to prioritise when false positives are costly.",
+  },
+  {
+    id: "m2-03", module: 2, type: "mc", kind: "theory",
+    prompt: "In a dataset where 98% of cases are negative, a model that always predicts \"negative\" achieves 98% accuracy. What does this show?",
+    options: [
+      "Accuracy misleads on imbalanced data: this model's recall for positives is 0",
+      "The model is excellent, because 98% exceeds the usual 90% target",
+      "The model's precision on the positive class must also be 98%, matching its accuracy",
+      "The model is overfitting, because accuracy is close to 100%",
+    ],
+    answer: 0,
+    explanation: "The model never finds a positive (recall = 0). Its precision for the positive class is undefined, since it makes no positive predictions. This is the module's warning about accuracy on imbalanced data.",
+  },
+  {
+    id: "m2-04", module: 2, type: "mc", kind: "theory",
+    prompt: "Which statement about RMSE and MAE is correct?",
+    options: [
+      "RMSE penalises large errors more, because errors are squared before averaging",
+      "MAE is always greater than or equal to RMSE when computed on the same predictions",
+      "RMSE is expressed in the squared units of the target variable",
+      "MAE is more sensitive to outliers than RMSE",
+    ],
+    answer: 0,
+    explanation: "Squaring amplifies large errors. RMSE ≥ MAE always holds, not the reverse. RMSE is in the target's units (MSE is squared), and MAE is the less outlier-sensitive of the two.",
+  },
+  {
+    id: "m2-05", module: 2, type: "mc", kind: "theory",
+    prompt: "A house-price model has MAE = 0.5 and RMSE = 1.4 (in $100k). What is the most reasonable interpretation?",
+    options: [
+      "Most errors are moderate, but a few large errors (outliers) inflate the RMSE",
+      "A typical prediction is off by about $140k",
+      "The model is underfitting, because RMSE is larger than MAE",
+      "There must be a calculation error, because RMSE cannot be almost three times MAE",
+    ],
+    answer: 0,
+    explanation: "RMSE is always ≥ MAE. A large gap between them means the errors vary a lot, usually because of a few big misses. MAE is the better description of a typical error.",
+  },
+  {
+    id: "m2-06", module: 2, type: "mc", kind: "theory",
+    prompt: "A news site wants to group thousands of articles by topic, but no articles have topic labels. Which type of problem is this?",
+    options: ["Clustering", "Multiclass classification", "Multilabel classification", "Regression"],
+    answer: 0,
+    explanation: "Without predefined labels, grouping similar observations is clustering. Multiclass classification would need labelled topics to learn from.",
+  },
+  {
+    id: "m2-07", module: 2, type: "mc", kind: "theory",
+    prompt: "A survey records customer satisfaction as \"low\", \"medium\" or \"high\". What data type is this?",
+    options: ["Ordinal", "Nominal categorical", "Continuous numerical", "Text"],
+    answer: 0,
+    explanation: "The categories have a natural order but no meaningful numeric distance, so the data is ordinal. Colour or country would be nominal.",
+  },
+  {
+    id: "m2-08", module: 2, type: "mc", kind: "theory",
+    prompt: "A feature \"country\" takes the values Spain, Mexico and Japan. Which encoding is generally most appropriate for a linear model, and why?",
+    options: [
+      "One-hot encoding, because label encoding would impose a false order and distance between countries",
+      "Label encoding, because it keeps the number of columns low and has no side effects",
+      "Standardization, because it gives the category mean 0 and standard deviation 1",
+      "Min-max normalization, because it maps each country to a value between 0 and 1",
+    ],
+    answer: 0,
+    explanation: "Nominal variables have no order. Label encoding (Spain=0, Mexico=1, Japan=2) would tell a linear model that Japan is 'twice' Mexico. Scaling only applies to values that are already numeric.",
+  },
+  {
+    id: "m2-09", module: 2, type: "mc", kind: "theory",
+    prompt: "When is label (ordinal) encoding an appropriate choice for a categorical feature?",
+    options: [
+      "When the categories have a natural order, such as education level",
+      "When the feature is nominal with many unique values, such as product ID",
+      "Always, because learning algorithms can learn to ignore an artificial order",
+      "Only when the categorical variable is the target of a regression problem",
+    ],
+    answer: 0,
+    explanation: "Assigning increasing integers makes sense only when the order is meaningful. For nominal variables, the course recommends one-hot encoding.",
+  },
+  {
+    id: "m2-10", module: 2, type: "mc", kind: "theory",
+    prompt: "Which statement correctly distinguishes normalization from standardization?",
+    options: [
+      "Normalization rescales values to a fixed range (typically 0–1); standardization gives mean 0 and standard deviation 1",
+      "Normalization gives mean 0 and standard deviation 1; standardization rescales values to the range 0–1",
+      "Both techniques guarantee that every value ends up between 0 and 1",
+      "Standardization removes outliers, while normalization keeps them",
+    ],
+    answer: 0,
+    explanation: "Min-max normalization maps values to [0, 1]. Standardization subtracts the mean and divides by the standard deviation, so the values are not bounded. Neither removes outliers.",
+  },
+  {
+    id: "m2-11", module: 2, type: "mc", kind: "theory",
+    prompt: "In which scenario is feature scaling MOST important?",
+    options: [
+      "KNN using Euclidean distance on 'age' (0–100) and 'income' (0–200,000)",
+      "A decision tree trained on the same 'age' and 'income' features",
+      "A model with a single numerical input feature",
+      "A dataset whose features are all one-hot encoded (0/1)",
+    ],
+    answer: 0,
+    explanation: "Distance-based methods are dominated by large-scale features: income would swamp age. Trees split on one feature at a time and are insensitive to scale, and 0/1 features already share a scale.",
+  },
+  {
+    id: "m2-12", module: 2, type: "mc", kind: "theory",
+    prompt: "Two features have a correlation coefficient of −0.92. What does this indicate?",
+    options: [
+      "A strong negative linear relationship; the features may be redundant",
+      "A weak relationship, because the coefficient is negative",
+      "That increasing the first feature causes the second one to decrease",
+      "That the two features are statistically independent",
+    ],
+    answer: 0,
+    explanation: "Values near ±1 mean a strong linear relationship. The sign gives the direction, not the strength. Correlation does not imply causation.",
+  },
+  {
+    id: "m2-13", module: 2, type: "mc", kind: "theory",
+    prompt: "Which visualization gives the most compact summary of a distribution (median, quartiles) while explicitly highlighting extreme observations?",
+    options: ["Box plot", "Histogram", "Scatter plot", "Correlation heatmap"],
+    answer: 0,
+    explanation: "A box plot shows the median, the quartiles and individual outlier points. Histograms show the shape of a distribution in more detail but less compactly. Scatter plots and heatmaps show relationships between variables.",
+  },
+  {
+    id: "m2-14", module: 2, type: "mc", kind: "theory",
+    prompt: "During EDA you find a customer whose age is 190. What is the BEST first step?",
+    options: [
+      "Check whether it is a data-entry error or a valid rare case before acting",
+      "Delete the row immediately, because no living person can realistically be 190",
+      "Replace it automatically with the column mean",
+      "Leave it unchanged, because ML models are robust to outliers",
+    ],
+    answer: 0,
+    explanation: "Outliers should be investigated first. It may be a typo (e.g., 19 or 90) that can be fixed. Automatic deletion or imputation can throw away information, and many models are sensitive to outliers.",
+  },
+  {
+    id: "m2-15", module: 2, type: "mc", kind: "theory",
+    prompt: "Why might median imputation be preferred over mean imputation for an 'income' column with some extremely high values?",
+    options: [
+      "The median is far less affected by skew and outliers than the mean",
+      "Median imputation always produces higher model accuracy",
+      "The mean cannot be computed when a column contains missing values",
+      "Median imputation preserves the original variance of the feature",
+    ],
+    answer: 0,
+    explanation: "A few huge incomes pull the mean upwards, while the median stays representative. Any single-value imputation shrinks variance, and the mean can be computed by ignoring missing values.",
+  },
+  {
+    id: "m2-16", module: 2, type: "mc", kind: "theory",
+    prompt: "Why should a scaler (or imputer) be fitted on the training set only?",
+    options: [
+      "Fitting on all data leaks test-set statistics into training, making evaluation optimistic",
+      "Scikit-Learn raises a ValueError if a transformer is fitted on data it has not seen in training",
+      "The training set is larger, so its mean and standard deviation are always more accurate",
+      "A transformer can only be fitted once during a session",
+    ],
+    answer: 0,
+    explanation: "This is data leakage. The test set must simulate unseen data, so its mean or standard deviation must not influence preprocessing. Scikit-Learn will not stop you from doing it.",
+  },
+  {
+    id: "m2-17", module: 2, type: "mc", kind: "theory",
+    prompt: "Which of the following is NOT a benefit of transformation pipelines?",
+    options: [
+      "They guarantee that the optimal hyperparameters are found",
+      "They apply the same preprocessing steps every time (reproducibility)",
+      "They help prevent data leakage by fitting transformations on training data only",
+      "They reduce manual effort by automating multi-step preprocessing",
+    ],
+    answer: 0,
+    explanation: "Pipelines organise preprocessing and modelling. Hyperparameter search is a separate step (Grid/Randomized Search), although a pipeline can be passed to it.",
+  },
+  {
+    id: "m2-18", module: 2, type: "mc", kind: "theory",
+    prompt: "Creating rooms_per_household = total_rooms / households in a housing dataset is an example of:",
+    options: ["Feature creation", "Feature selection", "Feature scaling", "One-hot encoding"],
+    answer: 0,
+    explanation: "Deriving a new variable from existing ones is feature creation (feature engineering). Selection removes features, and scaling changes their range.",
+  },
+  {
+    id: "m2-19", module: 2, type: "mc", kind: "theory",
+    prompt: "What is the main benefit of removing irrelevant or redundant features (feature selection)?",
+    options: [
+      "Lower complexity and less risk of overfitting, often with faster training",
+      "More training samples become available to estimate each remaining feature",
+      "More accurate labels in the training data",
+      "Guaranteed higher accuracy on the training set, since noise is removed",
+    ],
+    answer: 0,
+    explanation: "Fewer, more informative features reduce complexity, speed up training, improve interpretability and lower the risk of overfitting. Training accuracy usually stays the same or drops slightly.",
+  },
+  {
+    id: "m2-20", module: 2, type: "mc", kind: "theory",
+    prompt: "Which is a reasonable baseline model for a REGRESSION problem?",
+    options: [
+      "Predict the mean of the training target for every observation",
+      "Predict the majority value of the target for every observation",
+      "A tuned random forest with 500 trees",
+      "A model fitted on the test set to give an upper bound",
+    ],
+    answer: 0,
+    explanation: "A baseline is a deliberately simple reference point. For regression it is the mean (DummyRegressor). Predicting the majority class is the classification baseline.",
+  },
+  {
+    id: "m2-21", module: 2, type: "mc", kind: "theory",
+    prompt: "You must tune 6 hyperparameters, each with about 10 candidate values, on a limited compute budget. Which approach is most sensible?",
+    options: [
+      "Randomized Search with a fixed number of sampled combinations",
+      "Grid Search, because it reliably evaluates all 10⁶ combinations quickly",
+      "Grid Search, because Randomized Search can only tune continuous hyperparameters",
+      "Tune manually, checking each setting on the test set",
+    ],
+    answer: 0,
+    explanation: "Grid Search grows exponentially with the number of hyperparameters. Randomized Search explores large spaces with a fixed budget and works with discrete values too. Never tune on the test set.",
+  },
+  {
+    id: "m2-22", module: 2, type: "mc", kind: "theory",
+    prompt: "In 5-fold cross-validation, how many times is each observation used for validation?",
+    options: ["Exactly once", "Five times", "Four times", "It depends on the random shuffle"],
+    answer: 0,
+    explanation: "Each fold is the validation set exactly once. Each observation is used for training in the other 4 iterations.",
+  },
+  {
+    id: "m2-23", module: 2, type: "mc", kind: "theory",
+    prompt: "During problem framing, which activity comes FIRST?",
+    options: [
+      "Understanding the business objective, the stakeholders and the constraints",
+      "Choosing the learning algorithm that performs best on similar problems",
+      "Running Grid Search to find promising hyperparameters",
+      "Computing a correlation heatmap to identify useful features",
+    ],
+    answer: 0,
+    explanation: "Many projects fail because they solve the wrong problem. The objectives, stakeholders and constraints decide the problem type and the success metric.",
+  },
+  {
+    id: "m2-c1", module: 2, type: "mc", kind: "code",
+    prompt: "How many model fits does GridSearchCV perform during the search (excluding the final refit on the full training set)?",
+    code: `param_grid = {
+    "n_estimators": [50, 100],
+    "max_depth": [5, 10, None]
+}
+grid_search = GridSearchCV(RandomForestRegressor(random_state=42),
+                           param_grid, cv=3,
+                           scoring="neg_root_mean_squared_error")
+grid_search.fit(X_train, y_train)`,
+    options: ["18", "6", "5", "15"],
+    answer: 0,
+    explanation: "2 × 3 = 6 combinations, each evaluated with 3-fold CV, gives 6 × 3 = 18 fits. None is a valid max_depth value (no limit) and counts as a candidate.",
+  },
+  {
+    id: "m2-c2", module: 2, type: "mc", kind: "code",
+    prompt: "Why does the code print -scores instead of scores?",
+    code: `scores = cross_val_score(model, X_train_scaled, y_train,
+                         scoring="neg_root_mean_squared_error", cv=5)
+print(-scores)`,
+    options: [
+      "Scorers treat higher as better, so errors come back negative; negating gives RMSE",
+      "The minus sign converts the RMSE values back into MSE values for each fold",
+      "The model's predictions are negative, so the errors must be flipped",
+      "It reverses the order of the folds so they are printed from first to last",
+    ],
+    answer: 0,
+    explanation: "cross_val_score maximises the score, so RMSE is returned as its negative. Negating the array gives the positive RMSE for each fold.",
+  },
+  {
+    id: "m2-c3", module: 2, type: "mc", kind: "code",
+    prompt: "What is the main problem with this code?",
+    code: `scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)        # X = the full dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X_scaled, y, test_size=0.2, random_state=42)`,
+    options: [
+      "Data leakage: the scaler's statistics were computed on the test rows too",
+      "StandardScaler must be applied after the model has been trained",
+      "test_size=0.2 is too small to give a reliable evaluation",
+      "random_state must be omitted when the data has been scaled",
+    ],
+    answer: 0,
+    explanation: "Split first, then fit the scaler on X_train only (or put it in a Pipeline). Otherwise test-set statistics leak into training.",
+  },
+  {
+    id: "m2-c4", module: 2, type: "mc", kind: "code",
+    prompt: "What is wrong with the second line?",
+    code: `X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled  = scaler.fit_transform(X_test)`,
+    options: [
+      "The scaler is re-fitted on the test set; it should be scaler.transform(X_test)",
+      "Nothing; each set should be standardized with its own mean and standard deviation",
+      "The test set should not be scaled at all, only the training set",
+      "fit_transform should be replaced with fit, because the test set does not need transforming",
+    ],
+    answer: 0,
+    explanation: "The test data must go through the same transformation learned from the training data. Re-fitting uses test statistics (leakage) and puts the two sets on inconsistent scales.",
+  },
+  {
+    id: "m2-c5", module: 2, type: "mc", kind: "code",
+    prompt: "What happens when pipeline.predict(X_test) is called?",
+    code: `pipeline = Pipeline([
+    ("scaler", StandardScaler()),
+    ("model", LinearRegression())
+])
+pipeline.fit(X_train, y_train)
+y_pred = pipeline.predict(X_test)`,
+    options: [
+      "X_test is scaled with the statistics learned from X_train, then passed to the model",
+      "The scaler is re-fitted on X_test, then the trained model makes predictions",
+      "Only the model step runs, because the scaling step is applied only during fit()",
+      "The pipeline re-trains the linear model on X_test before predicting",
+    ],
+    answer: 0,
+    explanation: "During predict, a Pipeline calls transform (not fit) on each preprocessing step and then predict on the final estimator. That is how it prevents leakage.",
+  },
+  {
+    id: "m2-c6", module: 2, type: "mc", kind: "code",
+    prompt: "How much work does this RandomizedSearchCV do?",
+    code: `param_dist = {
+    "n_estimators": randint(50, 200),
+    "max_depth": randint(3, 20)
+}
+search = RandomizedSearchCV(RandomForestRegressor(random_state=42),
+                            param_dist, n_iter=20, cv=3,
+                            random_state=42)`,
+    options: [
+      "20 sampled combinations, each evaluated with 3-fold CV (60 fits)",
+      "Every one of the 150 × 17 combinations, visited in random order",
+      "20 fits in total, split across the 3 folds",
+      "60 sampled combinations, because n_iter is multiplied by cv",
+    ],
+    answer: 0,
+    explanation: "n_iter is the number of hyperparameter combinations sampled. Each one is cross-validated with cv folds: 20 × 3 = 60 fits.",
+  },
+  {
+    id: "m2-c7", module: 2, type: "mc", kind: "code",
+    prompt: "This pipeline is passed to GridSearchCV. Which param_grid key correctly targets the forest's number of trees?",
+    code: `forest_pipeline = Pipeline([
+    ("prep", preprocessor),
+    ("model", RandomForestRegressor())
+])`,
+    options: [
+      "\"model__n_estimators\"",
+      "\"model.n_estimators\"",
+      "\"n_estimators\"",
+      "\"model_n_estimators\"",
+    ],
+    answer: 0,
+    explanation: "Pipeline parameters use the step name, a double underscore, then the parameter name: <step>__<param>.",
+  },
+  {
+    id: "m2-c8", module: 2, type: "mc", kind: "code",
+    prompt: "In the lab, RMSE is computed as shown. What is the main limitation of the reported number?",
+    code: `predictions = model.predict(X_train_scaled)
+rmse = mean_squared_error(y_train, predictions) ** 0.5
+mae  = mean_absolute_error(y_train, predictions)`,
+    options: [
+      "It is training error, so it is optimistic and does not measure generalisation",
+      "Raising to the power 0.5 computes the MAE rather than the RMSE",
+      "RMSE and MAE cannot be computed when the features have been standardized",
+      "mean_squared_error expects the predictions as its first argument",
+    ],
+    answer: 0,
+    explanation: "Predicting on the data the model was trained on measures fit, not generalisation. Use cross-validation or the held-out test set. Argument order (y_true, y_pred) does not affect MSE.",
+  },
+  {
+    id: "m2-o1", module: 2, type: "open", kind: "theory",
+    prompt: "What is data leakage? Give an example of how it can happen during preprocessing and explain how Scikit-Learn pipelines help prevent it.",
+    modelAnswer: "Data leakage is when information that would not be available at prediction time (typically from the test/validation data) influences training, making evaluation results optimistically biased. Example: fitting a StandardScaler or imputer on the full dataset before splitting, so test-set means and standard deviations affect the training data. A Pipeline bundles preprocessing and the model so that fit() learns transformations from the training data only, and predict()/transform() reuse those statistics. Used inside cross-validation, the transformers are re-fitted on each training fold.",
+    keyPoints: [
+      { text: "Defines leakage: test/unseen information influences training", keywords: ["test", "unseen", "information", "leak"] },
+      { text: "Notes the consequence: optimistic / unreliable evaluation", keywords: ["optimistic", "overestimat", "biased", "unrealistic", "inflated"] },
+      { text: "Gives an example (scaling/imputing before splitting)", keywords: ["scaler", "scaling", "imput", "before split", "full dataset", "entire dataset"] },
+      { text: "Pipelines fit transformations on training data only", keywords: ["training data only", "only on training", "fit on train", "training set", "train"] },
+      { text: "Pipelines apply the same steps consistently (incl. within CV folds)", keywords: ["consistent", "same steps", "fold", "cross"] },
+    ],
+  },
+  {
+    id: "m2-o2", module: 2, type: "open", kind: "theory",
+    prompt: "Compare Grid Search and Randomized Search. How does each work, and when would you prefer one over the other?",
+    modelAnswer: "Grid Search evaluates every combination of a predefined set of hyperparameter values, usually with cross-validation, and selects the best. It is exhaustive, simple and reproducible, but its cost grows exponentially with the number of hyperparameters. Randomized Search samples a fixed number (n_iter) of combinations from given lists or distributions. It does not test everything, but it explores large spaces efficiently and often finds near-optimal results at a fraction of the cost. Prefer Grid Search for small search spaces and Randomized Search for many hyperparameters, continuous ranges or limited compute.",
+    keyPoints: [
+      { text: "Grid Search tries every combination", keywords: ["every", "all combinations", "exhaustive", "each combination"] },
+      { text: "Randomized Search samples a fixed number of combinations", keywords: ["random", "sample", "n_iter", "subset"] },
+      { text: "Both typically use cross-validation", keywords: ["cross", "cv"] },
+      { text: "Grid Search becomes expensive as the search space grows", keywords: ["expensive", "costly", "exponential", "computational"] },
+      { text: "Correct guidance: Grid for small spaces, Randomized for large spaces", keywords: ["small", "large", "many hyperparameter", "budget"] },
+    ],
+  },
+  {
+    id: "m2-o3", module: 2, type: "open", kind: "theory",
+    prompt: "Compare RMSE and MAE. What does it tell you when a model's RMSE is much larger than its MAE?",
+    modelAnswer: "Both measure the average size of regression errors in the target's units. MAE averages the absolute errors, so every unit of error counts equally; it is easy to interpret and less sensitive to outliers. RMSE squares the errors before averaging and then takes the square root, so large errors are penalised more heavily. RMSE ≥ MAE always holds. If RMSE is much larger than MAE, the errors vary a lot: a few large errors (outliers or poorly predicted cases) dominate.",
+    keyPoints: [
+      { text: "MAE = mean of absolute errors", keywords: ["absolute"] },
+      { text: "RMSE squares errors, penalising large errors more", keywords: ["squar", "large error", "penaliz", "penalis"] },
+      { text: "MAE is less sensitive to outliers", keywords: ["outlier", "robust", "less sensitive"] },
+      { text: "Large RMSE-MAE gap means a few large errors / high error variance", keywords: ["few large", "large errors", "outliers", "variance", "some large"] },
+    ],
+  },
+  {
+    id: "m2-o4", module: 2, type: "open", kind: "theory",
+    prompt: "Explain the difference between label encoding and one-hot encoding. For each, give an example of a feature where it is appropriate.",
+    modelAnswer: "Label encoding maps each category to an integer (e.g., low=0, medium=1, high=2). It is appropriate for ordinal features with a natural order, such as education level or T-shirt size. One-hot encoding creates a separate binary (0/1) column for each category. It is appropriate for nominal features with no order, such as colour, country or product type, because integer codes would make the model assume an order and distance between categories that does not exist.",
+    keyPoints: [
+      { text: "Label encoding assigns an integer per category", keywords: ["integer", "number", "numeric value"] },
+      { text: "Label encoding suits ordered (ordinal) categories, with an example", keywords: ["order", "ordinal", "education", "size", "low"] },
+      { text: "One-hot creates one binary column per category", keywords: ["binary", "column", "dummy", "0/1", "0 and 1"] },
+      { text: "One-hot suits nominal categories, with an example", keywords: ["nominal", "colour", "color", "country", "product"] },
+      { text: "Explains the risk of a false order with label encoding on nominal data", keywords: ["false order", "imply", "assume", "artificial", "distance"] },
+    ],
+  },
+  {
+    id: "m2-o5", module: 2, type: "open", kind: "code",
+    prompt: "Identify the problem in this code and rewrite it correctly (you may describe the fix or write code).",
+    code: `scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2)
+model = LinearRegression().fit(X_train, y_train)
+print(model.score(X_test, y_test))`,
+    modelAnswer: "The scaler is fitted on the full dataset before splitting, so test-set statistics leak into training (data leakage) and the test score is optimistic. Fix: split first, then fit on the training data only:\n\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\npipe = Pipeline([(\"scaler\", StandardScaler()), (\"model\", LinearRegression())])\npipe.fit(X_train, y_train)\nprint(pipe.score(X_test, y_test))\n\n(or scaler.fit_transform(X_train) and scaler.transform(X_test)). Adding random_state makes the split reproducible.",
+    keyPoints: [
+      { text: "Identifies data leakage (scaler fitted on full data)", keywords: ["leak", "full data", "entire", "whole data", "before split"] },
+      { text: "Split before fitting the scaler", keywords: ["split first", "split before", "before scaling", "train_test_split(x"] },
+      { text: "Fit on training only, transform() on test", keywords: ["transform(x_test", ".transform(", "fit_transform(x_train", "training only"] },
+      { text: "Uses a Pipeline (or mentions it)", keywords: ["pipeline"] },
+    ],
+  },
+  {
+    id: "m2-o6", module: 2, type: "open", kind: "theory",
+    prompt: "Why should you build a baseline model before trying complex models? Give a baseline for regression and one for classification.",
+    modelAnswer: "A baseline is a deliberately simple model that gives a reference point. It shows whether a complex model actually adds value, helps catch bugs (a model that cannot beat the baseline is broken or has no signal), and puts metrics in context, for example 95% accuracy is unimpressive if the majority class is 95%. Regression baseline: always predict the mean (or median) of the training target (DummyRegressor). Classification baseline: always predict the majority class (DummyClassifier).",
+    keyPoints: [
+      { text: "Baseline = simple reference point to measure improvement", keywords: ["reference", "benchmark", "compare", "improvement"] },
+      { text: "Regression baseline: predict the mean/median", keywords: ["mean", "average", "median"] },
+      { text: "Classification baseline: predict the majority class", keywords: ["majority", "most frequent"] },
+      { text: "Mentions context/sanity check (e.g., imbalanced accuracy)", keywords: ["imbalanc", "sanity", "bug", "context", "value"] },
+    ],
+  },
+
+  // ───────────────────────── Module 3: Classification ─────────────────────────
+  {
+    id: "m3-01", module: 3, type: "mc", kind: "theory",
+    prompt: "In a cancer-screening tool, missing a malignant case is far more costly than a false alarm (which only leads to a follow-up test). Which metric should be prioritised?",
+    options: ["Recall", "Precision", "Specificity", "Accuracy"],
+    answer: 0,
+    explanation: "Recall = TP/(TP+FN) measures how many actual positives are caught. Missed cancers are false negatives, so recall is the priority. Specificity focuses on negatives.",
+  },
+  {
+    id: "m3-02", module: 3, type: "mc", kind: "theory",
+    prompt: "Which formula defines specificity?",
+    options: ["TN / (TN + FP)", "TP / (TP + FN)", "TP / (TP + FP)", "TN / (TN + FN)"],
+    answer: 0,
+    explanation: "Specificity is the proportion of actual negatives correctly identified. TP/(TP+FN) is recall and TP/(TP+FP) is precision. TN/(TN+FN) is the negative predictive value.",
+  },
+  {
+    id: "m3-03", module: 3, type: "mc", kind: "theory",
+    prompt: "The false positive rate (FPR) plotted on the x-axis of a ROC curve equals:",
+    options: [
+      "FP / (FP + TN), which is 1 − specificity",
+      "FP / (FP + TP), which is 1 − precision",
+      "FN / (FN + TP), which is 1 − recall",
+      "FP / (TP + TN + FP + FN)",
+    ],
+    answer: 0,
+    explanation: "FPR is the share of actual negatives wrongly flagged as positive. FP/(FP+TP) is the false discovery rate, and FN/(FN+TP) is the false negative rate.",
+  },
+  {
+    id: "m3-04", module: 3, type: "mc", kind: "theory",
+    prompt: "A classifier outputs a score and uses a decision threshold. What typically happens when the threshold is RAISED?",
+    options: [
+      "Precision tends to increase and recall decreases",
+      "Precision and recall both increase",
+      "Precision decreases and recall increases",
+      "Precision and recall stay the same; only accuracy changes",
+    ],
+    answer: 0,
+    explanation: "A higher threshold means fewer, more confident positive predictions: fewer false positives (precision ↑) but more missed positives (recall ↓). This is the precision–recall trade-off.",
+  },
+  {
+    id: "m3-05", module: 3, type: "mc", kind: "theory",
+    prompt: "What does a ROC curve plot?",
+    options: [
+      "True positive rate against false positive rate, across all thresholds",
+      "Precision against recall, across all thresholds",
+      "Accuracy against the decision threshold",
+      "True positive rate against specificity, at the default threshold",
+    ],
+    answer: 0,
+    explanation: "ROC = TPR (y-axis) vs FPR (x-axis) over every possible threshold. Precision vs recall is the PR curve.",
+  },
+  {
+    id: "m3-06", module: 3, type: "mc", kind: "theory",
+    prompt: "A classifier has an AUC of 0.50. What does this mean?",
+    options: [
+      "It discriminates between the classes no better than random guessing",
+      "Half of its predictions are correct",
+      "It is a perfect classifier when the classes are balanced",
+      "Its precision and recall are both 0.50",
+    ],
+    answer: 0,
+    explanation: "AUC is the probability that a random positive is ranked above a random negative. 0.5 matches the diagonal (random) ROC line. It is not the same as 50% accuracy.",
+  },
+  {
+    id: "m3-07", module: 3, type: "mc", kind: "theory",
+    prompt: "Model A has AUC = 0.92 and Model B has AUC = 0.78. Which conclusion is justified?",
+    options: [
+      "Model A separates the two classes better across thresholds overall",
+      "Model A's accuracy is 92%",
+      "Model A has higher precision than Model B at every threshold",
+      "Model B is better, because a lower AUC means fewer false positives",
+    ],
+    answer: 0,
+    explanation: "AUC summarises ranking and discrimination over all thresholds. It is not accuracy, and it does not guarantee that A beats B at every single operating point.",
+  },
+  {
+    id: "m3-08", module: 3, type: "mc", kind: "theory",
+    prompt: "In credit-card fraud detection, only 0.1% of transactions are fraudulent, and detecting them is what matters. Which evaluation curve is generally more informative?",
+    options: [
+      "The precision–recall curve",
+      "The ROC curve",
+      "An accuracy-vs-threshold curve",
+      "A training-loss curve",
+    ],
+    answer: 0,
+    explanation: "With a rare positive class, the ROC curve can look optimistic because the huge number of true negatives keeps the FPR low. The PR curve focuses on performance on the positive class.",
+  },
+  {
+    id: "m3-09", module: 3, type: "mc", kind: "theory",
+    prompt: "The F1 score is the harmonic mean of precision and recall. Why is the harmonic mean used instead of the arithmetic mean?",
+    options: [
+      "It is pulled towards the lower value, so both must be high for a high F1",
+      "It is simpler to compute than the arithmetic mean",
+      "It gives more weight to whichever of the two values is larger",
+      "It makes F1 equal to accuracy whenever the two classes are perfectly balanced",
+    ],
+    answer: 0,
+    explanation: "The harmonic mean punishes imbalance. With precision 1.0 and recall 0.1, the arithmetic mean is 0.55 but F1 is about 0.18.",
+  },
+  {
+    id: "m3-10", module: 3, type: "mc", kind: "theory",
+    prompt: "A classifier has precision = 0.5 and recall = 1.0. What is its F1 score?",
+    options: ["≈ 0.67", "0.75", "0.50", "1.00"],
+    answer: 0,
+    explanation: "F1 = 2PR/(P+R) = 2(0.5)(1.0)/1.5 ≈ 0.667. 0.75 is the arithmetic mean, which is a common mistake.",
+  },
+  {
+    id: "m3-11", module: 3, type: "mc", kind: "theory",
+    prompt: "Why is stratified k-fold cross-validation preferred for imbalanced classification problems?",
+    options: [
+      "Each fold keeps approximately the same class proportions as the full dataset",
+      "Each fold is rebalanced to contain an equal 50/50 split of the classes",
+      "The minority class is held out of the validation folds to reduce noise",
+      "The minority class is oversampled within each training fold",
+    ],
+    answer: 0,
+    explanation: "Stratification preserves the original class ratio in every fold, so no fold ends up with too few positives. It does not rebalance or resample the data.",
+  },
+  {
+    id: "m3-12", module: 3, type: "mc", kind: "theory",
+    prompt: "In 10-fold cross-validation, what fraction of the data is each model trained on?",
+    options: ["90%", "10%", "100%", "50%"],
+    answer: 0,
+    explanation: "In each iteration 1 fold (10%) is used for validation and the other 9 folds (90%) for training.",
+  },
+  {
+    id: "m3-13", module: 3, type: "mc", kind: "theory",
+    prompt: "A binary-only algorithm is extended to a 10-class problem with the One-vs-One (OvO) strategy. How many binary classifiers are trained?",
+    options: ["45", "10", "90", "9"],
+    answer: 0,
+    explanation: "OvO trains one classifier for every pair of classes: 10 × 9 / 2 = 45. One-vs-Rest would train 10.",
+  },
+  {
+    id: "m3-14", module: 3, type: "mc", kind: "theory",
+    prompt: "How does the One-vs-Rest (OvR) strategy make a multiclass prediction?",
+    options: [
+      "One binary classifier per class (that class vs the rest); the highest score wins",
+      "It trains one classifier for every pair of classes and predicts the class that wins the most duels",
+      "It trains a single classifier with one output per class and picks a class at random among ties",
+      "It trains a binary classifier for the most frequent class and treats every other class as noise",
+    ],
+    answer: 0,
+    explanation: "OvR = one classifier per class, and the most confident one wins. Pairwise classifiers with voting describes OvO.",
+  },
+  {
+    id: "m3-15", module: 3, type: "mc", kind: "theory",
+    prompt: "A photo can contain a dog, a bicycle and a person at the same time, and the model must tag all of them. What type of task is this?",
+    options: ["Multilabel classification", "Multiclass classification", "Binary classification", "Clustering"],
+    answer: 0,
+    explanation: "Multilabel means an observation can belong to several classes at once. Multiclass assigns exactly one of three or more classes.",
+  },
+  {
+    id: "m3-16", module: 3, type: "mc", kind: "theory",
+    prompt: "A model removes noise from an image by predicting the clean intensity (0–255) of every pixel. This is an example of:",
+    options: [
+      "Multioutput classification",
+      "Multilabel binary classification",
+      "Multiclass classification with 256 classes",
+      "Unsupervised clustering of pixels",
+    ],
+    answer: 0,
+    explanation: "Each pixel is a separate output, and each output can take many values. That generalises multilabel (several outputs) and multiclass (several values per output), and is called multioutput classification.",
+  },
+  {
+    id: "m3-17", module: 3, type: "mc", kind: "theory",
+    prompt: "In a multiclass confusion matrix (rows = actual, columns = predicted), what do the values on the main diagonal represent?",
+    options: [
+      "The number of correct predictions for each class",
+      "The false positives for each class",
+      "The total number of predictions made for each class",
+      "The class pairs that are most often confused",
+    ],
+    answer: 0,
+    explanation: "The diagonal cells are actual = predicted, i.e., correct predictions. Off-diagonal cells are errors and show which classes are confused.",
+  },
+  {
+    id: "m3-18", module: 3, type: "mc", kind: "theory",
+    prompt: "Error analysis shows that a digit classifier frequently confuses 3s and 5s. Which next step is most reasonable?",
+    options: [
+      "Collect or augment more 3/5 examples, or engineer features that help tell them apart",
+      "Remove 3s and 5s from the test set so the metrics better reflect the model",
+      "Raise the decision threshold for all classes equally",
+      "Report accuracy only, since it hides class-specific errors",
+    ],
+    answer: 0,
+    explanation: "Error analysis should lead to targeted improvements: more or better data, more informative features, or a different model. Changing the test set or the metric only hides the problem.",
+  },
+  {
+    id: "m3-19", module: 3, type: "mc", kind: "theory",
+    prompt: "Which algorithm is fundamentally a binary classifier and relies on strategies such as OvR or OvO for multiclass problems?",
+    options: [
+      "Support Vector Machine (SVM)",
+      "Decision Tree",
+      "k-Nearest Neighbors",
+      "Naïve Bayes",
+    ],
+    answer: 0,
+    explanation: "SVMs (and linear classifiers such as SGDClassifier) separate two classes. Scikit-Learn applies OvO/OvR automatically. Decision trees, k-NN, Naïve Bayes, random forests and neural networks handle multiple classes natively.",
+  },
+  {
+    id: "m3-20", module: 3, type: "mc", kind: "theory",
+    prompt: "A logistic-regression model outputs a probability of 0.62 for a patient, and the decision threshold is set to 0.70. What is the predicted label?",
+    options: [
+      "Negative, because 0.62 is below the 0.70 threshold",
+      "Positive, because 0.62 is above 0.50",
+      "Positive, because the threshold only affects the ROC curve, not individual predictions",
+      "Undefined, because the probability lies between the two thresholds",
+    ],
+    answer: 0,
+    explanation: "The label is assigned by comparing the score with the chosen threshold. 0.5 is only the default threshold.",
+  },
+  {
+    id: "m3-21", module: 3, type: "mc", kind: "theory",
+    prompt: "Where does the ROC curve of an ideal classifier pass?",
+    options: [
+      "Through the top-left corner (FPR = 0, TPR = 1)",
+      "Along the diagonal from (0, 0) to (1, 1)",
+      "Through the bottom-right corner (FPR = 1, TPR = 0)",
+      "Through the top-right corner only (FPR = 1, TPR = 1)",
+    ],
+    answer: 0,
+    explanation: "A perfect classifier catches all positives with no false alarms. The diagonal is random guessing, and every curve ends at (1, 1).",
+  },
+  {
+    id: "m3-22", module: 3, type: "mc", kind: "theory",
+    prompt: "Which pair describes when ROC curves are generally appropriate?",
+    options: [
+      "Classes are roughly balanced and overall discrimination matters",
+      "The positive class is very rare, and detecting it is the main goal",
+      "The task is regression and the errors are continuous",
+      "There are no labels available for evaluation",
+    ],
+    answer: 0,
+    explanation: "The module recommends ROC for balanced classes and overall discrimination, and PR curves for highly imbalanced problems with a rare positive class.",
+  },
+  {
+    id: "m3-c1", module: 3, type: "mc", kind: "code",
+    prompt: "The binary '5 vs not-5' classifier produces this confusion matrix. How many FALSE NEGATIVES are there?",
+    code: `cm = confusion_matrix(y_train_5, y_train_pred)
+print(cm)
+# [[53892   687]
+#  [ 1891  3530]]`,
+    options: ["1891", "687", "3530", "53892"],
+    answer: 0,
+    explanation: "Scikit-Learn's layout is [[TN, FP], [FN, TP]]. Rows are actual classes and columns are predicted. The bottom-left cell is actual 5s predicted as not-5: 1891.",
+  },
+  {
+    id: "m3-c2", module: 3, type: "mc", kind: "code",
+    prompt: "Using the same matrix, what is the classifier's RECALL for the digit 5?",
+    code: `# [[TN  FP]      [[53892   687]
+#  [FN  TP]]  =   [ 1891  3530]]`,
+    options: ["≈ 0.65", "≈ 0.84", "≈ 0.73", "≈ 0.96"],
+    answer: 0,
+    explanation: "Recall = TP/(TP+FN) = 3530/5421 ≈ 0.651. 0.84 is precision (3530/4217), 0.73 is F1, and 0.96 is accuracy.",
+  },
+  {
+    id: "m3-c3", module: 3, type: "mc", kind: "code",
+    prompt: "Why does the code compare y_train with the string \"5\" rather than the integer 5?",
+    code: `mnist = fetch_openml("mnist_784", version=1, as_frame=False)
+X, y = mnist.data, mnist.target
+y_train_5 = (y_train == "5")`,
+    options: [
+      "fetch_openml returns the labels as strings, so == 5 would be all False",
+      "Comparing with a string automatically one-hot encodes the target",
+      "\"5\" refers to the class at index 5 of the sorted class list",
+      "NumPy requires a string on the right-hand side to build a boolean mask",
+    ],
+    answer: 0,
+    explanation: "fetch_openml returns labels as strings ('0'–'9'). That is also why the lab later uses y.astype(int) for the multilabel example.",
+  },
+  {
+    id: "m3-c4", module: 3, type: "mc", kind: "code",
+    prompt: "Why is method=\"decision_function\" passed to cross_val_predict here?",
+    code: `y_scores = cross_val_predict(sgd_clf, X_train, y_train_5, cv=5,
+                             method="decision_function")
+precisions, recalls, thresholds = precision_recall_curve(y_train_5, y_scores)`,
+    options: [
+      "To get continuous scores instead of hard labels, so curves can sweep every threshold",
+      "To speed up cross-validation by skipping the training step",
+      "To return calibrated probabilities that sum to 1 across the two classes for each instance",
+      "To train the classifier with a different loss function",
+    ],
+    answer: 0,
+    explanation: "Precision–recall and ROC curves need a score for each instance so they can sweep the threshold. The default method returns only 0/1 predictions.",
+  },
+  {
+    id: "m3-c5", module: 3, type: "mc", kind: "code",
+    prompt: "Which digit would receive the label [False, True]?",
+    code: `y_large = (y.astype(int) >= 7)
+y_odd   = (y.astype(int) % 2 == 1)
+y_multilabel = np.c_[y_large, y_odd]`,
+    options: ["3", "8", "9", "4"],
+    answer: 0,
+    explanation: "[False, True] means not large (< 7) and odd. 3 fits. 8 → [True, False], 9 → [True, True], 4 → [False, False].",
+  },
+  {
+    id: "m3-c6", module: 3, type: "mc", kind: "code",
+    prompt: "Roughly 10% of MNIST digits are 5s. This code prints an average accuracy of about 0.95. Why is that less impressive than it sounds?",
+    code: `scores = cross_val_score(sgd_clf, X_train, y_train_5,
+                         cv=5, scoring="accuracy")
+print("Average Accuracy:", scores.mean())   # ~0.95`,
+    options: [
+      "A dummy model that always predicts 'not 5' would already score about 90%",
+      "Five folds are too few for accuracy to be meaningful",
+      "Accuracy computed with cross-validation is always inflated by leakage",
+      "SGDClassifier reports training accuracy rather than validation accuracy",
+    ],
+    answer: 0,
+    explanation: "On imbalanced data, accuracy must be compared with the majority-class baseline. Precision, recall and F1 give a much clearer picture.",
+  },
+  {
+    id: "m3-c7", module: 3, type: "mc", kind: "code",
+    prompt: "y_scores are decision scores from the SGD classifier, whose default threshold is 0. Compared with the default, what will this change most likely do?",
+    code: `threshold = 3000
+y_pred_strict = (y_scores > threshold)`,
+    options: [
+      "Increase precision and decrease recall",
+      "Increase both precision and recall",
+      "Decrease precision and increase recall",
+      "Nothing, because SGDClassifier ignores custom thresholds",
+    ],
+    answer: 0,
+    explanation: "A stricter threshold labels fewer instances as positive. The predictions become more reliable (fewer FP) but miss more true 5s (more FN).",
+  },
+  {
+    id: "m3-c8", module: 3, type: "mc", kind: "code",
+    prompt: "What does average=\"macro\" do in this multilabel evaluation?",
+    code: `score = f1_score(y_train_multilabel, y_train_pred, average="macro")`,
+    options: [
+      "Computes F1 for each label separately and takes their unweighted average",
+      "Computes a single F1 from the total TP, FP and FN pooled across all labels",
+      "Weights each label's F1 by the number of positive instances it has",
+      "Returns the F1 of the label with the best performance",
+    ],
+    answer: 0,
+    explanation: "Macro averaging treats every label equally. Pooling counts is micro averaging, and weighting by support is average='weighted'.",
+  },
+  {
+    id: "m3-o1", module: 3, type: "open", kind: "theory",
+    prompt: "Explain the precision–recall trade-off. How does moving the decision threshold affect each metric, and how would you choose the threshold for (a) a spam filter and (b) a disease-screening test?",
+    modelAnswer: "Classifiers output a score, and the threshold turns it into a label. Raising the threshold makes the model predict positive only when it is very confident: fewer false positives (precision ↑) but more missed positives (recall ↓). Lowering it does the opposite. You usually cannot maximise both, so the threshold depends on the cost of each error. (a) Spam filter: false positives (losing legitimate email) are costly, so favour precision with a higher threshold. (b) Disease screening: false negatives (missed patients) are costly, so favour recall with a lower threshold.",
+    keyPoints: [
+      { text: "Higher threshold → precision ↑, recall ↓ (or vice versa)", keywords: ["higher threshold", "raising", "increase the threshold", "increasing the threshold", "lower threshold", "lowering"] },
+      { text: "Explains it in terms of false positives vs false negatives", keywords: ["false positive", "false negative", "fp", "fn"] },
+      { text: "Spam filter: favour precision", keywords: ["spam"] },
+      { text: "Disease screening: favour recall", keywords: ["disease", "medical", "screening", "patient"] },
+      { text: "Threshold choice depends on the cost of errors in the application", keywords: ["cost", "depends", "application", "consequence"] },
+    ],
+  },
+  {
+    id: "m3-o2", module: 3, type: "open", kind: "theory",
+    prompt: "Describe what the ROC curve shows and how AUC is interpreted. When would you prefer a precision–recall curve instead?",
+    modelAnswer: "The ROC curve plots the true positive rate (recall) against the false positive rate over all classification thresholds. A random classifier follows the diagonal, and a good one bows towards the top-left corner. AUC summarises the curve in one number between 0 and 1: 1.0 is perfect, about 0.9+ is excellent, and 0.5 is random guessing. Higher means better class discrimination, independent of any single threshold. Prefer a precision–recall curve when classes are highly imbalanced or the positive class is rare and important (e.g., fraud), because ROC can look overly optimistic when there are many true negatives.",
+    keyPoints: [
+      { text: "ROC plots TPR/recall vs FPR", keywords: ["true positive rate", "tpr", "false positive rate", "fpr"] },
+      { text: "Evaluated across all thresholds", keywords: ["threshold"] },
+      { text: "Diagonal/AUC 0.5 = random; top-left/AUC 1 = ideal", keywords: ["random", "diagonal", "0.5", "top-left", "upper-left", "upper left", "top left"] },
+      { text: "AUC summarises discrimination in one number (0–1)", keywords: ["auc", "area", "single", "discriminat"] },
+      { text: "Prefer PR curve for imbalanced data / rare positives", keywords: ["imbalanc", "rare", "skew"] },
+    ],
+  },
+  {
+    id: "m3-o3", module: 3, type: "open", kind: "theory",
+    prompt: "Distinguish binary, multiclass, multilabel and multioutput classification, giving one example of each.",
+    modelAnswer: "Binary: one of two classes (spam / not spam, digit 5 vs not 5). Multiclass: exactly one of three or more mutually exclusive classes (digits 0–9, news topic). Multilabel: several binary labels can be true at once for the same observation (an image tagged dog + bicycle + person; digit is large and odd). Multioutput: several target variables are predicted at once, each with its own set of possible classes (image denoising predicts every pixel's 0–255 value; a smart-home system predicts security status and fire risk).",
+    keyPoints: [
+      { text: "Binary = two classes, with example", keywords: ["two classes", "binary", "spam", "two"] },
+      { text: "Multiclass = one of 3+ classes, with example", keywords: ["three or more", "one of", "digit", "0-9", "0–9", "multiclass"] },
+      { text: "Multilabel = several labels simultaneously, with example", keywords: ["multiple labels", "several labels", "simultaneous", "at the same time", "dog"] },
+      { text: "Multioutput = several outputs each with multiple classes, with example", keywords: ["multiple outputs", "each output", "pixel", "denois", "multioutput"] },
+    ],
+  },
+  {
+    id: "m3-o4", module: 3, type: "open", kind: "code",
+    prompt: "A binary classifier produces the confusion matrix below (Scikit-Learn layout). Compute accuracy, precision, recall and F1, showing your formulas, and briefly interpret the result.",
+    code: `print(confusion_matrix(y_test, y_pred))
+# [[50 10]
+#  [ 5 35]]`,
+    modelAnswer: "Layout [[TN, FP], [FN, TP]] → TN=50, FP=10, FN=5, TP=35 (100 total).\nAccuracy = (TP+TN)/total = 85/100 = 0.85\nPrecision = TP/(TP+FP) = 35/45 ≈ 0.78\nRecall = TP/(TP+FN) = 35/40 = 0.875\nF1 = 2PR/(P+R) ≈ 2(0.778)(0.875)/1.653 ≈ 0.82\nInterpretation: the model finds most positives (high recall) but about 22% of its positive predictions are false alarms. It favours recall over precision.",
+    keyPoints: [
+      { text: "Correctly reads TN=50, FP=10, FN=5, TP=35", keywords: ["tp=35", "tp = 35", "fn=5", "fn = 5", "fp=10", "fp = 10"] },
+      { text: "Accuracy = 0.85", keywords: ["0.85", "85%", "85 %"] },
+      { text: "Precision ≈ 0.78", keywords: ["0.78", "0.777", "78%", "35/45"] },
+      { text: "Recall = 0.875", keywords: ["0.875", "0.88", "87.5", "35/40"] },
+      { text: "F1 ≈ 0.82 and an interpretation", keywords: ["0.82", "0.823", "82%"] },
+    ],
+  },
+  {
+    id: "m3-o5", module: 3, type: "open", kind: "theory",
+    prompt: "Explain how k-fold cross-validation works and why stratified k-fold is preferred for imbalanced classification problems.",
+    modelAnswer: "The data is split into k roughly equal folds. The model is trained k times; each time one fold is the validation set and the remaining k−1 folds are used for training, so every fold is used for validation exactly once. The k scores are averaged (often with their standard deviation reported), giving a more reliable estimate that depends less on a single split. Stratified k-fold keeps the class proportions of the full dataset in every fold. With imbalanced data, plain k-fold could produce folds with very few or no minority-class examples, which makes the scores unstable or misleading.",
+    keyPoints: [
+      { text: "Data split into k folds", keywords: ["k folds", "k equal", "folds", "subsets"] },
+      { text: "Each fold used once for validation, rest for training", keywords: ["once", "remaining", "k-1", "k − 1", "rest"] },
+      { text: "Scores are averaged → more reliable estimate", keywords: ["average", "mean", "reliable"] },
+      { text: "Stratified preserves class proportions in each fold", keywords: ["proportion", "ratio", "distribution", "preserv"] },
+    ],
+  },
+  {
+    id: "m3-o6", module: 3, type: "open", kind: "theory",
+    prompt: "What is error analysis in classification? Describe how you would carry it out and list at least three possible corrective actions.",
+    modelAnswer: "Error analysis means examining a model's incorrect predictions to understand why they happen, because high aggregate metrics can hide systematic problems. Steps: build a (multiclass) confusion matrix, often normalised, to see which classes are confused. Look at the off-diagonal cells, inspect misclassified examples manually, and check per-class precision and recall. Common causes are poor data quality, class imbalance, overlapping classes, insufficient features and overfitting. Corrective actions: collect more data for the confused classes, improve data quality or labels, engineer more informative features, rebalance the classes, tune hyperparameters, or try a different algorithm.",
+    keyPoints: [
+      { text: "Defines error analysis as examining incorrect predictions", keywords: ["incorrect", "errors", "misclassif", "mistakes"] },
+      { text: "Uses the confusion matrix (off-diagonal cells)", keywords: ["confusion matrix", "off-diagonal", "diagonal"] },
+      { text: "Mentions manual inspection of misclassified examples", keywords: ["inspect", "manual", "look at"] },
+      { text: "Lists corrective actions (more data, features, balancing, tuning, algorithm)", keywords: ["more data", "feature", "balanc", "hyperparameter", "algorithm", "augment"] },
+    ],
+  },
+];
+
+if (typeof module !== "undefined") module.exports = QUESTIONS;
