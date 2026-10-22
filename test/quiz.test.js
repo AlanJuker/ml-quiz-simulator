@@ -69,11 +69,11 @@ test("shuffled options still grade against the original answer", () => {
 });
 
 test("open answers earn partial credit from the rubric", () => {
-  const q = QUESTIONS.find((x) => x.id === "m3-o4");
-  const text = "TP=35, FN=5. Accuracy 0.85, precision 35/45, recall 0.875";
+  const q = QUESTIONS.find((x) => x.id === "m1-o5");
+  const text = "It is scored on the same data it was trained on, so it may overfit. Use train_test_split.";
   const item = { q, text, points: suggestPoints(q, text) };
-  assert.deepEqual(item.points, [true, true, true, true, false]);
-  assert.equal(itemScore(item), 0.8);
+  assert.deepEqual(item.points, [true, true, true, false]);
+  assert.equal(itemScore(item), 0.75);
   assert.equal(itemScore({ ...item, text: "  " }), 0, "blank answers score zero even if ticked");
 });
 

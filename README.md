@@ -1,6 +1,6 @@
 # ML Quiz Simulator
 
-A practice quiz for **Machine Learning Modules 1–3**. Each attempt is drawn at random from a bank of 176 questions, it can be timed, it is scored, and every question comes with an explanation.
+A practice quiz for **Machine Learning Modules 1–3**. Each attempt is drawn at random from a bank of 172 questions, it can be timed, it is scored, and every question comes with an explanation.
 
 **Live:** https://alanjuker.github.io/ml-quiz-simulator/
 

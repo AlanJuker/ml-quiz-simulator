@@ -968,13 +968,6 @@ print(model.score(X_test, y_test))`,
     explanation: "The harmonic mean punishes imbalance. With precision 1.0 and recall 0.1, the arithmetic mean is 0.55 but F1 is about 0.18.",
   },
   {
-    id: "m3-10", module: 3, type: "mc", kind: "theory",
-    prompt: "A classifier has precision = 0.5 and recall = 1.0. What is its F1 score?",
-    options: ["≈ 0.67", "0.75", "0.50", "1.00"],
-    answer: 0,
-    explanation: "F1 = 2PR/(P+R) = 2(0.5)(1.0)/1.5 ≈ 0.667. 0.75 is the arithmetic mean, which is a common mistake.",
-  },
-  {
     id: "m3-11", module: 3, type: "mc", kind: "theory",
     prompt: "Why is stratified k-fold cross-validation preferred for imbalanced classification problems?",
     options: [
@@ -992,13 +985,6 @@ print(model.score(X_test, y_test))`,
     options: ["90%", "10%", "100%", "50%"],
     answer: 0,
     explanation: "In each iteration 1 fold (10%) is used for validation and the other 9 folds (90%) for training.",
-  },
-  {
-    id: "m3-13", module: 3, type: "mc", kind: "theory",
-    prompt: "A binary-only algorithm is extended to a 10-class problem with the One-vs-One (OvO) strategy. How many binary classifiers are trained?",
-    options: ["45", "10", "90", "9"],
-    answer: 0,
-    explanation: "OvO trains one classifier for every pair of classes: 10 × 9 / 2 = 45. One-vs-Rest would train 10.",
   },
   {
     id: "m3-14", module: 3, type: "mc", kind: "theory",
@@ -1115,15 +1101,6 @@ print(cm)
     explanation: "Scikit-Learn's layout is [[TN, FP], [FN, TP]]. Rows are actual classes and columns are predicted. The bottom-left cell is actual 5s predicted as not-5: 1891.",
   },
   {
-    id: "m3-c2", module: 3, type: "mc", kind: "code",
-    prompt: "Using the same matrix, what is the classifier's RECALL for the digit 5?",
-    code: `# [[TN  FP]      [[53892   687]
-#  [FN  TP]]  =   [ 1891  3530]]`,
-    options: ["≈ 0.65", "≈ 0.84", "≈ 0.73", "≈ 0.96"],
-    answer: 0,
-    explanation: "Recall = TP/(TP+FN) = 3530/5421 ≈ 0.651. 0.84 is precision (3530/4217), 0.73 is F1, and 0.96 is accuracy.",
-  },
-  {
     id: "m3-c3", module: 3, type: "mc", kind: "code",
     prompt: "Why does the code compare y_train with the string \"5\" rather than the integer 5?",
     code: `mnist = fetch_openml("mnist_784", version=1, as_frame=False)
@@ -1238,21 +1215,6 @@ y_pred_strict = (y_scores > threshold)`,
       { text: "Multiclass = one of 3+ classes, with example", keywords: ["three or more", "one of", "digit", "0-9", "0–9", "multiclass"] },
       { text: "Multilabel = several labels simultaneously, with example", keywords: ["multiple labels", "several labels", "simultaneous", "at the same time", "dog"] },
       { text: "Multioutput = several outputs each with multiple classes, with example", keywords: ["multiple outputs", "each output", "pixel", "denois", "multioutput"] },
-    ],
-  },
-  {
-    id: "m3-o4", module: 3, type: "open", kind: "code",
-    prompt: "A binary classifier produces the confusion matrix below (Scikit-Learn layout). Compute accuracy, precision, recall and F1, showing your formulas, and briefly interpret the result.",
-    code: `print(confusion_matrix(y_test, y_pred))
-# [[50 10]
-#  [ 5 35]]`,
-    modelAnswer: "Layout [[TN, FP], [FN, TP]] → TN=50, FP=10, FN=5, TP=35 (100 total).\nAccuracy = (TP+TN)/total = 85/100 = 0.85\nPrecision = TP/(TP+FP) = 35/45 ≈ 0.78\nRecall = TP/(TP+FN) = 35/40 = 0.875\nF1 = 2PR/(P+R) ≈ 2(0.778)(0.875)/1.653 ≈ 0.82\nInterpretation: the model finds most positives (high recall) but about 22% of its positive predictions are false alarms. It favours recall over precision.",
-    keyPoints: [
-      { text: "Correctly reads TN=50, FP=10, FN=5, TP=35", keywords: ["tp=35", "tp = 35", "fn=5", "fn = 5", "fp=10", "fp = 10"] },
-      { text: "Accuracy = 0.85", keywords: ["0.85", "85%", "85 %"] },
-      { text: "Precision ≈ 0.78", keywords: ["0.78", "0.777", "78%", "35/45"] },
-      { text: "Recall = 0.875", keywords: ["0.875", "0.88", "87.5", "35/40"] },
-      { text: "F1 ≈ 0.82 and an interpretation", keywords: ["0.82", "0.823", "82%"] },
     ],
   },
   {
