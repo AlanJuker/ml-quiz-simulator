@@ -12,7 +12,7 @@ A practice quiz for **Machine Learning Modules 1–3**. Each attempt is drawn at
 
 ## How a quiz works
 
-- **Mix:** 80% multiple choice and 20% open answer. About 80% of the questions are theory and 20% ask you to interpret Scikit-Learn code from the labs.
+- **Mix:** 80% multiple choice and 20% open answer. About 80% of the questions are theory and 20% ask you to interpret Scikit-Learn code from the labs. Questions come in this order: theory multiple choice, code multiple choice, then the open questions.
 - **Setup:** choose the modules, the length (10, 20 or 30 questions) and an optional timer (60 or 90 s per question).
 - **During the quiz:** a question navigator, flags, and keyboard shortcuts (`1`–`4` / `A`–`D` to answer, `←` `→` to move, `F` to flag).
 - **Open answers:** after you submit, you see the model answer and a rubric. Points are pre-ticked by keyword matching, and you confirm or correct them. Each open answer earns partial credit.

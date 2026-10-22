@@ -44,7 +44,11 @@ test("quiz respects the 80/20 MC/open and theory/code mix", () => {
   assert.equal(new Set(quiz.map((it) => it.q.id)).size, 20, "no repeated questions");
   assert.equal(mc.filter((it) => it.q.kind === "code").length, 3);
   assert.equal(open.filter((it) => it.q.kind === "code").length, 1);
-  assert.ok(quiz.slice(0, 16).every((it) => it.q.type === "mc"), "MC section comes first");
+  const sections = quiz.map((it) => `${it.q.type}-${it.q.kind}`);
+  assert.deepEqual(sections, [
+    ...Array(13).fill("mc-theory"), ...Array(3).fill("mc-code"),
+    ...Array(3).fill("open-theory"), "open-code",
+  ], "theory MC first, then code MC, then open questions");
 });
 
 test("only selected modules are used", () => {

@@ -23,7 +23,11 @@ function pickType(pool, n, rand) {
   return [...picked, ...rest.slice(0, n - picked.length)];
 }
 
-// Returns quiz items: MC first (options shuffled, `order` maps display index → original index), then open.
+// Theory before code; sort is stable, so the random order within each kind is kept.
+const theoryFirst = (a, b) => (a.kind === "code") - (b.kind === "code");
+
+// Returns quiz items in exam order: theory MC, code MC, then open questions (theory, then code).
+// MC options are shuffled; `order` maps display index → original index.
 function buildQuiz(bank, { modules, total }, rand = Math.random) {
   const pool = bank.filter((q) => modules.includes(q.module));
   const mc = pool.filter((q) => q.type === "mc");
@@ -31,8 +35,8 @@ function buildQuiz(bank, { modules, total }, rand = Math.random) {
   const nOpen = Math.min(open.length, Math.round(total * OPEN_SHARE));
   const nMc = Math.min(mc.length, total - nOpen);
   return [
-    ...shuffle(pickType(mc, nMc, rand), rand).map((q) => ({ q, order: shuffle([0, 1, 2, 3], rand), choice: null, flagged: false })),
-    ...shuffle(pickType(open, nOpen, rand), rand).map((q) => ({ q, text: "", points: q.keyPoints.map(() => false), flagged: false })),
+    ...shuffle(pickType(mc, nMc, rand), rand).sort(theoryFirst).map((q) => ({ q, order: shuffle([0, 1, 2, 3], rand), choice: null, flagged: false })),
+    ...shuffle(pickType(open, nOpen, rand), rand).sort(theoryFirst).map((q) => ({ q, text: "", points: q.keyPoints.map(() => false), flagged: false })),
   ];
 }
 
