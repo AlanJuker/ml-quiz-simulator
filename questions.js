@@ -666,21 +666,6 @@ print("Accuracy:", model.score(X, y))   # 1.0`,
     explanation: "Many projects fail because they solve the wrong problem. The objectives, stakeholders and constraints decide the problem type and the success metric.",
   },
   {
-    id: "m2-c1", module: 2, type: "mc", kind: "code",
-    prompt: "How many model fits does GridSearchCV perform during the search (excluding the final refit on the full training set)?",
-    code: `param_grid = {
-    "n_estimators": [50, 100],
-    "max_depth": [5, 10, None]
-}
-grid_search = GridSearchCV(RandomForestRegressor(random_state=42),
-                           param_grid, cv=3,
-                           scoring="neg_root_mean_squared_error")
-grid_search.fit(X_train, y_train)`,
-    options: ["18", "6", "5", "15"],
-    answer: 0,
-    explanation: "2 × 3 = 6 combinations, each evaluated with 3-fold CV, gives 6 × 3 = 18 fits. None is a valid max_depth value (no limit) and counts as a candidate.",
-  },
-  {
     id: "m2-c2", module: 2, type: "mc", kind: "code",
     prompt: "Why does the code print -scores instead of scores?",
     code: `scores = cross_val_score(model, X_train_scaled, y_train,
@@ -742,25 +727,6 @@ y_pred = pipeline.predict(X_test)`,
     ],
     answer: 0,
     explanation: "During predict, a Pipeline calls transform (not fit) on each preprocessing step and then predict on the final estimator. That is how it prevents leakage.",
-  },
-  {
-    id: "m2-c6", module: 2, type: "mc", kind: "code",
-    prompt: "How much work does this RandomizedSearchCV do?",
-    code: `param_dist = {
-    "n_estimators": randint(50, 200),
-    "max_depth": randint(3, 20)
-}
-search = RandomizedSearchCV(RandomForestRegressor(random_state=42),
-                            param_dist, n_iter=20, cv=3,
-                            random_state=42)`,
-    options: [
-      "20 sampled combinations, each evaluated with 3-fold CV (60 fits)",
-      "Every one of the 150 × 17 combinations, visited in random order",
-      "20 fits in total, split across the 3 folds",
-      "60 sampled combinations, because n_iter is multiplied by cv",
-    ],
-    answer: 0,
-    explanation: "n_iter is the number of hyperparameter combinations sampled. Each one is cross-validated with cv folds: 20 × 3 = 60 fits.",
   },
   {
     id: "m2-c7", module: 2, type: "mc", kind: "code",
@@ -875,25 +841,6 @@ print(model.score(X_test, y_test))`,
     options: ["Recall", "Precision", "Specificity", "Accuracy"],
     answer: 0,
     explanation: "Recall = TP/(TP+FN) measures how many actual positives are caught. Missed cancers are false negatives, so recall is the priority. Specificity focuses on negatives.",
-  },
-  {
-    id: "m3-02", module: 3, type: "mc", kind: "theory",
-    prompt: "Which formula defines specificity?",
-    options: ["TN / (TN + FP)", "TP / (TP + FN)", "TP / (TP + FP)", "TN / (TN + FN)"],
-    answer: 0,
-    explanation: "Specificity is the proportion of actual negatives correctly identified. TP/(TP+FN) is recall and TP/(TP+FP) is precision. TN/(TN+FN) is the negative predictive value.",
-  },
-  {
-    id: "m3-03", module: 3, type: "mc", kind: "theory",
-    prompt: "The false positive rate (FPR) plotted on the x-axis of a ROC curve equals:",
-    options: [
-      "FP / (FP + TN), which is 1 − specificity",
-      "FP / (FP + TP), which is 1 − precision",
-      "FN / (FN + TP), which is 1 − recall",
-      "FP / (TP + TN + FP + FN)",
-    ],
-    answer: 0,
-    explanation: "FPR is the share of actual negatives wrongly flagged as positive. FP/(FP+TP) is the false discovery rate, and FN/(FN+TP) is the false negative rate.",
   },
   {
     id: "m3-04", module: 3, type: "mc", kind: "theory",
@@ -1571,14 +1518,6 @@ y = iris.target`,
     ],
     answer: 0,
     explanation: "random_state fixes the random seed so the shuffle (and therefore the split) is identical every time. test_size controls the proportion.",
-  },
-  {
-    id: "m2-45", module: 2, type: "mc", kind: "code",
-    prompt: "The California Housing DataFrame has 20,640 rows. How many rows end up in test_set?",
-    code: `train_set, test_set = train_test_split(df, test_size=0.2, random_state=42)`,
-    options: ["4,128", "16,512", "2,064", "20"],
-    answer: 0,
-    explanation: "20% of 20,640 = 4,128 rows for testing. The other 16,512 (80%) go to training.",
   },
   {
     id: "m2-46", module: 2, type: "mc", kind: "code",
