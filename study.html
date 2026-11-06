@@ -1,0 +1,977 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ML Midterm Study Guide</title>
+  <meta name="description" content="Plain-English study guide for the Machine Learning midterm (Modules 1-6), built from the Cascade content, the teaching demos and the in-class activities, with code explained line by line.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>ML Midterm Study Guide</h1>
+    <p class="subtitle">MCAI/CSAI 500 · Modules 1–6 · focus on 4, 5 and 6</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="index.html">Quiz &amp; midterm</a>
+      <a href="study.html" aria-current="page">Study guide</a>
+    </nav>
+  </header>
+
+  <main class="guide">
+    <!-- ───────────────────────── Overview ───────────────────────── -->
+    <section class="card" id="top">
+      <h2>The midterm in one card</h2>
+      <p>About <strong>6 written questions</strong> on Modules 2–6 (mostly 4, 5 and 6). Cascade picks 2 questions from each bank of 10:</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Section</th><th>What they give you</th><th>What you must do</th><th>Marks</th></tr></thead>
+        <tbody>
+          <tr><td><a href="#how-workflow">1 · Workflow &amp; methodology</a></td><td>A story, often a hospital, where someone did the ML workflow wrong</td><td>Find the problems, say the first step, decide what to do</td><td>5 each</td></tr>
+          <tr><td><a href="#how-code">2 · Python code interpretation</a></td><td>About 5 lines of Scikit-Learn code</td><td>Explain the purpose, the role of each function and why each parameter is used</td><td>5 each (assumed)</td></tr>
+          <tr><td><a href="#how-output">3 · Model output &amp; interpretation</a></td><td>A classification report, confusion matrix or results table</td><td>Read the numbers, compare classes or models, explain why, choose a model</td><td>4 each</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>The course in one table</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Module</th><th>Big question</th><th>Remember this</th></tr></thead>
+        <tbody>
+          <tr><td><a href="#m1">1 · ML landscape</a></td><td>What is machine learning?</td><td>Learn rules from data, then <strong>generalize</strong> to new data.</td></tr>
+          <tr><td><a href="#m2">2 · End-to-end workflow</a></td><td>How do I run an ML project?</td><td>Frame first. Split before anything learns. Use the test set once.</td></tr>
+          <tr><td><a href="#m3">3 · Classification</a></td><td>How do I judge a classifier?</td><td>Accuracy is not enough. Read the confusion matrix and pick the metric that matches the cost of errors.</td></tr>
+          <tr><td><a href="#m4">4 · Training models</a></td><td>How does a model learn, and how do I control its complexity?</td><td>Gradient descent lowers the cost step by step. Regularization stops overfitting.</td></tr>
+          <tr><td><a href="#m5">5 · Decision trees</a></td><td>How does a tree decide?</td><td>Greedy yes/no splits that make groups purer. Limit depth or it memorizes.</td></tr>
+          <tr><td><a href="#m6">6 · Ensembles</a></td><td>Why combine many models?</td><td>Bagging lowers variance, boosting lowers bias, stacking learns how to combine.</td></tr>
+        </tbody>
+      </table></div>
+      <p class="muted small">How to study: read <a href="#how">How to answer</a> first, then one module at a time. After each module, take a <a href="index.html">midterm simulation</a> and re-read what you missed. Use the <a href="#cheat">code cheat sheet</a> and the <a href="#review">last-minute review</a> the day before.</p>
+    </section>
+
+    <!-- ───────────────────────── How to answer ───────────────────────── -->
+    <section class="card" id="how">
+      <h2>How to answer each section</h2>
+      <p class="one-liner">Every good answer has the same shape: <strong>name the concept → explain it with the numbers or code you were given → say what to do and why</strong>.</p>
+
+      <h3 id="how-workflow">Section 1 · Workflow &amp; methodology (5 marks)</h3>
+      <p>Write 2–3 short paragraphs: <strong>problem → why it is a problem → fix</strong>. If they ask for the first step, it is almost always <strong>framing the problem</strong>.</p>
+      <p>Check the story against this list. Most questions hide 2 or 3 of these mistakes:</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Mistake in the story</th><th>Name it</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr><td>Starts training before defining the goal or metric</td><td>No problem framing</td><td>Define the objective with stakeholders, the task type and the metric first</td></tr>
+          <tr><td>Reports high accuracy on rare positives (e.g. 6% sick)</td><td>Accuracy trap / imbalanced data</td><td>Compare with a baseline; use recall, precision, F1 and the confusion matrix</td></tr>
+          <tr><td>Scales or imputes the whole dataset, then splits</td><td>Data leakage</td><td>Split first; put preprocessing in a <code>Pipeline</code> fitted on training data</td></tr>
+          <tr><td>Tunes or picks the model with the test set</td><td>Test set leakage, optimistic score</td><td>Tune with cross-validation on training data; use the test set once</td></tr>
+          <tr><td>Picks the model with the best <em>training</em> score</td><td>Overfitting not detected</td><td>Choose by validation / cross-validation score</td></tr>
+          <tr><td>Train 100%, test 78%</td><td>Overfitting (high variance)</td><td>Regularize (max_depth, alpha, early stopping), more data, ensemble</td></tr>
+          <tr><td>Train and test both low</td><td>Underfitting (high bias)</td><td>More complex model, better features, less regularization</td></tr>
+          <tr><td>No <code>stratify</code>, no <code>random_state</code>, a different split per model</td><td>Unfair, not reproducible comparison</td><td>Same stratified split or the same CV folds for every model</td></tr>
+          <tr><td>Uses threshold 0.5 when missing a patient is very costly</td><td>Wrong decision threshold</td><td>Lower the threshold, chosen on validation data, to raise recall</td></tr>
+          <tr><td>Doctors must explain decisions, team picks a 500-tree model</td><td>Ignores interpretability</td><td>A shallow tree or logistic regression, unless the gain is large and proven</td></tr>
+          <tr><td>"Feature X is most important, so X causes Y"</td><td>Importance ≠ causation</td><td>Say "X is a strong predictor"; causation needs a controlled study</td></tr>
+          <tr><td>Deploys and forgets</td><td>No monitoring</td><td>Monitor errors and data drift; retrain when data changes</td></tr>
+        </tbody>
+      </table></div>
+      <p class="example"><strong>Answer shape.</strong> "The first step is to frame the problem: … The main problem is <em>[name]</em>, because <em>[why, using the numbers in the story]</em>. To fix it, <em>[action]</em>. Then <em>[next correct step]</em>, and finally evaluate once on the test set."</p>
+
+      <h3 id="how-code">Section 2 · Python code interpretation (5 marks)</h3>
+      <ol>
+        <li><strong>Purpose</strong> of the whole snippet in one sentence ("this code tunes a decision tree with cross-validation").</li>
+        <li><strong>Each line / function</strong>: what it does (<code>fit</code> learns, <code>predict</code> gives labels, <code>predict_proba</code> gives probabilities…).</li>
+        <li><strong>Each parameter</strong>: what it controls and why this value (<code>test_size=0.2</code> → 20% test; <code>random_state=42</code> → reproducible).</li>
+        <li><strong>The concept behind it</strong>: leakage, overfitting, reproducibility, class balance, variance, bias.</li>
+        <li><strong>What you expect</strong> as output, or what would go wrong without it.</li>
+      </ol>
+      <p>The <a href="#cheat">code cheat sheet</a> lists what to say for every function used in class.</p>
+
+      <h3 id="how-output">Section 3 · Model output &amp; interpretation (4 marks)</h3>
+      <ol>
+        <li><strong>Quote the numbers</strong> ("recall for malignant is 0.93, so 3 of 42 cancers are missed").</li>
+        <li><strong>Compare</strong>: class vs class, model vs model, train vs test, CV vs test.</li>
+        <li><strong>Explain why</strong>: class imbalance, overfitting, variance, a linear vs non-linear model, a small test set.</li>
+        <li><strong>Decide in context</strong>: in a hospital, missing a sick patient (false negative) is usually the worst error, so prefer recall.</li>
+      </ol>
+      <h3>How to read a classification report</h3>
+      <pre><code>              precision    recall  f1-score   support
+      benign       0.96      0.99      0.97        72
+   malignant       0.97      0.93      0.95        42
+    accuracy                           0.96       114
+   macro avg       0.97      0.96      0.96       114
+weighted avg       0.97      0.96      0.96       114</code></pre>
+      <ul>
+        <li><strong>precision</strong> (per class): of the cases <em>predicted</em> as this class, how many were right.</li>
+        <li><strong>recall</strong> (per class): of the cases that <em>really</em> are this class, how many the model found.</li>
+        <li><strong>f1-score</strong>: one number that balances precision and recall.</li>
+        <li><strong>support</strong>: how many test cases of each class exist. Few cases = less reliable numbers.</li>
+        <li><strong>macro avg</strong>: simple average over classes (each class counts the same). <strong>weighted avg</strong>: weighted by support, so it leans toward the bigger class.</li>
+        <li>The class with the higher f1 is the class the model predicts best. Here benign (0.97) &gt; malignant (0.95), because there are more benign examples (imbalance) and borderline malignant tumours are harder.</li>
+      </ul>
+      <h3>How to read a confusion matrix (Scikit-Learn)</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th>predicted benign</th><th>predicted malignant</th></tr></thead>
+        <tbody>
+          <tr><td><strong>actual benign</strong></td><td>71 = TN (correct)</td><td>1 = FP (false alarm)</td></tr>
+          <tr><td><strong>actual malignant</strong></td><td>3 = FN (missed cancer)</td><td>39 = TP (cancer found)</td></tr>
+        </tbody>
+      </table></div>
+      <p><strong>Rows = actual, columns = predicted.</strong> The diagonal is correct. Everything off the diagonal is an error. The error type matters more than the total: here the model makes 4 errors, and 3 of them are missed cancers.</p>
+      <div class="trap"><strong>Other outputs you may get.</strong>
+        <ul>
+          <li><strong>Train vs test accuracy:</strong> a big gap = overfitting; both low = underfitting.</li>
+          <li><strong>CV mean ± std:</strong> the mean is the expected performance; a big std means the model is unstable across folds.</li>
+          <li><strong>OOB score:</strong> a built-in validation estimate for bagging and Random Forests. It should be close to the test score.</li>
+          <li><strong>Best CV score vs test score:</strong> the test score is the honest one to report. The best CV score is a little optimistic because it is the maximum of many tries.</li>
+          <li><strong>Feature importances:</strong> what the model relies on. Association, not causation.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ───────────────────────── Module 1 ───────────────────────── -->
+    <section class="card" id="m1">
+      <h2>Module 1 · The machine learning landscape (foundations)</h2>
+      <p class="one-liner">Traditional programming: <strong>data + rules → output</strong>. Machine learning: <strong>data + desired outputs → learning algorithm → model</strong>. A good model does not memorize; it <strong>generalizes</strong> to new data.</p>
+
+      <h3>1.1 Key words</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Term</th><th>Meaning</th><th>Iris example (class demo)</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Feature</strong> (X)</td><td>An input variable</td><td>petal length, petal width…</td></tr>
+          <tr><td><strong>Label / target</strong> (y)</td><td>The answer we want to predict</td><td>the species</td></tr>
+          <tr><td><strong>Model</strong></td><td>The learned relationship</td><td>a decision tree</td></tr>
+          <tr><td><strong>Training</strong></td><td>Adjusting the model with examples (<code>fit</code>)</td><td><code>tree.fit(X_train, y_train)</code></td></tr>
+          <tr><td><strong>Prediction</strong></td><td>Using the model on new input (<code>predict</code>)</td><td><code>tree.predict(X_test)</code></td></tr>
+          <tr><td><strong>Generalization</strong></td><td>Doing well on unseen data</td><td>the test accuracy</td></tr>
+          <tr><td><strong>Parameter vs hyperparameter</strong></td><td>Learned from data (coefficients) vs chosen by you before training (max_depth)</td><td><code>max_depth=3</code> is a hyperparameter</td></tr>
+        </tbody>
+      </table></div>
+      <p>Mitchell's definition: a program learns from <strong>experience E</strong> on a <strong>task T</strong> if its <strong>performance P</strong> improves with E. (Spam filter: T = classify emails, E = labelled emails, P = accuracy.)</p>
+
+      <h3>1.2 Types of learning</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Type</th><th>Idea</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Supervised</strong></td><td>Examples come with the answer. <em>Classification</em> predicts a category, <em>regression</em> a number.</td><td>Spam or not; house price</td></tr>
+          <tr><td><strong>Unsupervised</strong></td><td>No answers; find structure such as groups</td><td>KMeans clusters on Iris without using y</td></tr>
+          <tr><td><strong>Reinforcement</strong></td><td>An agent learns from rewards and penalties</td><td>A game-playing agent</td></tr>
+          <tr><td><strong>Batch vs online</strong></td><td>Train on all data at once (offline) vs learn continuously from new data</td><td>Monthly retraining vs a live stock model</td></tr>
+          <tr><td><strong>Instance-based vs model-based</strong></td><td>Compare new cases with stored examples (KNN) vs build a model that captures the pattern (linear regression)</td><td>KNN vs linear regression</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>1.3 Main challenges</h3>
+      <ul>
+        <li><strong>Poor-quality data</strong>: missing values, noise, errors. A complex algorithm cannot fix bad data.</li>
+        <li><strong>Nonrepresentative data</strong>: the training data does not look like the real world (sampling bias, historical bias, small samples).</li>
+        <li><strong>Overfitting</strong>: learns the training data too closely, including noise. Great on training, poor on new data.</li>
+        <li><strong>Underfitting</strong>: too simple to capture the pattern. Poor on both.</li>
+      </ul>
+
+      <h3>1.4 Code from class (Module 1 demo)</h3>
+      <pre><code>X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.20, random_state=42, stratify=y
+)
+tree = DecisionTreeClassifier(max_depth=3, random_state=42)
+tree.fit(X_train, y_train)            # learn rules from the training data
+y_pred = tree.predict(X_test)         # apply them to unseen flowers
+print(accuracy_score(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+print(classification_report(y_test, y_pred, target_names=iris.target_names))</code></pre>
+      <ul>
+        <li>The test set is kept aside to estimate <strong>generalization</strong>; "do not repeatedly use the test set to choose the model".</li>
+        <li><code>max_depth</code> controls how complex the tree can become.</li>
+        <li>Accuracy gives one number; the confusion matrix shows <em>which</em> classes are confused.</li>
+      </ul>
+
+      <details><summary>99% training accuracy, 71% on new data from the same population. Diagnosis?</summary><p>Overfitting. The model memorized the training data.</p></details>
+      <details><summary>Both training and validation errors are high and close. What helps?</summary><p>A more complex model or better features (underfitting). More data of the same kind will not help.</p></details>
+    </section>
+
+    <!-- ───────────────────────── Module 2 ───────────────────────── -->
+    <section class="card" id="m2">
+      <h2>Module 2 · End-to-end machine learning workflow</h2>
+      <p class="one-liner">Frame the problem, protect the test set, prepare the data inside a pipeline, beat a baseline, tune with cross-validation, test <strong>once</strong>, then deploy and monitor.</p>
+
+      <div class="flow" aria-label="Workflow steps">
+        <div class="step"><strong>1 · Frame</strong><span>Goal, task type, metric</span></div><div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><strong>2 · Explore</strong><span>EDA, quality checks</span></div><div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><strong>3 · Split</strong><span>Train / test, stratified</span></div><div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><strong>4 · Prepare</strong><span>Clean, encode, scale, in a pipeline</span></div><div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><strong>5 · Train</strong><span>Baseline first, then models</span></div><div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><strong>6 · Evaluate &amp; tune</strong><span>Cross-validation, Grid Search</span></div><div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><strong>7 · Test once</strong><span>Final unbiased score</span></div><div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><strong>8 · Deploy &amp; monitor</strong><span>Drift, errors, retrain</span></div>
+      </div>
+      <p class="muted small">The workflow is iterative: monitoring and new data can send you back to framing or feature engineering.</p>
+
+      <h3>2.1 Frame the problem (always the first step)</h3>
+      <ul>
+        <li><strong>Business objective:</strong> what decision will the prediction support? Who uses it? (Many projects fail from unclear goals, not from bad algorithms.)</li>
+        <li><strong>Task type:</strong> classification (category), regression (number) or clustering (groups, no labels).</li>
+        <li><strong>Performance measure:</strong> chosen from the cost of errors. Demo questions: "What is the cost of overestimating or underestimating? Which errors matter most?"</li>
+        <li><strong>Constraints:</strong> interpretability, speed, data available at prediction time.</li>
+      </ul>
+
+      <h3>2.2 Metrics: what each one answers</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Metric</th><th>Question it answers</th><th>Use it when</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Accuracy</strong></td><td>What share of all predictions is correct?</td><td>Classes are balanced. Misleading with rare positives.</td></tr>
+          <tr><td><strong>Precision</strong></td><td>When the model says "positive", how often is it right?</td><td>False positives are costly (spam filter, expensive investigation).</td></tr>
+          <tr><td><strong>Recall</strong></td><td>Of the real positives, how many did it find?</td><td>False negatives are costly (disease, fraud).</td></tr>
+          <tr><td><strong>F1</strong></td><td>Balance of precision and recall</td><td>You need both, or the data are imbalanced.</td></tr>
+          <tr><td><strong>MAE</strong></td><td>Average absolute error, in the target's units</td><td>Regression; easy to explain.</td></tr>
+          <tr><td><strong>RMSE</strong></td><td>Like MAE, but big errors count much more</td><td>Regression where large errors are especially bad.</td></tr>
+        </tbody>
+      </table></div>
+      <p class="example"><strong>Module 2 demo / Activity Core Task 1.</strong> actual = [1,1,1,1,0,0,0,0], predicted = [1,1,0,1,1,0,0,0]. Position by position: TP = 3, FN = 1 (the third case), FP = 1 (the fifth), TN = 3. Accuracy, precision, recall and F1 are all 0.75.</p>
+
+      <h3>2.3 Explore the data (EDA)</h3>
+      <pre><code>df.info()                       # data types and non-null counts
+display(df.describe().T)        # scale, centre and spread of each column
+df.isna().sum()                 # missing values → is imputation needed?
+df.hist(figsize=(12,8), bins=30)              # distributions, skew, outliers
+df.corr(numeric_only=True)["MedHouseVal"]     # linear relationships with the target</code></pre>
+      <ul>
+        <li>Histograms show skewness, outliers and imbalance; they can suggest scaling or transforming.</li>
+        <li>Correlation (−1 to +1) shows <strong>linear</strong> relationships only. It is <strong>not causation</strong> and can miss non-linear patterns.</li>
+      </ul>
+
+      <h3>2.4 Prepare the data</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Issue</th><th>What to do</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Missing values</strong></td><td>Drop rows (loses information) or impute (median is robust to outliers). Dropping loses data; imputing adds assumptions.</td></tr>
+          <tr><td><strong>Outliers</strong></td><td>Investigate before deleting. Demo: Age = 190 may be a typing error, but automatic deletion can remove rare valid cases.</td></tr>
+          <tr><td><strong>Duplicates</strong></td><td>Remove them (<code>df.duplicated().sum()</code>) so they don't bias the model.</td></tr>
+          <tr><td><strong>Categorical data</strong></td><td><em>Label encoding</em> (numbers) only for ordered categories (low/medium/high). <em>One-hot encoding</em> (one 0/1 column per category) for nominal ones (colour, country), so the model doesn't invent a false order.</td></tr>
+          <tr><td><strong>Feature scaling</strong></td><td><em>Normalization</em> (MinMaxScaler) → range 0–1. <em>Standardization</em> (StandardScaler) → mean 0, std 1. Needed for distance and gradient models (KNN, logistic/linear regression, SVM), not for trees.</td></tr>
+          <tr><td><strong>Feature engineering</strong></td><td>Create useful variables, e.g. <code>RoomsPerHousehold = AveRooms / AveOccup</code>. Never use future or target information.</td></tr>
+          <tr><td><strong>Feature selection</strong></td><td>Remove irrelevant or redundant features → faster, simpler, less overfitting.</td></tr>
+        </tbody>
+      </table></div>
+      <pre><code>encoder = OneHotEncoder(sparse_output=False, handle_unknown="ignore")
+encoded = encoder.fit_transform(df[["Color"]])        # Red/Blue/Green → 3 columns of 0/1
+MinMaxScaler().fit_transform(df[["Income"]])          # normalization: 0 to 1
+StandardScaler().fit_transform(df[["Income"]])        # standardization: mean 0, std 1</code></pre>
+      <p><code>handle_unknown="ignore"</code>: a category never seen in training becomes all zeros instead of crashing.</p>
+
+      <h3>2.5 Split first, then preprocess inside a pipeline</h3>
+      <pre><code>X = df.drop(columns="MedHouseVal")      # features
+y = df["MedHouseVal"]                    # target
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.20, random_state=42)
+
+numeric_pipeline = Pipeline([("imputer", SimpleImputer(strategy="median")),
+                             ("scaler", StandardScaler())])
+preprocessor = ColumnTransformer([("numeric", numeric_pipeline, list(X.columns))])
+X_train_prepared = preprocessor.fit_transform(X_train)   # learn medians/means from TRAIN
+X_test_prepared = preprocessor.transform(X_test)         # only apply them to TEST</code></pre>
+      <ul>
+        <li><strong>Data leakage</strong> = information from the test set (or the future) gets into training, so the score looks better than reality. Fitting the imputer or scaler on all the data is leakage.</li>
+        <li><code>fit_transform</code> on train learns the statistics and applies them; <code>transform</code> on test only applies them.</li>
+        <li><strong>Pipeline</strong>: chains steps so the same preparation happens in training, every CV fold, testing and future predictions. It improves reproducibility and prevents leakage.</li>
+        <li><strong>ColumnTransformer</strong>: different preprocessing for different columns (numeric pipeline vs categorical pipeline).</li>
+      </ul>
+
+      <h3>2.6 Baseline, cross-validation and tuning</h3>
+      <pre><code>baseline = DummyRegressor(strategy="mean")       # always predicts the training mean
+linear_pipeline = Pipeline([("preprocessor", preprocessor), ("model", LinearRegression())])
+forest_pipeline = Pipeline([("preprocessor", preprocessor),
+                            ("model", RandomForestRegressor(n_estimators=50, random_state=42, n_jobs=-1))])
+
+scores = cross_val_score(linear_pipeline, X_train, y_train,
+                         scoring="neg_root_mean_squared_error", cv=5)
+rmse = -scores                                   # flip the sign back to positive RMSE
+print(rmse.mean(), rmse.std())
+
+param_grid = {"model__n_estimators": [30, 60], "model__max_features": [0.7, 1.0],
+              "model__max_depth": [None, 15]}
+grid_search = GridSearchCV(forest_pipeline, param_grid, cv=3,
+                           scoring="neg_root_mean_squared_error")
+grid_search.fit(X_train, y_train)
+final_model = grid_search.best_estimator_
+test_rmse = mean_squared_error(y_test, final_model.predict(X_test)) ** 0.5   # test ONCE</code></pre>
+      <ul>
+        <li><strong>Baseline</strong> (mean for regression, majority class for classification): "how much value does ML add?"</li>
+        <li><strong>Training RMSE alone is not enough</strong>: a flexible forest can memorize, so its training error looks great.</li>
+        <li><strong>k-fold cross-validation</strong>: split the training data into k folds; train on k−1, validate on 1, k times. The mean is more reliable than one split; the std shows stability.</li>
+        <li>Scikit-Learn <strong>maximizes</strong> scores, so error metrics are negative (<code>neg_…</code>). Put a minus sign back.</li>
+        <li><code>model__n_estimators</code>: in a pipeline, the parameter name is <em>step name + two underscores + parameter</em>.</li>
+        <li><strong>Grid Search</strong> tries every combination (can guarantee the best <em>of the grid</em>, but expensive). <strong>Randomized Search</strong> samples a fixed number of random combinations (faster for large spaces, near-optimal).</li>
+        <li><code>best_params_</code> = best combination, <code>best_score_</code> = its mean CV score, <code>best_estimator_</code> = the model refitted on all training data.</li>
+      </ul>
+
+      <h3>2.7 Before deployment (from the demo)</h3>
+      <p>Is the data available at prediction time? Is performance acceptable for important groups? What happens when the data distribution changes (drift)? How will predictions and errors be monitored? Can the whole pipeline be reproduced? Can stakeholders understand the output?</p>
+
+      <div class="trap"><strong>Exam traps.</strong>
+        <ul>
+          <li>The first step is framing, not EDA and not training.</li>
+          <li>Split <strong>before</strong> imputing, scaling or selecting features with the data.</li>
+          <li>The test set is not for tuning. Tune with CV; test once.</li>
+          <li>Correlation is not causation. A feature can also hurt if it is irrelevant or leaks the answer.</li>
+          <li>Trees don't need scaling; KNN and gradient-based models do.</li>
+        </ul>
+      </div>
+      <details><summary>Why is fitting the scaler on the whole dataset a leakage risk?</summary><p>The scaler learns the mean and std from test rows too, so test information shapes training and the score is optimistic.</p></details>
+      <details><summary>What did the baseline teach us?</summary><p>The minimum score any useful model must beat. If a model barely beats "predict the mean", it adds little value.</p></details>
+      <details><summary>Why do RMSE scores come out negative in cross_val_score?</summary><p>Scikit-Learn treats higher scores as better, so it returns negative errors. Multiply by −1.</p></details>
+    </section>
+
+    <!-- ───────────────────────── Module 3 ───────────────────────── -->
+    <section class="card" id="m3">
+      <h2>Module 3 · Classification</h2>
+      <p class="one-liner">Judge a classifier by the <strong>kind</strong> of mistakes it makes. Define the positive class, read the confusion matrix, then pick the metric and threshold that match the cost of each error.</p>
+
+      <h3>3.1 Problem types</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Type</th><th>Meaning</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Binary</strong></td><td>Two classes</td><td>benign / malignant</td></tr>
+          <tr><td><strong>Multiclass</strong></td><td>One label from 3+ classes</td><td>digits 0–9, Iris species</td></tr>
+          <tr><td><strong>Multilabel</strong></td><td>Several labels at once for one example</td><td>a photo with a dog, a bicycle and a person</td></tr>
+          <tr><td><strong>Multioutput</strong></td><td>Several target variables predicted together, each with its own classes</td><td>security status + fire risk; image denoising</td></tr>
+        </tbody>
+      </table></div>
+      <p>For multiclass with binary-only algorithms: <strong>One-vs-Rest</strong> trains one classifier per class against all others; <strong>One-vs-One</strong> trains one per pair of classes. Trees, Random Forests, KNN and Naive Bayes handle multiclass directly.</p>
+
+      <h3>3.2 The breast-cancer demo (the class's main example)</h3>
+      <pre><code>df["target"] = (df["target"] == 0).astype(int)    # recode: 1 = malignant (the case we care about)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.20, stratify=y, random_state=RANDOM_STATE)
+
+models = {
+  "Logistic Regression": Pipeline([("imputer", SimpleImputer(strategy="median")),
+                                   ("scaler", StandardScaler()),
+                                   ("model", LogisticRegression(max_iter=2000))]),
+  "KNN": Pipeline([("imputer", SimpleImputer(strategy="median")),
+                   ("scaler", StandardScaler()),
+                   ("model", KNeighborsClassifier(n_neighbors=7))]),
+  "Random Forest": Pipeline([("imputer", SimpleImputer(strategy="median")),
+                             ("model", RandomForestClassifier(n_estimators=250, max_depth=6))]),
+}</code></pre>
+      <ul>
+        <li>The target is recoded so <strong>1 = malignant</strong>: the positive class should be the event we want to detect.</li>
+        <li><code>stratify=y</code> keeps the benign/malignant ratio the same in train and test.</li>
+        <li>Scaling is in the LR and KNN pipelines (distances and weights depend on scale) but not for the Random Forest (trees split on thresholds).</li>
+        <li>Same data, three ways of learning: LR learns a <strong>linear boundary</strong>, KNN looks at <strong>nearby examples</strong>, RF <strong>combines many trees</strong>. That is why their predictions differ.</li>
+      </ul>
+      <pre><code>                     Accuracy  Precision  Recall     F1  ROC AUC
+Logistic Regression     0.965      0.975   0.929  0.951    0.996
+Random Forest           0.965      1.000   0.905  0.950    0.995
+KNN                     0.956      0.974   0.905  0.938    0.982</code></pre>
+      <p class="example"><strong>Reading it.</strong> LR and RF have the same accuracy but make different errors. RF has perfect precision (no false alarms) but misses 4 cancers; LR misses 3 and has the best recall, F1 and AUC. For cancer screening, choose LR. "The best model depends on the metric and the application, not accuracy alone."</p>
+
+      <h3>3.3 Confusion-matrix metrics</h3>
+      <ul>
+        <li><strong>Precision</strong> = TP / (TP + FP): correctness of positive predictions.</li>
+        <li><strong>Recall</strong> (sensitivity, true positive rate) = TP / (TP + FN): share of real positives found.</li>
+        <li><strong>Specificity</strong> (true negative rate) = TN / (TN + FP): share of real negatives found. LR: 71/72 = 0.986.</li>
+        <li><strong>False positive rate</strong> = FP / (FP + TN) = 1 − specificity.</li>
+      </ul>
+      <pre><code>tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()   # order for binary: tn, fp, fn, tp
+specificity = tn / (tn + fp)</code></pre>
+
+      <h3>3.4 The accuracy trap</h3>
+      <pre><code>X_imb, y_imb = make_classification(n_samples=1000, weights=[0.95, 0.05], random_state=42)
+dummy = DummyClassifier(strategy="most_frequent").fit(X_imb, y_imb)
+# Positive-class proportion: 0.057   Dummy accuracy: 0.943   Dummy recall: 0.0</code></pre>
+      <p>A model that always says "negative" gets 94% accuracy and finds <strong>zero</strong> positives. Always compare with a baseline and look at recall.</p>
+
+      <h3>3.5 Thresholds: precision vs recall trade-off</h3>
+      <pre><code>proba = log_model.predict_proba(X_test)[:, 1]        # probability of malignant
+for threshold in [0.30, 0.50, 0.70]:
+    y_threshold = (proba &gt;= threshold).astype(int)   # 1 if probability ≥ threshold
+    # precision, recall and F1 for each threshold</code></pre>
+      <pre><code>   Threshold  Precision  Recall     F1
+         0.3      0.976   0.976  0.976
+         0.5      0.975   0.929  0.951
+         0.7      1.000   0.905  0.950</code></pre>
+      <ul>
+        <li><strong>Lower threshold</strong> → more cases called positive → recall ↑, precision usually ↓.</li>
+        <li><strong>Higher threshold</strong> → stricter → precision ↑, recall ↓.</li>
+        <li>For screening, 0.30 is better (fewer missed cancers). Choose the threshold on validation data, not the test set.</li>
+      </ul>
+
+      <h3>3.6 ROC curve, AUC and PR curve</h3>
+      <ul>
+        <li><strong>ROC curve</strong>: recall (TPR) vs false positive rate across all thresholds.</li>
+        <li><strong>AUC</strong>: area under ROC, 0 to 1. Close to 1 = excellent at ranking positives above negatives; 0.5 = random guessing. Above 0.90 is excellent.</li>
+        <li>Use <strong>ROC</strong> when classes are fairly balanced; use the <strong>precision-recall curve</strong> when the positive class is rare and finding it matters.</li>
+      </ul>
+      <pre><code>fpr, tpr, _ = roc_curve(y_test, probabilities)
+auc = roc_auc_score(y_test, probabilities)
+plt.plot([0, 1], [0, 1], "k--")      # the random-classifier diagonal</code></pre>
+
+      <h3>3.7 Stratified cross-validation and tuning</h3>
+      <pre><code>cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
+scores = cross_validate(model, X_train, y_train, cv=cv,
+                        scoring={"recall": "recall", "f1": "f1", "roc_auc": "roc_auc"})
+
+knn_grid = GridSearchCV(models["KNN"],
+                        {"model__n_neighbors": [3, 5, 7, 11, 15],
+                         "model__weights": ["uniform", "distance"]},
+                        scoring="f1", cv=cv)
+# Best KNN parameters: n_neighbors=3, weights="uniform"   Best CV F1: 0.963</code></pre>
+      <ul>
+        <li><strong>StratifiedKFold</strong> keeps the class ratio in every fold; <code>shuffle=True</code> mixes rows first.</li>
+        <li><strong>cross_validate</strong> can return several metrics at once (cross_val_score returns one).</li>
+        <li>Preprocessing must stay inside the pipeline so each fold learns its scaling only from its own training part.</li>
+        <li>CV results in class: LR recall 0.953 ± 0.040, KNN 0.929 ± 0.024, RF 0.929 ± 0.044. The ± is the fold-to-fold variation.</li>
+      </ul>
+
+      <h3>3.8 Multiclass and error analysis</h3>
+      <p>Digits demo: accuracy 0.972, but classes <strong>1</strong> and <strong>8</strong> have only 0.89 precision and recall. The confusion matrix shows <em>which</em> classes are confused (similar shapes).</p>
+      <pre><code>errors = error_table[error_table["actual"] != error_table["predicted"]]   # the 4 LR mistakes
+error_review["confidence"] = np.maximum(p_malignant, 1 - p_malignant)    # uncertain or confidently wrong?</code></pre>
+      <p>Causes of errors: poor data quality, class imbalance, overlapping classes, insufficient features, overfitting. Fixes: more data, better features, balance classes, tune hyperparameters, another algorithm, inspect the errors by hand. In the LR demo, two of the four errors were borderline (malignant probability 0.49 and 0.51, right at the threshold), one was 0.31, and one was confidently wrong (0.06): that last one deserves a manual look.</p>
+      <pre><code>OneVsRestClassifier(LogisticRegression(max_iter=1000))     # multilabel: one classifier per label
+MultiOutputClassifier(LogisticRegression(max_iter=1000))   # multioutput: one model per target column</code></pre>
+
+      <div class="trap"><strong>Exam traps.</strong>
+        <ul>
+          <li>Precision looks at <em>predicted</em> positives; recall looks at <em>actual</em> positives.</li>
+          <li>Rows of the Scikit-Learn confusion matrix are actual; columns are predicted.</li>
+          <li>Same accuracy ≠ same model. Compare the error types.</li>
+          <li>Lowering the threshold raises recall, not precision.</li>
+          <li>PR curve for rare positives; ROC for balanced classes.</li>
+        </ul>
+      </div>
+      <details><summary>In disease screening, which matters more: precision or recall?</summary><p>Recall, because a false negative (a missed sick patient) is the most costly error.</p></details>
+      <details><summary>Why can scaling matter for KNN?</summary><p>KNN uses distances, so a feature with large numbers (income) would dominate one with small numbers (age).</p></details>
+      <details><summary>Why can different algorithms give different predictions on the same data?</summary><p>They learn different decision boundaries (linear, neighbour-based, tree-based) and have different hyperparameters.</p></details>
+    </section>
+
+    <!-- ───────────────────────── Module 4 ───────────────────────── -->
+    <section class="card" id="m4">
+      <h2>Module 4 · Training models</h2>
+      <p class="one-liner">Training = finding the parameters that make the <strong>cost</strong> (error) smallest. <strong>Gradient descent</strong> gets there step by step. Polynomial features add flexibility; <strong>regularization</strong> and <strong>early stopping</strong> stop that flexibility from overfitting. <strong>Logistic regression</strong> uses the same idea to output probabilities.</p>
+
+      <h3>4.1 Linear regression</h3>
+      <ul>
+        <li>Prediction = intercept + coefficient × feature (simple), or + one coefficient per feature (multiple).</li>
+        <li><strong>Coefficient</strong>: how much the prediction changes when that feature increases by 1 and the others stay the same. Positive → goes up together; negative → inverse; bigger magnitude → stronger. Compare magnitudes only if the features are scaled.</li>
+        <li><strong>Residual</strong> = actual − predicted. Small residuals = good fit.</li>
+      </ul>
+      <pre><code>X_simple = X[["MedInc"]]                  # one feature: median income
+lin_reg = LinearRegression()
+lin_reg.fit(X_simple, y)
+print(lin_reg.intercept_, lin_reg.coef_[0])   # positive slope: richer areas → pricier houses
+
+multi_reg = LinearRegression().fit(X, y)      # all features
+coef_df = pd.DataFrame({"Feature": X.columns, "Coefficient": multi_reg.coef_})</code></pre>
+      <p><strong>Computational complexity</strong> grows with the number of samples, the number of features and the algorithm (a direct solution vs iterative optimization). For very large data, gradient descent scales better.</p>
+
+      <h3>4.2 Gradient descent</h3>
+      <p>The cost for linear regression is the <strong>MSE</strong>. Gradient descent starts from random parameters and repeatedly takes a step <em>downhill</em>: opposite to the gradient (the direction where the cost grows fastest).</p>
+      <pre><code>X_b = np.c_[np.ones((100, 1)), X]         # add a column of 1s for the intercept
+theta = np.random.randn(2, 1)               # random start: [intercept, slope]
+for iteration in range(n_iterations):
+    gradients = (2 / m) * X_b.T.dot(X_b.dot(theta) - y)   # slope of the MSE, using ALL m rows
+    theta = theta - learning_rate * gradients              # step downhill</code></pre>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Learning rate (Module 4 lab)</th><th>What happens</th></tr></thead>
+        <tbody>
+          <tr><td>0.02 (too small)</td><td>Slow convergence: many tiny steps</td></tr>
+          <tr><td>0.1 (good)</td><td>Fast and stable</td></tr>
+          <tr><td>0.8 (too large)</td><td>Overshoots the minimum: unstable, can diverge</td></tr>
+        </tbody>
+      </table></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Variant</th><th>Data per update</th><th>Good</th><th>Bad</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Batch GD</strong></td><td>The whole training set</td><td>Smooth, stable path</td><td>Slow on large data</td></tr>
+          <tr><td><strong>Stochastic GD (SGD)</strong></td><td>One random example</td><td>Very fast, works on huge data, can escape local minima</td><td>Noisy, bounces around the minimum</td></tr>
+          <tr><td><strong>Mini-batch GD</strong></td><td>A small random batch</td><td>Balance of speed and stability</td><td>One more setting (batch size)</td></tr>
+        </tbody>
+      </table></div>
+      <p>Scale the features before gradient descent; otherwise one learning rate cannot suit features with very different ranges.</p>
+
+      <h3>4.3 Polynomial regression</h3>
+      <pre><code>for degree in [1, 2, 10]:
+    polynomial_model = Pipeline([
+        ("poly_features", PolynomialFeatures(degree=degree, include_bias=False)),
+        ("linear_regression", LinearRegression())])
+    polynomial_model.fit(X, y)</code></pre>
+      <ul>
+        <li><code>PolynomialFeatures</code> adds x², x³… so a <em>linear</em> model can draw a <em>curve</em> (it stays linear in its parameters).</li>
+        <li><code>include_bias=False</code>: skip the column of 1s, because LinearRegression already fits an intercept.</li>
+      </ul>
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th>Degree 1</th><th>Degree 2</th><th>Degree 10</th></tr></thead>
+        <tbody>
+          <tr><td>Complexity</td><td>Low</td><td>Moderate</td><td>Very high</td></tr>
+          <tr><td>Bias</td><td>High</td><td>Moderate</td><td>Low</td></tr>
+          <tr><td>Variance</td><td>Low</td><td>Moderate</td><td>High</td></tr>
+          <tr><td>Training error</td><td>High</td><td>Low</td><td>Very low</td></tr>
+          <tr><td>Test error</td><td>High</td><td>Low</td><td>High</td></tr>
+          <tr><td>Behaviour</td><td>Underfitting</td><td>Good fit</td><td>Overfitting</td></tr>
+        </tbody>
+      </table></div>
+      <pre><code>5-fold CV on 40 noisy points from a quadratic curve (Module 4 lab data)
+degree  train_RMSE  validation_RMSE
+     1       1.719            1.839     ← underfit: both high
+     2       0.744            0.772     ← best: lowest validation, small gap
+    10       0.656            1.148     ← overfit: lowest train, big gap</code></pre>
+
+      <h3>4.4 Learning curves</h3>
+      <pre><code>train_sizes, train_scores, validation_scores = learning_curve(
+    model, X, y, cv=5, scoring="neg_root_mean_squared_error",
+    train_sizes=np.linspace(0.1, 1.0, 10))
+train_rmse = -train_scores.mean(axis=1)          # negative scores → positive RMSE</code></pre>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Pattern</th><th>What you see</th><th>What to do</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Underfitting</strong></td><td>Training and validation errors both high and close (plateau)</td><td>More complex model / better features. More data will <strong>not</strong> help.</td></tr>
+          <tr><td><strong>Good generalization</strong></td><td>Both errors low and converge with a small gap</td><td>Keep it</td></tr>
+          <tr><td><strong>Overfitting</strong></td><td>Training error low, validation error much higher (a gap)</td><td>Regularize, simplify, or add more data (the gap may shrink)</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>4.5 Regularization: Ridge, Lasso, early stopping</h3>
+      <p>Regularization adds a <strong>penalty</strong> on large coefficients to the cost, so the model stays simpler and generalizes better. <code>alpha</code> = penalty strength (0 = plain linear regression; bigger = more shrinking, more bias, less variance). Scale the features first.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th>Ridge</th><th>Lasso</th></tr></thead>
+        <tbody>
+          <tr><td>Penalty</td><td>L2</td><td>L1</td></tr>
+          <tr><td>Effect</td><td>Shrinks all coefficients toward 0; keeps every feature</td><td>Can set some coefficients exactly to 0</td></tr>
+          <tr><td>Use</td><td>Many useful, correlated features</td><td>Automatic <strong>feature selection</strong>, simpler model</td></tr>
+        </tbody>
+      </table></div>
+      <pre><code>ridge_reg = Ridge(alpha=10).fit(X, y)
+lasso_reg = Lasso(alpha=0.1, random_state=42).fit(X, y)
+
+   Feature  Linear  Ridge(alpha=10)  Lasso(alpha=0.1)
+    MedInc  0.4367           0.4357            0.3906
+  AveRooms -0.1073          -0.1055           -0.0000   ← Lasso removed it
+ AveBedrms  0.6451           0.6352            0.0000   ← Lasso removed it
+  Latitude -0.4213          -0.4212           -0.1142</code></pre>
+      <p><strong>Early stopping</strong>: stop training when the validation error is at its minimum; after that point it rises while training error keeps falling (overfitting).</p>
+      <pre><code>sgd_reg = SGDRegressor(max_iter=1, tol=None, warm_start=True, random_state=42)
+for epoch in range(100):
+    sgd_reg.fit(X_train_scaled, y_train)          # ONE more epoch (warm_start keeps the weights)
+    val_rmse.append(np.sqrt(mean_squared_error(y_val, sgd_reg.predict(X_val_scaled))))
+best_epoch = np.argmin(val_rmse)                   # epoch with the lowest validation error</code></pre>
+      <ul>
+        <li><code>max_iter=1</code>: each <code>fit</code> runs one epoch. <code>tol=None</code>: don't stop on its own.</li>
+        <li><code>warm_start=True</code>: continue from the previous weights instead of starting over.</li>
+        <li>The data are scaled (StandardScaler fitted on train only) because SGD is sensitive to scale.</li>
+      </ul>
+
+      <h3>4.6 Logistic regression (a classifier, despite the name)</h3>
+      <ul>
+        <li>Computes a linear score, then the <strong>sigmoid</strong> squeezes it into a probability between 0 and 1.</li>
+        <li><strong>Decision threshold</strong> (default 0.5) turns the probability into a class. Where the class changes is the <strong>decision boundary</strong> (a straight line/plane).</li>
+        <li>Fast, gives interpretable probabilities, a strong baseline for binary problems (disease, spam, fraud, purchase).</li>
+      </ul>
+      <pre><code>log_reg = LogisticRegression(max_iter=5000, random_state=42)   # max_iter: enough steps to converge
+log_reg.fit(X_train, y_train)
+y_pred = log_reg.predict(X_test)          # class labels (threshold 0.5)
+y_prob = log_reg.predict_proba(X_test)    # [P(class 0), P(class 1)] for each row
+ConfusionMatrixDisplay.from_predictions(y_test, y_pred)
+RocCurveDisplay.from_estimator(log_reg, X_test, y_test)</code></pre>
+      <p>Two settings you may see: <code>C</code> is the <em>inverse</em> of regularization strength (smaller C = stronger penalty, simpler model); <code>class_weight="balanced"</code> gives the rare class more weight, which usually raises its recall.</p>
+
+      <div class="trap"><strong>Exam traps.</strong>
+        <ul>
+          <li>Lower training error does not mean a better model. Decide with validation error.</li>
+          <li>Lasso removes features; Ridge only shrinks them.</li>
+          <li>Too large a learning rate diverges; too small is slow. Scale the features.</li>
+          <li>Logistic regression is classification. Its output is a probability; the threshold makes the label.</li>
+          <li>Underfitting: more data won't help. Overfitting: more data can help.</li>
+        </ul>
+      </div>
+      <details><summary>Validation error starts rising while training error keeps falling. What is happening and what do you do?</summary><p>The model is starting to overfit. Stop at the epoch with the lowest validation error (early stopping).</p></details>
+      <details><summary>Why does PolynomialFeatures use include_bias=False before LinearRegression?</summary><p>LinearRegression already fits the intercept, so a column of 1s would be redundant.</p></details>
+      <details><summary>Which model gives automatic feature selection?</summary><p>Lasso (L1), because it can set coefficients exactly to zero.</p></details>
+    </section>
+
+    <!-- ───────────────────────── Module 5 ───────────────────────── -->
+    <section class="card" id="m5">
+      <h2>Module 5 · Decision trees</h2>
+      <p class="one-liner">A tree asks a series of yes/no questions about the features. <strong>CART</strong> chooses each question greedily to make the groups <strong>purer</strong>. Without limits it memorizes the data, so <code>max_depth</code> and the minimum-sample settings are its regularization.</p>
+
+      <h3>5.1 Structure</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Part</th><th>What it is</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Root node</strong></td><td>All the training data; holds the first split</td></tr>
+          <tr><td><strong>Internal node</strong></td><td>Applies a rule to one feature; True goes left, False goes right</td></tr>
+          <tr><td><strong>Leaf node</strong></td><td>No more splits; gives the prediction (majority class, or average value for regression)</td></tr>
+          <tr><td><strong>Decision rule</strong></td><td>Feature vs threshold, e.g. <code>petal length &lt;= 2.45</code>, "Income &gt; $60,000?"</td></tr>
+        </tbody>
+      </table></div>
+      <p>Splitting again and again is <strong>recursive partitioning</strong>, until a stopping rule (max depth, min samples, pure node). Big strength: <strong>interpretability</strong>; you can trace every prediction from root to leaf (useful in healthcare, finance, risk).</p>
+
+      <h3>5.2 Reading a node in plot_tree</h3>
+      <pre><code>petal length (cm) &lt;= 2.45     ← 1. the decision rule
+gini = 0.667                   ← 2. impurity (0 = pure)
+samples = 150                  ← 3. training rows reaching this node
+value = [50, 50, 50]           ← 4. rows of each class here
+class = setosa                 ← 5. majority class = the prediction</code></pre>
+      <p><code>value = [50, 0, 0]</code> is pure (only class 1). <code>value = [3, 25, 22]</code> is mixed.</p>
+      <pre><code>tree_clf = DecisionTreeClassifier(criterion="gini", max_depth=3, random_state=RANDOM_STATE)
+tree_clf.fit(X_train, y_train)
+print(tree_clf.get_depth(), tree_clf.get_n_leaves())     # 3 and 5: a small, readable tree
+plot_tree(tree_clf, feature_names=X.columns, class_names=iris.target_names,
+          filled=True, rounded=True)                     # filled: colour by majority class</code></pre>
+
+      <h3>5.3 Gini impurity and entropy</h3>
+      <ul>
+        <li>Both measure how <strong>mixed</strong> a node is. Pure node = 0. CART picks the split with the biggest drop in impurity.</li>
+        <li><strong>Gini</strong>: chance of misclassifying a random item. Default in Scikit-Learn, slightly faster.</li>
+        <li><strong>Entropy</strong>: uncertainty (information theory).</li>
+        <li>They usually give very similar trees. Demo (Iris, depth 3): both had test accuracy 0.895, depth 3, 5 leaves.</li>
+      </ul>
+      <pre><code>Node                             Gini   Entropy
+Pure node [1, 0, 0]              0.000    0.000
+Balanced node [1/3, 1/3, 1/3]    0.667    1.585
+Mixed node [0.5, 0.5, 0]         0.500    1.000</code></pre>
+
+      <h3>5.4 CART (how the tree is built)</h3>
+      <ol>
+        <li>Evaluate candidate splits (every feature and threshold).</li>
+        <li>Measure the impurity of the resulting groups.</li>
+        <li>Choose the split with the greatest impurity reduction.</li>
+        <li>Partition the data, then repeat for each child (recursively).</li>
+        <li>Stop when a criterion is met (max depth, too few samples, pure nodes).</li>
+      </ol>
+      <p><strong>Greedy</strong>: the best split <em>right now</em>, not the best possible tree overall (fast, works well, not guaranteed optimal). <strong>Binary</strong>: every node has exactly two branches.</p>
+      <p><strong>Complexity:</strong> training is costly (many candidate splits; grows with samples, features and depth). Prediction is very cheap: one path from root to leaf.</p>
+
+      <h3>5.5 predict vs predict_proba</h3>
+      <pre><code>sample = X_test.iloc[[0]]                     # double brackets: keep it as a 2-D table
+tree_clf.predict(sample)                      # → setosa (the majority class of its leaf)
+tree_clf.predict_proba(sample)                # → [1.0, 0.0, 0.0] (class shares in that leaf)</code></pre>
+      <p>Leaf <code>value = [0, 2, 43]</code> → predicts virginica with probability 43/45 ≈ 96%. A balanced leaf like [0.20, 0.80] means less confidence (80% for the second class).</p>
+
+      <h3>5.6 Regularization hyperparameters</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Hyperparameter</th><th>Purpose</th><th>To make the tree simpler</th></tr></thead>
+        <tbody>
+          <tr><td><code>max_depth</code></td><td>Limits the number of levels (None = unlimited)</td><td>Use a <strong>smaller</strong> value</td></tr>
+          <tr><td><code>min_samples_split</code></td><td>Minimum rows needed to split a node</td><td>Use a <strong>larger</strong> value (fewer splits)</td></tr>
+          <tr><td><code>min_samples_leaf</code></td><td>Minimum rows that must stay in each leaf</td><td>Use a <strong>larger</strong> value (more stable predictions)</td></tr>
+          <tr><td><code>max_leaf_nodes</code></td><td>Maximum number of leaves</td><td>Use a <strong>smaller</strong> value</td></tr>
+          <tr><td><code>criterion</code></td><td>"gini" or "entropy": how splits are scored</td><td>No real effect on size</td></tr>
+        </tbody>
+      </table></div>
+      <p class="muted small">Careful: the Cascade table says a larger <code>max_depth</code> "produces a simpler tree". It is the opposite: a larger max_depth allows a deeper, more complex tree. In the exam, explain it the correct way.</p>
+      <pre><code>Moons dataset (Module 5 demo)
+max_depth            train_accuracy  test_accuracy  leaves
+1                             0.843          0.807       2   ← underfit (too simple)
+2                             0.911          0.893       4
+4                             0.911          0.893       8
+5                             0.974          0.947      10   ← good choice
+None (unrestricted)           1.000          0.947      22   ← memorizes, no test gain</code></pre>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Shallow tree</th><th>Appropriate tree</th><th>Overgrown tree</th></tr></thead>
+        <tbody>
+          <tr><td>High bias, underfits, poor on train and test</td><td>Captures the pattern, small train-test gap</td><td>High variance, fragmented regions, train ≫ test</td></tr>
+        </tbody>
+      </table></div>
+      <p><strong>Decision boundaries</strong> are <strong>axis-aligned</strong> (rectangles, stair shapes) because each rule tests one feature against a threshold. That is also why trees <strong>don't need feature scaling</strong>.</p>
+
+      <h3>5.7 Tuning with GridSearchCV (demo + in-class activity)</h3>
+      <pre><code>param_grid = {"max_depth": [2, 3, 4, 5, None],
+              "min_samples_leaf": [1, 2, 5, 10],
+              "criterion": ["gini", "entropy"]}
+search = GridSearchCV(DecisionTreeClassifier(random_state=RANDOM_STATE),
+                      param_grid=param_grid, cv=5, scoring="accuracy", n_jobs=-1)
+search.fit(X_train, y_train)
+# Best parameters: gini, max_depth=3, min_samples_leaf=1
+# Best cross-validation accuracy: 0.938   Test accuracy: 0.895</code></pre>
+      <ul>
+        <li>Test (0.895) &lt; CV (0.938): the best CV score is a bit optimistic, and the Iris test set is small (38 flowers: one error ≈ 2.6 points). Report the test score.</li>
+        <li>Many combinations tied at 0.938, so prefer the <strong>simplest</strong> tree.</li>
+        <li>CV is more reliable than choosing by training accuracy, which always favours the deepest tree.</li>
+      </ul>
+
+      <h3>5.8 Feature importance and regression trees</h3>
+      <pre><code>importance = pd.Series(tree_2d.feature_importances_, index=X_2d.columns)
+# petal length 0.586, petal width 0.414 → share of total impurity reduction</code></pre>
+      <p>Importance can change with the data, the split or the settings, and it is <strong>not causation</strong>.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th>DecisionTreeClassifier</th><th>DecisionTreeRegressor</th></tr></thead>
+        <tbody>
+          <tr><td>Target</td><td>A class</td><td>A number</td></tr>
+          <tr><td>Leaf predicts</td><td>Majority class</td><td>Average target value (step-shaped curve)</td></tr>
+          <tr><td>Split criterion</td><td>Gini / entropy</td><td>Error reduction (usually MSE)</td></tr>
+          <tr><td>Metrics</td><td>Accuracy, precision, recall</td><td>RMSE, MAE, R²</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="trap"><strong>Exam traps.</strong>
+        <ul>
+          <li>100% training accuracy is a warning sign, not a success.</li>
+          <li>Gini and entropy rarely change the result much; depth does.</li>
+          <li>CART is greedy and binary, so it is not guaranteed to find the globally best tree.</li>
+          <li>Training is expensive; prediction is cheap.</li>
+          <li>predict gives the class; predict_proba gives the class shares in the leaf.</li>
+        </ul>
+      </div>
+      <details><summary>The in-class activity asks: why is the highest training accuracy not automatically the best choice?</summary><p>An unrestricted tree reaches 100% on training by memorizing noise; what matters is accuracy on unseen data (CV or test).</p></details>
+      <details><summary>Are tree decision boundaries smooth, diagonal or axis-aligned?</summary><p>Axis-aligned, because each rule compares one feature with a threshold.</p></details>
+      <details><summary>What does a leaf with probabilities [0.20, 0.80] mean?</summary><p>80% of the training rows in that leaf belong to the second class, so the tree predicts it with 80% confidence.</p></details>
+    </section>
+
+    <!-- ───────────────────────── Module 6 ───────────────────────── -->
+    <section class="card" id="m6">
+      <h2>Module 6 · Ensemble learning &amp; Random Forests</h2>
+      <p class="one-liner">One tree is unstable (<strong>high variance</strong>). Many <strong>diverse</strong> models make different errors that cancel out. <strong>Bagging-type</strong> methods train independent trees to cut variance; <strong>boosting</strong> trains learners one after another to cut bias; <strong>voting</strong> and <strong>stacking</strong> combine different algorithms.</p>
+
+      <h3>6.1 Voting classifiers</h3>
+      <ul>
+        <li><strong>Hard voting</strong>: each model votes a label, majority wins (A, A, B, A → A).</li>
+        <li><strong>Soft voting</strong>: average the predicted probabilities, so confident models count more. Every model needs <code>predict_proba</code>, so the demo uses <code>SVC(probability=True)</code>.</li>
+        <li>Works best with <strong>diverse</strong> and reasonably accurate base models (LR + tree + SVM/KNN).</li>
+      </ul>
+      <pre><code>base_estimators = [
+    ("lr", make_pipeline(StandardScaler(), LogisticRegression(max_iter=5000))),
+    ("tree", DecisionTreeClassifier(max_depth=4)),
+    ("svc", make_pipeline(StandardScaler(), SVC(probability=True)))]
+hard_voting = VotingClassifier(estimators=base_estimators, voting="hard")
+soft_voting = VotingClassifier(estimators=base_estimators, voting="soft")
+# LR 0.986 · Hard Voting 0.986 · SVM 0.979 · Soft Voting 0.972 · Decision Tree 0.944</code></pre>
+      <p>Here the ensemble did <strong>not</strong> beat logistic regression: an ensemble is not automatically better.</p>
+
+      <h3>6.2 Bagging, pasting and OOB</h3>
+      <ul>
+        <li><strong>Bagging</strong> (bootstrap aggregating): each model trains on a random sample drawn <strong>with replacement</strong> (rows can repeat). <strong>Pasting</strong>: <strong>without</strong> replacement.</li>
+        <li>Same algorithm, different data subsets, trained <strong>independently</strong> (in parallel); combine by majority vote (classification) or average (regression).</li>
+        <li>Main goal: <strong>reduce variance</strong> and overfitting of high-variance models like deep trees.</li>
+        <li><strong>OOB (out-of-bag)</strong>: each bootstrap sample holds about <strong>63.2%</strong> of the rows; the other <strong>36.8% (~37%)</strong> are out-of-bag. Each tree is scored on its OOB rows, which gives a validation estimate <strong>without a separate validation set</strong>.</li>
+      </ul>
+      <pre><code>bagging = BaggingClassifier(
+    estimator=DecisionTreeClassifier(random_state=RANDOM_STATE),   # the base learner
+    n_estimators=100,      # 100 trees
+    max_samples=1.0,       # each bootstrap sample = 100% of the training size
+    bootstrap=True,        # with replacement (False would be pasting)
+    oob_score=True,        # compute the OOB estimate
+    n_jobs=-1)             # use all CPU cores (trees are independent)
+# Bagging test accuracy 0.951 · OOB accuracy 0.955</code></pre>
+
+      <h3>6.3 Random Forest and Extra Trees</h3>
+      <p><strong>Random Forest</strong> = bagging of trees <strong>+ a random subset of features at each split</strong>. Trees become less correlated, so averaging them reduces variance more. Scikit-Learn predicts the class with the highest average probability across trees.</p>
+      <pre><code>forest = RandomForestClassifier(
+    n_estimators=200,         # number of trees
+    max_features="sqrt",      # √(number of features) candidates per split → diversity
+    oob_score=True, random_state=RANDOM_STATE, n_jobs=-1)
+# Random Forest test accuracy 0.958 · OOB accuracy 0.962</code></pre>
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th>Random Forest</th><th>Extra Trees</th></tr></thead>
+        <tbody>
+          <tr><td>Training data</td><td>Bootstrap samples</td><td>Whole training set (default)</td></tr>
+          <tr><td>Features per split</td><td>Random subset</td><td>Random subset</td></tr>
+          <tr><td>Split threshold</td><td>Best threshold searched</td><td>Random threshold</td></tr>
+          <tr><td>Diversity</td><td>High</td><td>Very high</td></tr>
+          <tr><td>Training speed</td><td>Fast</td><td>Faster</td></tr>
+          <tr><td>Bias / variance</td><td>Lower bias / low variance</td><td>Slightly higher bias / often lower variance</td></tr>
+          <tr><td>Feature importance</td><td>Yes</td><td>Yes</td></tr>
+        </tbody>
+      </table></div>
+      <pre><code>Model           Test accuracy   OOB accuracy
+Extra Trees             0.965            NaN   ← no bootstrap by default → no OOB
+Random Forest           0.958          0.962   ← OOB close to test: reliable estimate
+Bagging                 0.951          0.955
+Single tree             0.944            NaN   ← baseline (max_depth=4, 11 leaves)</code></pre>
+
+      <h3>6.4 Feature importance</h3>
+      <pre><code>importance = pd.Series(forest.feature_importances_, index=X.columns).sort_values(ascending=False)
+# worst perimeter 0.1457 · worst area 0.1368 · worst concave points 0.1072 · mean concave points 0.1039</code></pre>
+      <ul>
+        <li>= <strong>mean decrease in impurity</strong>: how much each feature reduced impurity across all the trees.</li>
+        <li>Useful for interpretation and feature selection, but it shows <strong>association, not causation</strong>.</li>
+        <li><strong>Correlated features share importance</strong>: perimeter, area and radius all measure size, so the credit is split between them.</li>
+      </ul>
+
+      <h3>6.5 Boosting: AdaBoost and Gradient Boosting</h3>
+      <p>Learners are trained <strong>sequentially</strong>; each new one fixes the mistakes of the ones before. Turns weak learners into a strong one, mainly <strong>reduces bias</strong>, and cannot be fully parallelized.</p>
+      <pre><code>ada = AdaBoostClassifier(
+    estimator=DecisionTreeClassifier(max_depth=1),   # a decision STUMP: one split, a weak learner
+    n_estimators=100, learning_rate=0.5, random_state=RANDOM_STATE)
+gradient = GradientBoostingClassifier(
+    n_estimators=100,      # trees added one after another
+    learning_rate=0.05,    # how much each tree contributes (shrinkage)
+    max_depth=2, random_state=RANDOM_STATE)
+# AdaBoost 0.965 · Gradient Boosting 0.944</code></pre>
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th>AdaBoost</th><th>Gradient Boosting</th></tr></thead>
+        <tbody>
+          <tr><td>What the next learner focuses on</td><td>Misclassified rows get <strong>bigger weights</strong></td><td>Fits the <strong>residual errors</strong> (negative gradients of the loss)</td></tr>
+          <tr><td>How learners are combined</td><td>Weighted vote; more accurate learners get more say</td><td>Sum of all trees, scaled by the learning rate</td></tr>
+          <tr><td>Typical base learner</td><td>Decision stumps</td><td>Small trees</td></tr>
+          <tr><td>Watch out</td><td>Sensitive to noise and outliers</td><td>Needs careful tuning; can overfit</td></tr>
+        </tbody>
+      </table></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Bagging (and Random Forest)</th><th>Boosting</th></tr></thead>
+        <tbody>
+          <tr><td>Independent learners, trained in parallel</td><td>Sequential learners, each correcting the last</td></tr>
+          <tr><td>Bootstrap samples</td><td>Re-weighted rows (AdaBoost) or residuals (Gradient Boosting)</td></tr>
+          <tr><td>Mainly reduces <strong>variance</strong></td><td>Mainly reduces <strong>bias</strong></td></tr>
+          <tr><td>Robust, little tuning</td><td>Very accurate, but sensitive to noise and tuning</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>6.6 Stacking</h3>
+      <pre><code>stacking = StackingClassifier(
+    estimators=[("lr", LogisticRegression(max_iter=3000)),
+                ("tree", DecisionTreeClassifier(max_depth=4)),
+                ("forest", RandomForestClassifier(n_estimators=100))],
+    final_estimator=LogisticRegression(max_iter=3000),   # the META-MODEL
+    cv=5)                                                # out-of-fold predictions → no leakage
+# Stacking test accuracy 0.972</code></pre>
+      <p>Voting uses a fixed rule; stacking <strong>learns</strong> how much to trust each base model. Its training data are cross-validated predictions, which reduces information leakage. It is more complex and expensive.</p>
+
+      <h3>6.7 The final comparison (Module 6 demo, 143 test patients)</h3>
+      <pre><code>Model                 Accuracy   Errors
+Logistic Regression      0.986        2
+Hard Voting              0.986        2
+SVM                      0.979        3
+Soft Voting              0.972        4
+Stacking                 0.972        4
+Extra Trees              0.965        5
+AdaBoost                 0.965        5
+Random Forest            0.958        6
+Bagging                  0.951        7
+Decision Tree            0.944        8
+Gradient Boosting        0.944        8
+
+Random Forest confusion matrix (rows = true)   malignant  benign
+                              true malignant          49       4
+                              true benign              2      88</code></pre>
+      <ul>
+        <li>The differences are small (2 to 8 errors out of 143), so confirm with cross-validation.</li>
+        <li>A simple, scaled logistic regression won: this data is almost linearly separable, so extra flexibility didn't help.</li>
+        <li>The Random Forest's 4 errors in the top row are malignant tumours predicted benign: the most dangerous error in screening. Check recall, not only accuracy.</li>
+      </ul>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Method</th><th>Main advantage</th><th>Main limitation</th></tr></thead>
+        <tbody>
+          <tr><td>Voting</td><td>Simple, often more accurate</td><td>Needs diverse, decent base models</td></tr>
+          <tr><td>Bagging</td><td>Lower variance, more stable</td><td>Many models to train</td></tr>
+          <tr><td>Random Forest</td><td>Accurate, generalizes well, feature importance</td><td>Less interpretable than one tree</td></tr>
+          <tr><td>AdaBoost</td><td>Focuses on hard cases</td><td>Sensitive to noise and outliers</td></tr>
+          <tr><td>Gradient Boosting</td><td>Excellent accuracy, flexible</td><td>Needs careful tuning, can overfit</td></tr>
+          <tr><td>Stacking</td><td>Learns the best combination</td><td>Complex and expensive</td></tr>
+        </tbody>
+      </table></div>
+      <p>Overall: ensembles trade <strong>simplicity and interpretability</strong> for <strong>accuracy and robustness</strong>.</p>
+
+      <div class="trap"><strong>Exam traps.</strong>
+        <ul>
+          <li>Bagging = independent / parallel / variance. Boosting = sequential / bias.</li>
+          <li>Random Forest = bagging + random features. Extra Trees = also random thresholds, no bootstrap by default.</li>
+          <li>OOB ≈ 37% of rows, an estimate without a validation set (NaN when there is no bootstrap).</li>
+          <li>Feature importance is not causation; correlated features share it.</li>
+          <li>Ensembles are not always better than a simple model.</li>
+        </ul>
+      </div>
+      <details><summary>Why might a single tree be sensitive to changes in the training data?</summary><p>It has high variance: a small change can change the first splits, and every split below them changes too.</p></details>
+      <details><summary>What extra randomness does a Random Forest introduce compared with bagging?</summary><p>A random subset of features at each split.</p></details>
+      <details><summary>Medical screening: which is more serious, malignant predicted as benign or the reverse?</summary><p>Malignant predicted as benign (a false negative): a cancer goes untreated. So look at recall too, not only accuracy.</p></details>
+    </section>
+
+    <!-- ───────────────────────── Code cheat sheet ───────────────────────── -->
+    <section class="card" id="cheat">
+      <h2>Code cheat sheet (Section 2)</h2>
+      <p>What to say about every function and parameter used in class.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Code</th><th>What it does / what to say</th></tr></thead>
+        <tbody>
+          <tr><td><code>train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)</code></td><td>Holds out 20% as an unseen test set. random_state = same split every run (reproducible). stratify = same class ratio in both sets.</td></tr>
+          <tr><td><code>RANDOM_STATE = 42</code></td><td>Fixes randomness so results can be reproduced and compared.</td></tr>
+          <tr><td><code>.fit(X_train, y_train)</code></td><td>Learns the parameters (or the preprocessing statistics) from training data.</td></tr>
+          <tr><td><code>.predict(X)</code> / <code>.predict_proba(X)</code></td><td>Class labels (threshold 0.5) / probability for each class. <code>[:, 1]</code> = probability of the positive class.</td></tr>
+          <tr><td><code>.score(X, y)</code></td><td>Accuracy for classifiers, R² for regressors.</td></tr>
+          <tr><td><code>scaler.fit_transform(X_train)</code> then <code>scaler.transform(X_test)</code></td><td>Learn mean/std from train only, apply to test → no leakage.</td></tr>
+          <tr><td><code>SimpleImputer(strategy="median")</code></td><td>Fills missing values with the column median (robust to outliers).</td></tr>
+          <tr><td><code>StandardScaler()</code> / <code>MinMaxScaler()</code></td><td>Standardization (mean 0, std 1) / normalization (0 to 1).</td></tr>
+          <tr><td><code>OneHotEncoder(handle_unknown="ignore")</code></td><td>One 0/1 column per category; unknown categories become zeros.</td></tr>
+          <tr><td><code>Pipeline([...])</code> / <code>make_pipeline(...)</code></td><td>Chains preprocessing + model; same steps everywhere; prevents leakage inside CV.</td></tr>
+          <tr><td><code>ColumnTransformer([...])</code></td><td>Different preprocessing for different columns.</td></tr>
+          <tr><td><code>DummyClassifier(strategy="most_frequent")</code> / <code>DummyRegressor(strategy="mean")</code></td><td>Baseline to beat.</td></tr>
+          <tr><td><code>cross_val_score(model, X, y, cv=5, scoring="f1")</code></td><td>5-fold CV: 5 scores; report mean (performance) and std (stability).</td></tr>
+          <tr><td><code>cross_validate(..., scoring={...})</code></td><td>Like cross_val_score but several metrics at once.</td></tr>
+          <tr><td><code>StratifiedKFold(n_splits=5, shuffle=True, random_state=42)</code></td><td>Folds that keep the class ratio; shuffled first.</td></tr>
+          <tr><td><code>scoring="neg_root_mean_squared_error"</code></td><td>Negative because Scikit-Learn maximizes scores; flip the sign.</td></tr>
+          <tr><td><code>GridSearchCV(model, param_grid, cv=5, scoring=...)</code></td><td>Tries every combination with CV; refits the best on all training data. <code>best_params_</code>, <code>best_score_</code> (mean CV), <code>best_estimator_</code>.</td></tr>
+          <tr><td><code>"model__n_estimators"</code></td><td>Parameter of the step called "model" inside a pipeline.</td></tr>
+          <tr><td><code>RandomizedSearchCV(..., n_iter=...)</code></td><td>Tries n_iter random combinations: faster on large search spaces.</td></tr>
+          <tr><td><code>n_jobs=-1</code></td><td>Use all CPU cores in parallel.</td></tr>
+          <tr><td><code>LinearRegression().coef_</code>, <code>.intercept_</code></td><td>Learned weights per feature and the intercept.</td></tr>
+          <tr><td><code>PolynomialFeatures(degree=2, include_bias=False)</code></td><td>Adds x², … so a linear model can fit curves; degree = flexibility.</td></tr>
+          <tr><td><code>Ridge(alpha=10)</code> / <code>Lasso(alpha=0.1)</code></td><td>L2 shrinks all / L1 sets some to zero. alpha = penalty strength.</td></tr>
+          <tr><td><code>SGDRegressor(max_iter=1, tol=None, warm_start=True)</code></td><td>One epoch per fit, continuing from previous weights → early stopping loop.</td></tr>
+          <tr><td><code>learning_curve(model, X, y, cv=5, train_sizes=...)</code></td><td>Train vs validation error as the training set grows → diagnose under/overfitting.</td></tr>
+          <tr><td><code>np.argmin(val_rmse)</code></td><td>Index of the lowest validation error (best epoch).</td></tr>
+          <tr><td><code>LogisticRegression(max_iter=5000, C=..., class_weight="balanced")</code></td><td>Binary classifier with probabilities. max_iter = enough steps to converge; C = inverse regularization strength; balanced = more weight to the rare class.</td></tr>
+          <tr><td><code>(y_prob &gt;= 0.3).astype(int)</code></td><td>Custom threshold: more positives → higher recall, lower precision.</td></tr>
+          <tr><td><code>confusion_matrix</code>, <code>ConfusionMatrixDisplay</code>, <code>classification_report</code></td><td>Error types (rows actual, columns predicted) / per-class precision, recall, F1, support.</td></tr>
+          <tr><td><code>roc_curve</code>, <code>roc_auc_score</code>, <code>RocCurveDisplay</code></td><td>TPR vs FPR over thresholds; AUC 1 = perfect, 0.5 = random.</td></tr>
+          <tr><td><code>KNeighborsClassifier(n_neighbors=7)</code></td><td>Predicts from the 7 nearest examples; needs scaling; small k = overfit, large k = underfit.</td></tr>
+          <tr><td><code>DecisionTreeClassifier(criterion, max_depth, min_samples_split, min_samples_leaf, max_leaf_nodes)</code></td><td>Tree with complexity limits (regularization). No scaling needed.</td></tr>
+          <tr><td><code>get_depth()</code>, <code>get_n_leaves()</code>, <code>plot_tree(...)</code></td><td>Measure and draw the tree's complexity.</td></tr>
+          <tr><td><code>feature_importances_</code></td><td>Share of impurity reduction per feature; not causation.</td></tr>
+          <tr><td><code>VotingClassifier(voting="hard"/"soft")</code></td><td>Majority of labels / average of probabilities.</td></tr>
+          <tr><td><code>BaggingClassifier(estimator, n_estimators, bootstrap=True, oob_score=True)</code></td><td>Many trees on bootstrap samples; OOB estimate via <code>oob_score_</code>.</td></tr>
+          <tr><td><code>RandomForestClassifier(n_estimators=200, max_features="sqrt", oob_score=True)</code></td><td>Bagging + random features per split.</td></tr>
+          <tr><td><code>ExtraTreesClassifier(n_estimators=200)</code></td><td>Random thresholds too; no bootstrap by default.</td></tr>
+          <tr><td><code>AdaBoostClassifier(estimator=DecisionTreeClassifier(max_depth=1), learning_rate=0.5)</code></td><td>Sequential stumps; re-weights misclassified rows.</td></tr>
+          <tr><td><code>GradientBoostingClassifier(n_estimators, learning_rate, max_depth)</code></td><td>Sequential small trees fitted to residuals; learning rate = contribution of each tree.</td></tr>
+          <tr><td><code>StackingClassifier(estimators, final_estimator, cv=5)</code></td><td>Meta-model learns to combine base models from out-of-fold predictions.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- ───────────────────────── Last-minute review ───────────────────────── -->
+    <section class="card" id="review">
+      <h2>Last-minute review</h2>
+      <h3>Pairs people mix up</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Pair</th><th>Tell them apart</th></tr></thead>
+        <tbody>
+          <tr><td>Precision vs recall</td><td>Right when it says positive vs finds the real positives</td></tr>
+          <tr><td>False positive vs false negative</td><td>False alarm vs missed case</td></tr>
+          <tr><td>Overfitting vs underfitting</td><td>Train ≫ test (variance) vs both bad (bias)</td></tr>
+          <tr><td>Bias vs variance</td><td>Too simple, wrong everywhere vs too sensitive to the training data</td></tr>
+          <tr><td>Validation set vs test set</td><td>For choosing and tuning vs one final honest score</td></tr>
+          <tr><td>Parameter vs hyperparameter</td><td>Learned (coefficients) vs chosen before training (max_depth, alpha)</td></tr>
+          <tr><td>fit_transform vs transform</td><td>Learn + apply (train) vs only apply (test)</td></tr>
+          <tr><td>Normalization vs standardization</td><td>0 to 1 vs mean 0, std 1</td></tr>
+          <tr><td>Label vs one-hot encoding</td><td>Ordered categories vs nominal categories</td></tr>
+          <tr><td>Grid vs randomized search</td><td>Every combination vs a random sample of them</td></tr>
+          <tr><td>ROC vs PR curve</td><td>Balanced classes vs rare positives</td></tr>
+          <tr><td>Batch vs stochastic vs mini-batch GD</td><td>All rows vs one row vs a small batch per step</td></tr>
+          <tr><td>Ridge vs Lasso</td><td>L2 shrinks all vs L1 can zero some out (feature selection)</td></tr>
+          <tr><td>predict vs predict_proba</td><td>Label vs probabilities</td></tr>
+          <tr><td>Gini vs entropy</td><td>Default and slightly faster vs information-based; similar trees</td></tr>
+          <tr><td>Hard vs soft voting</td><td>Count labels vs average probabilities</td></tr>
+          <tr><td>Bagging vs pasting</td><td>With vs without replacement</td></tr>
+          <tr><td>Bagging vs boosting</td><td>Parallel, lowers variance vs sequential, lowers bias</td></tr>
+          <tr><td>Random Forest vs Extra Trees</td><td>Best threshold, bootstrap vs random threshold, whole data</td></tr>
+          <tr><td>AdaBoost vs Gradient Boosting</td><td>Re-weights misclassified rows vs fits residuals</td></tr>
+          <tr><td>Voting vs stacking</td><td>Fixed rule vs a meta-model learns the combination</td></tr>
+          <tr><td>OOB vs cross-validation</td><td>Free estimate from left-out bootstrap rows vs repeated folds</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Say these out loud before the exam</h3>
+      <details><summary>What is the first step of any ML project?</summary><p>Frame the problem: the business objective with stakeholders, the task type (classification/regression) and the performance measure that matches the cost of errors.</p></details>
+      <details><summary>What is data leakage and how do you prevent it?</summary><p>Information from the test set or the future reaching training, which makes scores too optimistic. Split first, fit preprocessing on training data only inside a Pipeline, tune with CV, and test once.</p></details>
+      <details><summary>Why cross-validation instead of one split?</summary><p>One split can be lucky or unlucky. k-fold trains and validates k times, so the mean is more reliable and the std shows stability.</p></details>
+      <details><summary>Why is accuracy misleading on imbalanced data?</summary><p>Always predicting the majority class already scores high (94% with 6% positives) while finding no positives. Use recall, precision, F1 and the confusion matrix.</p></details>
+      <details><summary>What happens when you lower the decision threshold?</summary><p>More cases are predicted positive: recall rises, precision usually falls. Use it when missing a positive is costly, and choose the threshold on validation data.</p></details>
+      <details><summary>How does gradient descent work, and what does the learning rate do?</summary><p>It starts from random parameters and repeatedly steps opposite to the gradient of the cost (MSE) to reduce it. The learning rate is the step size: too small is slow, too large overshoots and diverges.</p></details>
+      <details><summary>How do you detect overfitting with learning curves, and how do you fix it?</summary><p>Training error is low and validation error much higher (a gap). Fix it with regularization (Ridge/Lasso, max_depth), a simpler model, early stopping or more data.</p></details>
+      <details><summary>How does CART build a tree?</summary><p>Greedily: at each node it tries features and thresholds, keeps the split with the largest impurity reduction (Gini or entropy), and repeats on each child until a stopping rule.</p></details>
+      <details><summary>Why is a Random Forest better than one tree?</summary><p>One tree has high variance. A forest trains many trees on bootstrap samples with random features per split, so they are diverse and their averaged vote has lower variance and generalizes better. OOB gives a built-in estimate.</p></details>
+      <details><summary>Bagging vs boosting in one breath?</summary><p>Bagging trains independent models in parallel on bootstrap samples and mainly reduces variance. Boosting trains models one after another, each fixing the previous errors, and mainly reduces bias.</p></details>
+      <details><summary>Does high feature importance prove causation?</summary><p>No. It shows the model relies on the feature (association). Confounders and correlated features can explain it, and correlated features share importance.</p></details>
+      <details><summary>When would you choose a simple tree or logistic regression over an ensemble?</summary><p>When decisions must be explained (healthcare, finance), when the accuracy gain is small or not confirmed by CV, or when the data are nearly linear, as in the breast-cancer demo where logistic regression won.</p></details>
+    </section>
+  </main>
+  <footer class="site-footer">Study aid, not official course material. Built from the Module 1–6 Cascade content, the teaching demos and the in-class activities.</footer>
+</body>
+</html>
