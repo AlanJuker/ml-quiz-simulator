@@ -1,7 +1,10 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const QUESTIONS = require("../questions.js");
-const { buildQuiz, suggestPoints, itemScore, grade } = require("../quiz.js");
+const MIDTERM = require("../midterm.js");
+const { buildQuiz, buildMidterm, suggestPoints, itemScore, grade } = require("../quiz.js");
+
+const SECTIONS = ["Workflow & methodology", "Python code interpretation", "Model output & interpretation"];
 
 test("question bank is well formed", () => {
   const ids = new Set();
@@ -89,4 +92,46 @@ test("grade aggregates totals and groups", () => {
   assert.equal(g.groups["Module 1"].earned, 1);
   assert.equal(g.groups["Open answer"].earned, 1 / openQ.keyPoints.length);
   assert.equal(g.percent, Math.round(((1 + 1 / openQ.keyPoints.length) / 2) * 100));
+});
+
+test("midterm bank: 10 written questions per section, one key point per mark", () => {
+  const ids = new Set(QUESTIONS.map((q) => q.id));
+  for (const q of MIDTERM) {
+    assert.ok(!ids.has(q.id), `duplicate id ${q.id}`);
+    ids.add(q.id);
+    assert.equal(q.type, "open", q.id);
+    assert.ok([2, 3, 4, 5, 6].includes(q.module), q.id);
+    assert.ok(SECTIONS.includes(q.section), q.id);
+    assert.equal(q.marks, q.section === SECTIONS[2] ? 4 : 5, q.id);
+    assert.equal(q.keyPoints.length, q.marks, `${q.id}: one key point per mark`);
+    assert.ok(q.prompt.length > 10 && q.modelAnswer, q.id);
+    if (q.kind === "code" || q.section === SECTIONS[2]) assert.ok(q.code, `${q.id} needs its code or output`);
+    for (const p of q.keyPoints) assert.ok(p.text && p.keywords.length, q.id);
+    assert.ok(suggestPoints(q, q.modelAnswer).every(Boolean), `${q.id}: the model answer should earn full marks`);
+  }
+  for (const section of SECTIONS) assert.equal(MIDTERM.filter((q) => q.section === section).length, 10, section);
+});
+
+test("midterm: 2 questions per section in exam order, unseen questions first", () => {
+  const seen = {};
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const exam = buildMidterm(MIDTERM, seen);
+    assert.deepEqual(exam.map((it) => it.q.section), SECTIONS.flatMap((s) => [s, s]));
+    exam.forEach((it) => (seen[it.q.id] = (seen[it.q.id] || 0) + 1));
+  }
+  assert.ok(MIDTERM.every((q) => seen[q.id] === 1), "5 attempts cover all 30 questions once each");
+});
+
+test("midterm score is weighted by marks", () => {
+  const five = MIDTERM.find((q) => q.marks === 5);
+  const four = MIDTERM.find((q) => q.marks === 4);
+  const items = [
+    { q: five, text: "x", points: five.keyPoints.map(() => true) },
+    { q: four, text: "x", points: [true, true, false, false] },
+  ];
+  const g = grade(items);
+  assert.equal(g.earned, 7);
+  assert.equal(g.total, 9);
+  assert.equal(g.percent, 78);
+  assert.equal(g.groups[four.section].total, 4);
 });

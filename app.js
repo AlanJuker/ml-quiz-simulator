@@ -1,8 +1,9 @@
-/* global QUESTIONS, buildQuiz, suggestPoints, itemScore, grade */
+/* global QUESTIONS, MIDTERM, buildQuiz, buildMidterm, suggestPoints, itemScore, grade */
 // UI layer: renders the four screens (setup → quiz → self-grading → results) into #app.
 
 const app = document.getElementById("app");
 const HISTORY_KEY = "mlquiz.history";
+const SEEN_KEY = "mlquiz.midterm.seen"; // midterm question id → times shown, so new attempts prefer unseen ones
 const PASS_MARK = 70;
 const LETTERS = "ABCD";
 const MODULES = [
@@ -17,19 +18,19 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 const fmt = (sec) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
 const isAnswered = (it) => (it.q.type === "mc" ? it.choice !== null : it.text.trim() !== "");
 
-function loadHistory() {
+function load(key, fallback) {
   try {
-    return JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+    return JSON.parse(localStorage.getItem(key)) || fallback;
   } catch {
-    return [];
+    return fallback;
   }
 }
 
-function saveHistory(list) {
+function save(key, value) {
   try {
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(0, 20)));
+    localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    // Storage unavailable (private mode); history is a convenience, so ignore.
+    // Storage unavailable (private mode); history and progress are conveniences, so ignore.
   }
 }
 
@@ -39,8 +40,24 @@ const chip = (type, name, value, label, checked) =>
 // ───────────── Setup ─────────────
 function renderSetup(settings = { modules: [1, 2, 3], total: 20, perQuestion: 60 }) {
   state = null;
-  const history = loadHistory();
+  const history = load(HISTORY_KEY, []);
+  const seen = load(SEEN_KEY, {});
+  const seenCount = MIDTERM.filter((q) => seen[q.id]).length;
+  const seenPct = Math.round((seenCount / MIDTERM.length) * 100);
   app.innerHTML = `
+    <section class="card">
+      <h2>Midterm simulation</h2>
+      <p class="muted">6 written questions from Modules 2–6, in the format of the real midterm: 2 on workflow and
+      methodology (5 marks each), 2 on Python code interpretation (5 marks each) and 2 on model output and
+      interpretation (4 marks each). Questions you haven't seen yet come first. After you submit, you mark your
+      answers against a model answer and a rubric worth one mark per key point.</p>
+      <div class="bar-row" style="margin-bottom: 16px">
+        <span>Seen ${seenCount} / ${MIDTERM.length}</span>
+        <div class="bar"><span style="width: ${seenPct}%"></span></div>
+        <span class="small">${seenPct}%</span>
+      </div>
+      <button class="primary" data-act="midterm">Start midterm simulation</button>
+    </section>
     <section class="card">
       <h2>Set up your practice quiz</h2>
       <p class="muted">80% multiple choice, 20% open answer, and roughly 80% theory, 20% code interpretation.
@@ -66,7 +83,7 @@ function renderSetup(settings = { modules: [1, 2, 3], total: 20, perQuestion: 60
       <table>
         <thead><tr><th>Date</th><th>Modules</th><th class="num">Questions</th><th class="num">Score</th></tr></thead>
         <tbody>${history.map((h) => `
-          <tr><td>${esc(new Date(h.date).toLocaleString())}</td><td>${esc(h.modules.join(", "))}</td>
+          <tr><td>${esc(new Date(h.date).toLocaleString())}</td><td>${h.midterm ? "Midterm" : esc(h.modules.join(", "))}</td>
           <td class="num">${h.total}</td><td class="num">${h.percent}%</td></tr>`).join("")}
         </tbody>
       </table>
@@ -74,7 +91,7 @@ function renderSetup(settings = { modules: [1, 2, 3], total: 20, perQuestion: 60
 }
 
 function startQuiz(settings) {
-  const items = buildQuiz(QUESTIONS, settings);
+  const items = settings.midterm ? buildMidterm(MIDTERM, load(SEEN_KEY, {})) : buildQuiz(QUESTIONS, settings);
   const now = Date.now();
   state = {
     screen: "quiz",
@@ -131,7 +148,8 @@ function renderQuestion() {
     <section class="card">
       <div class="badges">
         <span class="badge">Module ${q.module}</span>
-        <span class="badge">${q.type === "mc" ? "Multiple choice" : "Open answer"}</span>
+        ${q.section ? `<span class="badge">${esc(q.section)}</span><span class="badge">${q.marks} marks</span>`
+          : `<span class="badge">${q.type === "mc" ? "Multiple choice" : "Open answer"}</span>`}
         ${q.kind === "code" ? '<span class="badge code">Code</span>' : ""}
       </div>
       <p class="prompt" id="prompt">${esc(q.prompt)}</p>
@@ -187,14 +205,15 @@ function renderSelfGrade() {
     .filter(({ it }) => it.q.type === "open" && it.text.trim())
     .map(({ it, i }) => `
       <section class="card">
-        <div class="badges"><span class="badge">Question ${i + 1}</span><span class="badge">Module ${it.q.module}</span></div>
+        <div class="badges"><span class="badge">Question ${i + 1}</span><span class="badge">Module ${it.q.module}</span>
+          ${it.q.marks ? `<span class="badge">${it.q.marks} marks</span>` : ""}</div>
         <p class="prompt">${esc(it.q.prompt)}</p>
         ${it.q.code ? `<pre><code>${esc(it.q.code)}</code></pre>` : ""}
         <h3>Your answer</h3>
         <p class="user-answer">${esc(it.text)}</p>
         <h3>Model answer</h3>
         <p class="model-answer">${esc(it.q.modelAnswer)}</p>
-        <h3>Rubric: tick each point your answer covers</h3>
+        <h3>Rubric: tick each point your answer covers${it.q.marks ? " (1 mark each)" : ""}</h3>
         <ul class="checklist">
           ${it.q.keyPoints.map((p, j) => `
             <li><label><input type="checkbox" data-item="${i}" data-point="${j}" ${it.points[j] ? "checked" : ""}> ${esc(p.text)}</label></li>`).join("")}
@@ -218,7 +237,13 @@ function renderResults() {
   const g = grade(state.items);
   const seconds = Math.round((state.finishedAt - state.startedAt) / 1000);
   if (!state.saved) {
-    saveHistory([{ date: new Date().toISOString(), modules: state.settings.modules, total: g.total, percent: g.percent }, ...loadHistory()]);
+    const { midterm = false, modules = [] } = state.settings;
+    save(HISTORY_KEY, [{ date: new Date().toISOString(), midterm, modules, total: state.items.length, percent: g.percent }, ...load(HISTORY_KEY, [])].slice(0, 20));
+    if (midterm) {
+      const seen = load(SEEN_KEY, {});
+      state.items.forEach((it) => (seen[it.q.id] = (seen[it.q.id] || 0) + 1));
+      save(SEEN_KEY, seen);
+    }
     state.saved = true;
   }
   const pass = g.percent >= PASS_MARK;
@@ -243,7 +268,7 @@ function renderResults() {
         }).join("")}
       </div>
       <div class="row" style="margin-top: 18px">
-        <button class="primary" data-act="retake">New quiz, same settings</button>
+        <button class="primary" data-act="retake">${state.settings.midterm ? "New midterm simulation" : "New quiz, same settings"}</button>
         <button data-act="setup">Change settings</button>
       </div>
     </section>
@@ -263,7 +288,7 @@ function reviewItem(it, i) {
     <div class="badges">
       <span class="badge">Q${i + 1}</span><span class="badge">Module ${q.module}</span>
       ${q.kind === "code" ? '<span class="badge code">Code</span>' : ""}
-      <span class="badge">${q.type === "mc" ? `${s} / 1` : `${Math.round(s * 100)}%`}</span>
+      <span class="badge">${q.type === "mc" ? `${s} / 1` : q.marks ? `${Math.round(s * q.marks * 10) / 10} / ${q.marks} marks` : `${Math.round(s * 100)}%`}</span>
     </div>
     <p class="prompt">${esc(q.prompt)}</p>
     ${q.code ? `<pre><code>${esc(q.code)}</code></pre>` : ""}`;
@@ -308,10 +333,11 @@ app.addEventListener("click", (e) => {
     renderQuestion();
   } else if (act === "submit") submit();
   else if (act === "results") renderResults();
+  else if (act === "midterm") startQuiz({ midterm: true });
   else if (act === "retake") startQuiz(state.settings);
-  else if (act === "setup") renderSetup(state.settings);
+  else if (act === "setup") renderSetup(state.settings.midterm ? undefined : state.settings);
   else if (act === "clear-history" && confirm("Delete all saved attempts?")) {
-    saveHistory([]);
+    save(HISTORY_KEY, []);
     renderSetup();
   }
 });
