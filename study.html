@@ -53,7 +53,7 @@
       <p class="one-liner">Every good answer has the same shape: <strong>name the concept → explain it with the numbers or code you were given → say what to do and why</strong>.</p>
 
       <h3 id="how-workflow">Section 1 · Workflow &amp; methodology (5 marks)</h3>
-      <p>Write 2–3 short paragraphs: <strong>problem → why it is a problem → fix</strong>. If they ask for the first step, it is almost always <strong>framing the problem</strong>.</p>
+      <p>Write 2–3 short paragraphs: <strong>problem → why it is a problem → fix</strong>. If they ask for the first step, it is <strong>Problem Definition</strong> (framing the problem), step 1 of the course workflow. Know the <a href="#m2">9 steps</a> in order: Problem Definition → Data Collection → EDA → Data Preparation → Feature Engineering → Model Training → Model Evaluation → Hyperparameter Tuning → Deployment &amp; Monitoring.</p>
       <p>Check the story against this list. Most questions hide 2 or 3 of these mistakes:</p>
       <div class="table-wrap"><table>
         <thead><tr><th>Mistake in the story</th><th>Name it</th><th>Fix</th></tr></thead>
@@ -189,29 +189,28 @@ print(classification_report(y_test, y_pred, target_names=iris.target_names))</co
     <!-- ───────────────────────── Module 2 ───────────────────────── -->
     <section class="card" id="m2">
       <h2>Module 2 · End-to-end machine learning workflow</h2>
-      <p class="one-liner">Frame the problem, protect the test set, prepare the data inside a pipeline, beat a baseline, tune with cross-validation, test <strong>once</strong>, then deploy and monitor.</p>
+      <p class="one-liner">The course workflow (Figure 2.1) has <strong>9 steps</strong>: define the problem, collect data, explore it, prepare it, engineer features, train, evaluate, tune hyperparameters, then deploy and monitor. It is a loop: feedback and new data send you back to improve.</p>
 
-      <div class="flow" aria-label="Workflow steps">
-        <div class="step"><strong>1 · Frame</strong><span>Goal, task type, metric</span></div><div class="arrow" aria-hidden="true">→</div>
-        <div class="step"><strong>2 · Explore</strong><span>EDA, quality checks</span></div><div class="arrow" aria-hidden="true">→</div>
-        <div class="step"><strong>3 · Split</strong><span>Train / test, stratified</span></div><div class="arrow" aria-hidden="true">→</div>
-        <div class="step"><strong>4 · Prepare</strong><span>Clean, encode, scale, in a pipeline</span></div><div class="arrow" aria-hidden="true">→</div>
-        <div class="step"><strong>5 · Train</strong><span>Baseline first, then models</span></div><div class="arrow" aria-hidden="true">→</div>
-        <div class="step"><strong>6 · Evaluate &amp; tune</strong><span>Cross-validation, Grid Search</span></div><div class="arrow" aria-hidden="true">→</div>
-        <div class="step"><strong>7 · Test once</strong><span>Final unbiased score</span></div><div class="arrow" aria-hidden="true">→</div>
-        <div class="step"><strong>8 · Deploy &amp; monitor</strong><span>Drift, errors, retrain</span></div>
+      <div class="flow" aria-label="End-to-end machine learning workflow, Figure 2.1">
+        <div class="step"><strong>1 · Problem Definition</strong><span>Define the business problem and objectives</span></div><div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><strong>2 · Data Collection</strong><span>Gather relevant data from various sources</span></div><div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><strong>3 · Exploratory Data Analysis (EDA)</strong><span>Explore and visualize data to understand patterns and relationships</span></div><div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><strong>4 · Data Preparation</strong><span>Clean, transform and prepare data for modeling</span></div><div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><strong>5 · Feature Engineering</strong><span>Create and select relevant features to improve performance</span></div><div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><strong>6 · Model Training</strong><span>Train machine learning models using training data</span></div><div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><strong>7 · Model Evaluation</strong><span>Evaluate performance using appropriate metrics</span></div><div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><strong>8 · Hyperparameter Tuning</strong><span>Optimize hyperparameters to improve performance</span></div><div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><strong>9 · Deployment &amp; Monitoring</strong><span>Deploy the model and monitor it in the real world</span></div>
       </div>
-      <p class="muted small">The workflow is iterative: monitoring and new data can send you back to framing or feature engineering.</p>
+      <p class="muted small">↺ Iterate and improve based on feedback and new data. Memory trick, in order: <strong>Define → Collect → Explore → Prepare → Engineer → Train → Evaluate → Tune → Deploy</strong>.</p>
+      <div class="trap"><strong>Where does the train/test split go?</strong> It is not a box in the figure: Cascade covers it under Model Training &amp; Evaluation. In code, though, the Module 2 demo says <em>"Split the data before learning transformations"</em>: split <strong>right after exploring</strong> and before any step that learns from the data (imputing, scaling, selecting features). Otherwise you get data leakage.</div>
 
-      <h3>2.1 Frame the problem (always the first step)</h3>
+      <h3>Step 1 · Problem Definition (always the first step)</h3>
       <ul>
-        <li><strong>Business objective:</strong> what decision will the prediction support? Who uses it? (Many projects fail from unclear goals, not from bad algorithms.)</li>
-        <li><strong>Task type:</strong> classification (category), regression (number) or clustering (groups, no labels).</li>
-        <li><strong>Performance measure:</strong> chosen from the cost of errors. Demo questions: "What is the cost of overestimating or underestimating? Which errors matter most?"</li>
-        <li><strong>Constraints:</strong> interpretability, speed, data available at prediction time.</li>
+        <li><strong>Business problem and objectives:</strong> what decision will the prediction support? Who are the stakeholders? What are the constraints? Many projects fail from unclear objectives or the wrong problem, not from bad algorithms.</li>
+        <li><strong>Problem type:</strong> classification (category: spam, churn), regression (number: house price, sales) or clustering (groups without labels).</li>
+        <li><strong>Performance measure:</strong> chosen from the cost of errors. Demo questions: "Who uses the predictions? What is the cost of overestimating or underestimating? Which errors matter most?"</li>
       </ul>
-
-      <h3>2.2 Metrics: what each one answers</h3>
       <div class="table-wrap"><table>
         <thead><tr><th>Metric</th><th>Question it answers</th><th>Use it when</th></tr></thead>
         <tbody>
@@ -225,37 +224,48 @@ print(classification_report(y_test, y_pred, target_names=iris.target_names))</co
       </table></div>
       <p class="example"><strong>Module 2 demo / Activity Core Task 1.</strong> actual = [1,1,1,1,0,0,0,0], predicted = [1,1,0,1,1,0,0,0]. Position by position: TP = 3, FN = 1 (the third case), FP = 1 (the fifth), TN = 3. Accuracy, precision, recall and F1 are all 0.75.</p>
 
-      <h3>2.3 Explore the data (EDA)</h3>
+      <h3>Step 2 · Data Collection</h3>
+      <p>Gather relevant data from the available sources (databases, files, sensors). Check, using Module 1's challenges, that the data are:</p>
+      <ul>
+        <li><strong>Representative</strong> of the real situation where the model will be used (no sampling or historical bias, enough examples).</li>
+        <li><strong>Good quality</strong>: data merged from several sources can be inconsistent, and sensors add measurement errors and noise.</li>
+        <li><strong>Available at prediction time</strong>: a column you will not have when predicting cannot be used (that is leakage).</li>
+      </ul>
+      <pre><code>housing = fetch_california_housing(as_frame=True)   # the demo's data source
+df = housing.frame.copy()                            # features + target MedHouseVal</code></pre>
+
+      <h3>Step 3 · Exploratory Data Analysis (EDA)</h3>
+      <p>"What does the data look like? Are there missing values, outliers or important relationships?" EDA uses <strong>summary statistics</strong>, <strong>distribution analysis</strong> and <strong>correlation analysis</strong>.</p>
       <pre><code>df.info()                       # data types and non-null counts
-display(df.describe().T)        # scale, centre and spread of each column
+display(df.describe().T)        # mean, median, min, max, std of each column
 df.isna().sum()                 # missing values → is imputation needed?
 df.hist(figsize=(12,8), bins=30)              # distributions, skew, outliers
 df.corr(numeric_only=True)["MedHouseVal"]     # linear relationships with the target</code></pre>
       <ul>
-        <li>Histograms show skewness, outliers and imbalance; they can suggest scaling or transforming.</li>
-        <li>Correlation (−1 to +1) shows <strong>linear</strong> relationships only. It is <strong>not causation</strong> and can miss non-linear patterns.</li>
+        <li>Plots: <strong>histograms</strong> (distribution, skew, outliers), <strong>box plots</strong> (extreme values), <strong>scatter plots</strong> (relationships, clusters), <strong>correlation heatmaps</strong> (many variables at once).</li>
+        <li>Know the data types: numerical, categorical, ordinal, text. They decide the preprocessing.</li>
+        <li>Correlation (−1 to +1) shows <strong>linear</strong> relationships, useful predictors and redundant features. It is <strong>not causation</strong> and can miss non-linear patterns.</li>
       </ul>
 
-      <h3>2.4 Prepare the data</h3>
+      <h3>Step 4 · Data Preparation</h3>
       <div class="table-wrap"><table>
         <thead><tr><th>Issue</th><th>What to do</th></tr></thead>
         <tbody>
-          <tr><td><strong>Missing values</strong></td><td>Drop rows (loses information) or impute (median is robust to outliers). Dropping loses data; imputing adds assumptions.</td></tr>
+          <tr><td><strong>Missing values</strong></td><td>Remove rows (loses information) or impute with the mean or median (adds assumptions; the median is robust to outliers).</td></tr>
           <tr><td><strong>Outliers</strong></td><td>Investigate before deleting. Demo: Age = 190 may be a typing error, but automatic deletion can remove rare valid cases.</td></tr>
-          <tr><td><strong>Duplicates</strong></td><td>Remove them (<code>df.duplicated().sum()</code>) so they don't bias the model.</td></tr>
-          <tr><td><strong>Categorical data</strong></td><td><em>Label encoding</em> (numbers) only for ordered categories (low/medium/high). <em>One-hot encoding</em> (one 0/1 column per category) for nominal ones (colour, country), so the model doesn't invent a false order.</td></tr>
-          <tr><td><strong>Feature scaling</strong></td><td><em>Normalization</em> (MinMaxScaler) → range 0–1. <em>Standardization</em> (StandardScaler) → mean 0, std 1. Needed for distance and gradient models (KNN, logistic/linear regression, SVM), not for trees.</td></tr>
-          <tr><td><strong>Feature engineering</strong></td><td>Create useful variables, e.g. <code>RoomsPerHousehold = AveRooms / AveOccup</code>. Never use future or target information.</td></tr>
-          <tr><td><strong>Feature selection</strong></td><td>Remove irrelevant or redundant features → faster, simpler, less overfitting.</td></tr>
+          <tr><td><strong>Duplicates</strong></td><td>Identify and remove them (<code>df.duplicated().sum()</code>) to avoid biased results.</td></tr>
+          <tr><td><strong>Categorical variables</strong></td><td><em>Label encoding</em> (a number per category) only for ordered categories (low/medium/high). <em>One-hot encoding</em> (one 0/1 column per category) for nominal ones (colour, country), so the model doesn't invent a false order.</td></tr>
+          <tr><td><strong>Feature scaling</strong></td><td><em>Normalization</em> (MinMaxScaler) → range 0–1. <em>Standardization</em> (StandardScaler) → mean 0, std 1. Needed for distance and gradient models (KNN, linear/logistic regression, SVM), not for trees.</td></tr>
         </tbody>
       </table></div>
-      <pre><code>encoder = OneHotEncoder(sparse_output=False, handle_unknown="ignore")
+      <pre><code>quality_demo.isna().sum()          # Age and Income each have a missing value
+quality_demo.duplicated().sum()    # duplicate rows
+encoder = OneHotEncoder(sparse_output=False, handle_unknown="ignore")
 encoded = encoder.fit_transform(df[["Color"]])        # Red/Blue/Green → 3 columns of 0/1
 MinMaxScaler().fit_transform(df[["Income"]])          # normalization: 0 to 1
 StandardScaler().fit_transform(df[["Income"]])        # standardization: mean 0, std 1</code></pre>
       <p><code>handle_unknown="ignore"</code>: a category never seen in training becomes all zeros instead of crashing.</p>
-
-      <h3>2.5 Split first, then preprocess inside a pipeline</h3>
+      <p>In practice, these steps run inside a <strong>pipeline</strong> fitted on the training data only (after the split):</p>
       <pre><code>X = df.drop(columns="MedHouseVal")      # features
 y = df["MedHouseVal"]                    # target
 X_train, X_test, y_train, y_test = train_test_split(
@@ -269,44 +279,68 @@ X_test_prepared = preprocessor.transform(X_test)         # only apply them to TE
       <ul>
         <li><strong>Data leakage</strong> = information from the test set (or the future) gets into training, so the score looks better than reality. Fitting the imputer or scaler on all the data is leakage.</li>
         <li><code>fit_transform</code> on train learns the statistics and applies them; <code>transform</code> on test only applies them.</li>
-        <li><strong>Pipeline</strong>: chains steps so the same preparation happens in training, every CV fold, testing and future predictions. It improves reproducibility and prevents leakage.</li>
-        <li><strong>ColumnTransformer</strong>: different preprocessing for different columns (numeric pipeline vs categorical pipeline).</li>
+        <li><strong>ColumnTransformer</strong>: different preprocessing for different columns (a numeric pipeline and a categorical pipeline).</li>
       </ul>
 
-      <h3>2.6 Baseline, cross-validation and tuning</h3>
+      <h3>Step 5 · Feature Engineering</h3>
+      <p>Creating, selecting and transforming variables. Well-designed features often matter more than the choice of algorithm.</p>
+      <ul>
+        <li><strong>Feature creation:</strong> new variables from existing ones. Demo: <code>RoomsPerHousehold = AveRooms / AveOccup</code>, <code>BedroomsPerRoom = AveBedrms / AveRooms</code>. Never use future or target information, and create them the same way for future data.</li>
+        <li><strong>Feature selection:</strong> keep the informative variables and remove irrelevant or redundant ones → better performance, less complexity, faster training, easier interpretation, less overfitting.</li>
+        <li><strong>Transformation pipelines:</strong> chain imputation, encoding, scaling and feature engineering so they are applied automatically and the same way every time (reproducibility, automation, data integrity, no leakage).</li>
+      </ul>
+      <p class="muted small">Does adding a feature always help? No: an irrelevant or leakage-prone feature can make the model worse, or give an unrealistically optimistic score.</p>
+
+      <h3>Step 6 · Model Training</h3>
       <pre><code>baseline = DummyRegressor(strategy="mean")       # always predicts the training mean
+baseline.fit(X_train, y_train)
 linear_pipeline = Pipeline([("preprocessor", preprocessor), ("model", LinearRegression())])
 forest_pipeline = Pipeline([("preprocessor", preprocessor),
                             ("model", RandomForestRegressor(n_estimators=50, random_state=42, n_jobs=-1))])
+linear_pipeline.fit(X_train, y_train)
+forest_pipeline.fit(X_train, y_train)</code></pre>
+      <ul>
+        <li>Train on the <strong>training data</strong> only (80/20 or 70/30 split).</li>
+        <li>Start with a <strong>baseline</strong> (the mean for regression, the majority class for classification) as a reference point: "how much value does ML add?"</li>
+        <li><strong>Training RMSE alone is not enough</strong>: a flexible forest can memorize, so its training error looks great.</li>
+      </ul>
 
-scores = cross_val_score(linear_pipeline, X_train, y_train,
+      <h3>Step 7 · Model Evaluation</h3>
+      <pre><code>scores = cross_val_score(linear_pipeline, X_train, y_train,
                          scoring="neg_root_mean_squared_error", cv=5)
 rmse = -scores                                   # flip the sign back to positive RMSE
-print(rmse.mean(), rmse.std())
+print(rmse.mean(), rmse.std())</code></pre>
+      <ul>
+        <li>Compare models with metrics that fit the problem (accuracy, precision, recall, F1, RMSE, MAE), looking for the best balance of performance, efficiency, interpretability and generalization.</li>
+        <li><strong>k-fold cross-validation</strong>: split the training data into k folds; train on k−1, validate on 1, k times. The mean is more reliable than one split; the std shows stability.</li>
+        <li>Scikit-Learn <strong>maximizes</strong> scores, so error metrics come out negative (<code>neg_…</code>). Put a minus sign back.</li>
+        <li>The <strong>test set</strong> gives the final unbiased estimate on unseen data. Use it once, at the end, not for repeated tuning.</li>
+      </ul>
 
-param_grid = {"model__n_estimators": [30, 60], "model__max_features": [0.7, 1.0],
+      <h3>Step 8 · Hyperparameter Tuning</h3>
+      <pre><code>param_grid = {"model__n_estimators": [30, 60], "model__max_features": [0.7, 1.0],
               "model__max_depth": [None, 15]}
 grid_search = GridSearchCV(forest_pipeline, param_grid, cv=3,
                            scoring="neg_root_mean_squared_error")
 grid_search.fit(X_train, y_train)
+print(grid_search.best_params_, -grid_search.best_score_)
 final_model = grid_search.best_estimator_
-test_rmse = mean_squared_error(y_test, final_model.predict(X_test)) ** 0.5   # test ONCE</code></pre>
+test_rmse = mean_squared_error(y_test, final_model.predict(X_test)) ** 0.5   # test ONCE
+test_mae = mean_absolute_error(y_test, final_model.predict(X_test))</code></pre>
       <ul>
-        <li><strong>Baseline</strong> (mean for regression, majority class for classification): "how much value does ML add?"</li>
-        <li><strong>Training RMSE alone is not enough</strong>: a flexible forest can memorize, so its training error looks great.</li>
-        <li><strong>k-fold cross-validation</strong>: split the training data into k folds; train on k−1, validate on 1, k times. The mean is more reliable than one split; the std shows stability.</li>
-        <li>Scikit-Learn <strong>maximizes</strong> scores, so error metrics are negative (<code>neg_…</code>). Put a minus sign back.</li>
+        <li><strong>Hyperparameters</strong> are set before training (max depth, number of trees, regularization strength). <strong>Parameters</strong> are learned from the data (coefficients).</li>
+        <li><strong>Grid Search</strong> tries every combination with cross-validation (finds the best <em>of the grid</em>, but expensive). <strong>Randomized Search</strong> samples random combinations from ranges (faster for large spaces, near-optimal).</li>
         <li><code>model__n_estimators</code>: in a pipeline, the parameter name is <em>step name + two underscores + parameter</em>.</li>
-        <li><strong>Grid Search</strong> tries every combination (can guarantee the best <em>of the grid</em>, but expensive). <strong>Randomized Search</strong> samples a fixed number of random combinations (faster for large spaces, near-optimal).</li>
-        <li><code>best_params_</code> = best combination, <code>best_score_</code> = its mean CV score, <code>best_estimator_</code> = the model refitted on all training data.</li>
+        <li><code>best_params_</code> = best combination, <code>best_score_</code> = its mean CV score, <code>best_estimator_</code> = the model refitted on all the training data, then evaluated <strong>once</strong> on the test set.</li>
       </ul>
 
-      <h3>2.7 Before deployment (from the demo)</h3>
-      <p>Is the data available at prediction time? Is performance acceptable for important groups? What happens when the data distribution changes (drift)? How will predictions and errors be monitored? Can the whole pipeline be reproduced? Can stakeholders understand the output?</p>
+      <h3>Step 9 · Deployment &amp; Monitoring</h3>
+      <p>A model is not finished when a score is printed. Before and after deploying, ask (Module 2 demo): Is the data available at prediction time? Is performance acceptable for important groups? What happens when the data distribution changes (drift)? How will predictions and errors be monitored? Can the whole pipeline be reproduced? Can stakeholders understand the output? Then go back around the loop with the feedback and new data.</p>
 
       <div class="trap"><strong>Exam traps.</strong>
         <ul>
-          <li>The first step is framing, not EDA and not training.</li>
+          <li>The first step is Problem Definition (framing), not data collection, EDA or training.</li>
+          <li>In the course order, Model Evaluation (7) comes before Hyperparameter Tuning (8), and Feature Engineering (5) after Data Preparation (4).</li>
           <li>Split <strong>before</strong> imputing, scaling or selecting features with the data.</li>
           <li>The test set is not for tuning. Tune with CV; test once.</li>
           <li>Correlation is not causation. A feature can also hurt if it is irrelevant or leaks the answer.</li>
@@ -958,7 +992,7 @@ Random Forest confusion matrix (rows = true)   malignant  benign
       </table></div>
 
       <h3>Say these out loud before the exam</h3>
-      <details><summary>What is the first step of any ML project?</summary><p>Frame the problem: the business objective with stakeholders, the task type (classification/regression) and the performance measure that matches the cost of errors.</p></details>
+      <details><summary>What is the first step of any ML project, and what are the 9 steps?</summary><p>Problem Definition: the business problem and objectives with stakeholders, the task type (classification/regression) and the performance measure that matches the cost of errors. Then Data Collection → EDA → Data Preparation → Feature Engineering → Model Training → Model Evaluation → Hyperparameter Tuning → Deployment &amp; Monitoring, iterating with feedback and new data.</p></details>
       <details><summary>What is data leakage and how do you prevent it?</summary><p>Information from the test set or the future reaching training, which makes scores too optimistic. Split first, fit preprocessing on training data only inside a Pipeline, tune with CV, and test once.</p></details>
       <details><summary>Why cross-validation instead of one split?</summary><p>One split can be lucky or unlucky. k-fold trains and validates k times, so the mean is more reliable and the std shows stability.</p></details>
       <details><summary>Why is accuracy misleading on imbalanced data?</summary><p>Always predicting the majority class already scores high (94% with 6% positives) while finding no positives. Use recall, precision, F1 and the confusion matrix.</p></details>
