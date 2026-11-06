@@ -4,6 +4,8 @@ A **midterm simulation for Modules 2–6** and a practice quiz for **Modules 1�
 
 **Live:** https://alanjuker.github.io/ml-quiz-simulator/
 
+**Study guide:** https://alanjuker.github.io/ml-quiz-simulator/study.html. It explains Modules 1–6 in plain English, using the code from the teaching demos and in-class activities. It also shows how to answer each midterm section and includes a code cheat sheet and a last-minute review.
+
 | Module | Topics |
 | --- | --- |
 | 1 · The ML landscape | Mitchell's T/E/P, supervised vs unsupervised, batch vs online, instance- vs model-based, data quality, overfitting/underfitting, train/validation/test |
@@ -56,6 +58,7 @@ The tests check that both banks are well formed, that each quiz follows the 80/2
 
 ```
 index.html        page shell
+study.html        study guide (static page)
 styles.css        light/dark theme, responsive layout
 questions.js      practice-quiz bank (edit here to add questions)
 midterm.js        midterm bank: 3 sections × 10 written questions
