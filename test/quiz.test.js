@@ -6,11 +6,13 @@ const { buildMidterm, suggestPoints, itemScore, grade } = require("../quiz.js");
 const SECTIONS = ["Workflow & methodology", "Python code interpretation", "Model output & interpretation"];
 
 // Runs attempts the way the app does: each one counts as seen and becomes `last` as soon as it starts.
-function attempts(n) {
+// `perSection` is 2 (full exam), 1 (quick), or a function of the attempt number to mix both.
+function attempts(n, perSection = 2) {
   const seen = {};
   let last = [];
-  return Array.from({ length: n }, () => {
-    const ids = buildMidterm(MIDTERM, { seen, last }).map((it) => it.q.id);
+  return Array.from({ length: n }, (_, i) => {
+    const per = typeof perSection === "function" ? perSection(i) : perSection;
+    const ids = buildMidterm(MIDTERM, { seen, last, perSection: per }).map((it) => it.q.id);
     ids.forEach((id) => (seen[id] = (seen[id] || 0) + 1));
     last = ids;
     return ids;
@@ -34,22 +36,24 @@ test("midterm bank: 10 written questions per section, one key point per mark", (
   for (const section of SECTIONS) assert.equal(MIDTERM.filter((q) => q.section === section).length, 10, section);
 });
 
-test("each attempt has 2 questions per section in exam order", () => {
-  const exam = buildMidterm(MIDTERM);
-  assert.deepEqual(exam.map((it) => it.q.section), SECTIONS.flatMap((s) => [s, s]));
+test("the full exam has 2 questions per section and the quick one 1, in exam order", () => {
+  assert.deepEqual(buildMidterm(MIDTERM).map((it) => it.q.section), SECTIONS.flatMap((s) => [s, s]));
+  assert.deepEqual(buildMidterm(MIDTERM, { perSection: 1 }).map((it) => it.q.section), SECTIONS);
 });
 
-test("every 5 attempts cover the whole bank once", () => {
-  const runs = attempts(20);
-  for (let round = 0; round < 4; round++) {
-    const ids = runs.slice(round * 5, round * 5 + 5).flat();
-    assert.equal(new Set(ids).size, MIDTERM.length, `round ${round + 1} covers all 30 questions`);
+test("every 5 full or 10 quick attempts cover the whole bank once", () => {
+  for (const [perSection, size] of [[2, 5], [1, 10]]) {
+    const runs = attempts(size * 4, perSection);
+    for (let round = 0; round < 4; round++) {
+      const ids = runs.slice(round * size, (round + 1) * size).flat();
+      assert.equal(new Set(ids).size, MIDTERM.length, `${size} attempts, round ${round + 1}`);
+    }
   }
 });
 
-test("two attempts in a row never share a question, even across rounds", () => {
+test("two attempts in a row never share a question, even across rounds and when mixing quick and full", () => {
   for (let trial = 0; trial < 20; trial++) {
-    const runs = attempts(30);
+    const runs = attempts(30, () => (Math.random() < 0.5 ? 1 : 2));
     for (let i = 1; i < runs.length; i++) {
       assert.ok(!runs[i].some((id) => runs[i - 1].includes(id)), `attempt ${i + 1} repeats attempt ${i}`);
     }

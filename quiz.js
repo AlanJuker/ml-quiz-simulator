@@ -1,7 +1,5 @@
 // Pure midterm logic: selection, shuffling and scoring. No DOM access, so it runs in Node tests too.
 
-const PER_SECTION = 2; // each attempt draws 2 written questions from each section's bank
-
 function shuffle(items, rand = Math.random) {
   const a = items.slice();
   for (let i = a.length - 1; i > 0; i--) {
@@ -11,17 +9,17 @@ function shuffle(items, rand = Math.random) {
   return a;
 }
 
-// One attempt: PER_SECTION questions from each section, in bank order. Least-seen questions come first,
-// so attempts work through the whole bank before anything repeats. Among equally seen questions the
-// previous attempt's go last, so two attempts in a row never share a question, even when a new round of
-// the bank starts. Remaining ties are random.
+// One attempt: `perSection` questions from each section, in bank order (2 = the full exam, 1 = quick).
+// Least-seen questions come first, so attempts work through the whole bank before anything repeats.
+// Among equally seen questions the previous attempt's go last, so two attempts in a row never share a
+// question, even when a new round of the bank starts. Remaining ties are random.
 // `seen` maps question id → times shown; `last` lists the previous attempt's question ids.
-function buildMidterm(bank, { seen = {}, last = [] } = {}, rand = Math.random) {
+function buildMidterm(bank, { seen = {}, last = [], perSection = 2 } = {}, rand = Math.random) {
   const sections = [...new Set(bank.map((q) => q.section))];
   return sections.flatMap((section) =>
     shuffle(bank.filter((q) => q.section === section), rand)
       .sort((a, b) => (seen[a.id] || 0) - (seen[b.id] || 0) || last.includes(a.id) - last.includes(b.id))
-      .slice(0, PER_SECTION)
+      .slice(0, perSection)
       .map((q) => ({ q, text: "", points: q.keyPoints.map(() => false), flagged: false })));
 }
 

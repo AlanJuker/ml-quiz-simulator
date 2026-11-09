@@ -6,8 +6,13 @@ const HISTORY_KEY = "mlquiz.history";
 const SEEN_KEY = "mlquiz.midterm.seen"; // question id → times shown, so new attempts prefer unseen ones
 const LAST_KEY = "mlquiz.midterm.last"; // the previous attempt's question ids, never repeated straight away
 const PASS_MARK = 70;
+// Quick is the default; the full exam is the real midterm's length.
+const MODES = {
+  quick: { title: "Quick midterm", perSection: 1, detail: "3 questions, one from each section · 14 marks" },
+  full: { title: "Full midterm", perSection: 2, detail: "6 questions, like the real exam · 28 marks" },
+};
 
-let state = null; // { screen, items, index, startedAt, finishedAt, timerId, saved }
+let state = null; // { screen, mode, items, index, startedAt, finishedAt, timerId, saved }
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const fmt = (sec) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
@@ -42,38 +47,44 @@ function renderStart() {
   app.innerHTML = `
     <section class="card">
       <h2>Midterm simulation</h2>
-      <p class="muted">6 written questions from Modules 2–6, in the format of the real midterm: 2 on workflow and
-      methodology (5 marks each), 2 on Python code interpretation (5 marks each) and 2 on model output and
-      interpretation (4 marks each). Every new attempt gives you different questions: the ones you haven't seen
-      come first, so 5 attempts cover all 30. After you submit, you mark your answers against a model answer and
-      a rubric worth one mark per key point.</p>
+      <p class="muted">Written questions from Modules 2–6, in the format of the real midterm: workflow and methodology
+      (5 marks), Python code interpretation (5 marks) and model output and interpretation (4 marks). Every new attempt
+      gives you different questions: the ones you haven't seen come first. After you submit, you mark your answers
+      against a model answer and a rubric worth one mark per key point.</p>
+      <fieldset class="modes"><legend>Choose a length</legend>
+        ${Object.entries(MODES).map(([k, m]) => `
+          <label class="mode"><input type="radio" name="mode" value="${k}" ${k === "quick" ? "checked" : ""}>
+            <span><strong>${m.title}</strong>${k === "quick" ? ' <span class="pill">Default</span>' : ""}<br>
+            <span class="muted small">${m.detail}</span></span></label>`).join("")}
+      </fieldset>
       <div class="bar-row" style="margin-bottom: 16px">
         <span>Seen ${seenCount} / ${MIDTERM.length}</span>
         <div class="bar"><span style="width: ${seenPct}%"></span></div>
         <span class="small">${seenPct}%</span>
       </div>
-      <button class="primary" data-act="start">Start midterm simulation</button>
+      <button class="primary" data-act="start">Start</button>
     </section>
     ${history.length ? `
     <section class="card">
       <div class="row spread"><h2>Your attempts</h2><button class="link" data-act="clear-history">Clear</button></div>
       <table>
-        <thead><tr><th>Date</th><th class="num">Score</th></tr></thead>
+        <thead><tr><th>Date</th><th>Midterm</th><th class="num">Score</th></tr></thead>
         <tbody>${history.map((h) => `
-          <tr><td>${esc(new Date(h.date).toLocaleString())}</td><td class="num">${h.percent}%</td></tr>`).join("")}
+          <tr><td>${esc(new Date(h.date).toLocaleString())}</td><td>${h.mode === "quick" ? "Quick" : "Full"}</td>
+          <td class="num">${h.percent}%</td></tr>`).join("")}
         </tbody>
       </table>
     </section>` : ""}`;
 }
 
 // An attempt counts as seen as soon as it starts, so even an abandoned attempt is not repeated next time.
-function startMidterm() {
+function startMidterm(mode) {
   const seen = load(SEEN_KEY, {});
-  const items = buildMidterm(MIDTERM, { seen, last: load(LAST_KEY, []) });
+  const items = buildMidterm(MIDTERM, { seen, last: load(LAST_KEY, []), perSection: MODES[mode].perSection });
   items.forEach((it) => (seen[it.q.id] = (seen[it.q.id] || 0) + 1));
   save(SEEN_KEY, seen);
   save(LAST_KEY, items.map((it) => it.q.id));
-  state = { screen: "quiz", items, index: 0, startedAt: Date.now(), saved: false };
+  state = { screen: "quiz", mode, items, index: 0, startedAt: Date.now(), saved: false };
   state.timerId = setInterval(tick, 1000);
   renderQuestion();
 }
@@ -191,7 +202,7 @@ function renderResults() {
   const g = grade(state.items);
   const seconds = Math.round((state.finishedAt - state.startedAt) / 1000);
   if (!state.saved) {
-    save(HISTORY_KEY, [{ date: new Date().toISOString(), midterm: true, percent: g.percent }, ...loadHistory()].slice(0, 20));
+    save(HISTORY_KEY, [{ date: new Date().toISOString(), midterm: true, mode: state.mode, percent: g.percent }, ...loadHistory()].slice(0, 20));
     state.saved = true;
   }
   const pass = g.percent >= PASS_MARK;
@@ -203,6 +214,7 @@ function renderResults() {
           <div class="verdict ${pass ? "pass" : "fail"}">${pass ? "Pass" : "Below the pass mark"} (${PASS_MARK}%)</div>
         </div>
         <div class="muted small">
+          ${MODES[state.mode].title}<br>
           ${Math.round(g.earned * 10) / 10} / ${g.total} marks<br>
           Time used: ${fmt(seconds)}
         </div>
@@ -215,7 +227,7 @@ function renderResults() {
         }).join("")}
       </div>
       <div class="row" style="margin-top: 18px">
-        <button class="primary" data-act="start">New midterm simulation</button>
+        <button class="primary" data-act="start">New ${MODES[state.mode].title.toLowerCase()}</button>
         <button data-act="home">Back to start</button>
       </div>
     </section>
@@ -259,7 +271,7 @@ app.addEventListener("click", (e) => {
     renderQuestion();
   } else if (act === "submit") submit();
   else if (act === "results") renderResults();
-  else if (act === "start") startMidterm();
+  else if (act === "start") startMidterm(document.querySelector('input[name="mode"]:checked')?.value ?? state.mode);
   else if (act === "home") renderStart();
   else if (act === "clear-history" && confirm("Delete all saved attempts?")) {
     save(HISTORY_KEY, []);
