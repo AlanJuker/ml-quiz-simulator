@@ -8,17 +8,22 @@ A **midterm simulation** and a **study guide** for Machine Learning (MCAI/CSAI 5
 
 ## Midterm simulation
 
-Six written questions in the format of the real midterm, drawn from a bank of 30 (10 per section):
+Written questions in the format of the real midterm, drawn from a bank of 30 (10 per section). There are two lengths:
 
-| Section | Questions | Marks | What it asks |
-| --- | --- | --- | --- |
-| Workflow & methodology | 2 | 5 each | A scenario (often a hospital) with a flawed ML workflow: find the problems, say what the first step should be, and decide what to do |
-| Python code interpretation | 2 | 5 each | A short Scikit-Learn snippet: explain its purpose, the role of a function and why a parameter is used |
-| Model output & interpretation | 2 | 4 each | A classification report, confusion matrix or results table: compare classes or models, select one and explain the differences |
+- **Quick midterm (default):** 3 questions, one from each section, 14 marks.
+- **Full midterm:** 6 questions, two from each section, 28 marks, like the real exam.
 
-- **Always a different attempt:** questions you have not seen come first, so every 5 attempts cover all 30. An attempt counts as soon as it starts, and the next one never repeats any question from it, even when the bank starts a new round.
+The three sections:
+
+| Section | Marks | What it asks |
+| --- | --- | --- |
+| Workflow & methodology | 5 each | A scenario (often a hospital) with a flawed ML workflow: find the problems, say what the first step should be, and decide what to do |
+| Python code interpretation | 5 each | A short Scikit-Learn snippet: explain its purpose, the role of a function and why a parameter is used |
+| Model output & interpretation | 4 each | A classification report, confusion matrix or results table: compare classes or models, select one and explain the differences |
+
+- **Always a different attempt:** questions you have not seen come first, so every 10 quick or 5 full attempts cover all 30. An attempt counts as soon as it starts, and the next one never repeats any question from it, even when the bank starts a new round.
 - **During the attempt:** a question navigator, flags, an elapsed-time clock, and `←` `→` / `F` shortcuts.
-- **Marking:** after you submit, you see each model answer and a rubric with one key point per mark. Points are pre-ticked by keyword matching, and you confirm or correct them. The score is out of 28, against a 70% pass mark, with a breakdown by section and module.
+- **Marking:** after you submit, you see each model answer and a rubric with one key point per mark. Points are pre-ticked by keyword matching, and you confirm or correct them. The score is in marks (out of 14 or 28), against a 70% pass mark, with a breakdown by section and module.
 - The outputs in the third section come from the class demos (Modules 3, 5 and 6) or from running the Module 4 lab code.
 - Past attempts and the questions you have seen are saved in your browser.
 
@@ -36,7 +41,7 @@ npm start          # python3 -m http.server 8000 → http://localhost:8000
 npm test           # node --test (Node 20+)
 ```
 
-The tests check that the bank is well formed, that every model answer earns full marks under its rubric, that each attempt follows the 2-2-2 section order, that every 5 attempts cover the bank, that consecutive attempts never share a question, and that scores are weighted by marks. CI runs them on every push.
+The tests check that the bank is well formed, that every model answer earns full marks under its rubric, that quick and full attempts follow the section order, that every 10 quick or 5 full attempts cover the bank, that consecutive attempts never share a question, and that scores are weighted by marks. CI runs them on every push.
 
 ## Project structure
 
