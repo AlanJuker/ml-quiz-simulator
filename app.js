@@ -8,8 +8,9 @@ const LAST_KEY = "mlquiz.midterm.last"; // the previous attempt's question ids, 
 const PASS_MARK = 70;
 // Quick is the default; the full exam is the real midterm's length.
 const MODES = {
-  quick: { title: "Quick midterm", perSection: 1, detail: "3 questions, one from each section · 14 marks" },
-  full: { title: "Full midterm", perSection: 2, detail: "6 questions, like the real exam · 28 marks" },
+  single: { title: "Super quick midterm", short: "Super quick", total: 1, detail: "1 question from any section · 4 or 5 marks" },
+  quick: { title: "Quick midterm", short: "Quick", perSection: 1, detail: "3 questions, one from each section · 14 marks" },
+  full: { title: "Full midterm", short: "Full", perSection: 2, detail: "6 questions, like the real exam · 28 marks" },
 };
 
 let state = null; // { screen, mode, items, index, startedAt, finishedAt, timerId, saved }
@@ -70,7 +71,7 @@ function renderStart() {
       <table>
         <thead><tr><th>Date</th><th>Midterm</th><th class="num">Score</th></tr></thead>
         <tbody>${history.map((h) => `
-          <tr><td>${esc(new Date(h.date).toLocaleString())}</td><td>${h.mode === "quick" ? "Quick" : "Full"}</td>
+          <tr><td>${esc(new Date(h.date).toLocaleString())}</td><td>${MODES[h.mode]?.short ?? "Full"}</td>
           <td class="num">${h.percent}%</td></tr>`).join("")}
         </tbody>
       </table>
@@ -80,7 +81,8 @@ function renderStart() {
 // An attempt counts as seen as soon as it starts, so even an abandoned attempt is not repeated next time.
 function startMidterm(mode) {
   const seen = load(SEEN_KEY, {});
-  const items = buildMidterm(MIDTERM, { seen, last: load(LAST_KEY, []), perSection: MODES[mode].perSection });
+  const { perSection, total } = MODES[mode];
+  const items = buildMidterm(MIDTERM, { seen, last: load(LAST_KEY, []), perSection, total });
   items.forEach((it) => (seen[it.q.id] = (seen[it.q.id] || 0) + 1));
   save(SEEN_KEY, seen);
   save(LAST_KEY, items.map((it) => it.q.id));
