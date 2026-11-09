@@ -55,6 +55,8 @@ app.js            UI: start → midterm → self-marking → results
 test/             node:test suite
 ```
 
+When you change a script or `styles.css`, bump the `?v=` version on their links in `index.html` (and `study.html` for the stylesheet). GitHub Pages lets browsers cache each file for 10 minutes, so without it a browser can mix a new file with an old one.
+
 ### Adding a question
 
 Append an object to `MIDTERM` in `midterm.js`, with one key point per mark:
