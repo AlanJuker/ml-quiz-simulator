@@ -1,16 +1,10 @@
-# ML Quiz Simulator
+# ML Midterm Simulator
 
-A **midterm simulation for Modules 2–6** and a practice quiz for **Modules 1–3** of Machine Learning. Every attempt is scored, and every question comes with an explanation or a model answer.
+A **midterm simulation** and a **study guide** for Machine Learning (MCAI/CSAI 500), Modules 2–6. Every attempt is self-marked against a model answer and a rubric.
 
 **Live:** https://alanjuker.github.io/ml-quiz-simulator/
 
 **Study guide:** https://alanjuker.github.io/ml-quiz-simulator/study.html. It explains Modules 1–6 in plain English, using the code from the teaching demos and in-class activities. It also shows how to answer each midterm section and includes a code cheat sheet and a last-minute review.
-
-| Module | Topics |
-| --- | --- |
-| 1 · The ML landscape | Mitchell's T/E/P, supervised vs unsupervised, batch vs online, instance- vs model-based, data quality, overfitting/underfitting, train/validation/test |
-| 2 · End-to-end workflow | Problem framing, metrics (precision, recall, RMSE, MAE), EDA, cleaning, encoding, scaling, leakage, pipelines, cross-validation, Grid/Randomized Search |
-| 3 · Classification | Confusion matrix, precision/recall/F1/specificity, thresholds, ROC/AUC vs PR curves, stratified k-fold, OvR/OvO, error analysis, multilabel/multioutput |
 
 ## Midterm simulation
 
@@ -22,21 +16,11 @@ Six written questions in the format of the real midterm, drawn from a bank of 30
 | Python code interpretation | 2 | 5 each | A short Scikit-Learn snippet: explain its purpose, the role of a function and why a parameter is used |
 | Model output & interpretation | 2 | 4 each | A classification report, confusion matrix or results table: compare classes or models, select one and explain the differences |
 
+- **Always a different attempt:** questions you have not seen come first, so every 5 attempts cover all 30. An attempt counts as soon as it starts, and the next one never repeats any question from it, even when the bank starts a new round.
+- **During the attempt:** a question navigator, flags, an elapsed-time clock, and `←` `→` / `F` shortcuts.
+- **Marking:** after you submit, you see each model answer and a rubric with one key point per mark. Points are pre-ticked by keyword matching, and you confirm or correct them. The score is out of 28, against a 70% pass mark, with a breakdown by section and module.
 - The outputs in the third section come from the class demos (Modules 3, 5 and 6) or from running the Module 4 lab code.
-- Questions you have not seen yet come first, so five attempts cover the whole bank.
-- After you submit, you mark each answer against a model answer and a rubric with one key point per mark, so the score is out of 28.
-
-## Practice quiz (Modules 1–3)
-
-Each attempt is drawn at random from a bank of 167 questions and can be timed.
-
-- **Mix:** 80% multiple choice and 20% open answer. About 80% of the questions are theory and 20% ask you to interpret Scikit-Learn code from the labs. Questions come in this order: theory multiple choice, code multiple choice, then the open questions.
-- **Setup:** choose the modules, the length (10, 20 or 30 questions) and an optional timer (60 or 90 s per question).
-- **During the quiz:** a question navigator, flags, and keyboard shortcuts (`1`–`4` / `A`–`D` to answer, `←` `→` to move, `F` to flag).
-- **Open answers:** after you submit, you see the model answer and a rubric. Points are pre-ticked by keyword matching, and you confirm or correct them. Each open answer earns partial credit.
-- **Results:** your score against a 70% pass mark, a breakdown by module, question type and theory vs code, and a full review with explanations. Past attempts are saved in your browser.
-
-Multiple-choice options are shuffled on every attempt. The distractors are based on common misconceptions, and a test checks that the correct option is never noticeably longer than the others.
+- Past attempts and the questions you have seen are saved in your browser.
 
 ## Run locally
 
@@ -52,7 +36,7 @@ npm start          # python3 -m http.server 8000 → http://localhost:8000
 npm test           # node --test (Node 20+)
 ```
 
-The tests check that both banks are well formed, that each quiz follows the 80/20 mixes, that grading still matches after the options are shuffled, and that open answers get the right partial credit. For the midterm they also check the 2-2-2 section order, that five attempts cover the bank without repeats, that scores are weighted by marks, and that every model answer earns full marks under the rubric. CI runs them on every push.
+The tests check that the bank is well formed, that every model answer earns full marks under its rubric, that each attempt follows the 2-2-2 section order, that every 5 attempts cover the bank, that consecutive attempts never share a question, and that scores are weighted by marks. CI runs them on every push.
 
 ## Project structure
 
@@ -60,28 +44,27 @@ The tests check that both banks are well formed, that each quiz follows the 80/2
 index.html        page shell
 study.html        study guide (static page)
 styles.css        light/dark theme, responsive layout
-questions.js      practice-quiz bank (edit here to add questions)
-midterm.js        midterm bank: 3 sections × 10 written questions
-quiz.js           pure logic: selection, shuffling, scoring in marks
-app.js            UI: setup → quiz → self-grading → results
+midterm.js        question bank: 3 sections × 10 written questions
+quiz.js           pure logic: selection, scoring in marks
+app.js            UI: start → midterm → self-marking → results
 test/             node:test suite
 ```
 
 ### Adding a question
 
-Append an object to `QUESTIONS` in `questions.js`:
+Append an object to `MIDTERM` in `midterm.js`, with one key point per mark:
 
 ```js
 {
-  id: "m3-23", module: 3, type: "mc", kind: "theory",   // kind: "theory" | "code"
-  prompt: "…", code: "optional snippet",
-  options: ["correct", "distractor", "distractor", "distractor"],
-  answer: 0,                                            // index into options
-  explanation: "Why the answer is correct.",
+  id: "mt-w11", module: 4, type: "open", kind: "theory",   // kind: "theory" | "code"
+  section: "Workflow & methodology", marks: 5,
+  prompt: "…", code: "optional snippet or model output",
+  modelAnswer: "…",
+  keyPoints: [{ text: "What earns the mark", keywords: ["words", "that", "pre-tick", "it"] }, /* … */],
 }
 ```
 
-Open questions use `type: "open"` with `modelAnswer` and `keyPoints: [{ text, keywords: [] }]`. Run `npm test` to validate the bank.
+Run `npm test` to validate the bank.
 
 ## Disclaimer
 
