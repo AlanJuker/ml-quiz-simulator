@@ -68,18 +68,6 @@ main, .site-header, .site-footer {
 h2 { font-size: 1.2rem; margin: 0 0 12px; }
 h3 { font-size: 1rem; margin: 18px 0 8px; }
 
-fieldset { border: 0; padding: 0; margin: 0 0 18px; }
-legend { font-weight: 600; margin-bottom: 8px; }
-
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip {
-  display: inline-flex; align-items: center; gap: 6px;
-  border: 1px solid var(--border); border-radius: 999px;
-  padding: 6px 14px; cursor: pointer; user-select: none;
-}
-.chip:has(input:checked) { background: var(--accent-soft); border-color: var(--accent); }
-.chip input { accent-color: var(--accent); margin: 0; }
-
 button {
   font: inherit; cursor: pointer;
   border-radius: 8px; padding: 9px 16px;
@@ -99,7 +87,6 @@ button.link { border: 0; background: none; color: var(--accent); padding: 4px; }
 /* Quiz */
 .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }
 .timer { font-variant-numeric: tabular-nums; font-weight: 600; }
-.timer.low { color: var(--bad); }
 .progress { height: 6px; background: var(--border); border-radius: 999px; overflow: hidden; margin-bottom: 14px; }
 .progress > span { display: block; height: 100%; background: var(--accent); transition: width .2s; }
 
@@ -123,15 +110,6 @@ pre {
   padding: 12px 14px; overflow-x: auto; font: 13.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   margin: 0 0 14px;
 }
-
-.options { display: grid; gap: 8px; }
-.option {
-  display: flex; gap: 10px; align-items: flex-start;
-  border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; cursor: pointer;
-}
-.option:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
-.option input { margin-top: 4px; accent-color: var(--accent); }
-.letter { font-weight: 700; color: var(--muted); min-width: 1.2em; }
 
 textarea {
   width: 100%; min-height: 180px; resize: vertical;
@@ -157,10 +135,6 @@ textarea {
 .review-item.wrong { border-left-color: var(--bad); }
 .review-item.partial { border-left-color: var(--warn); }
 
-.answer-line { padding: 6px 10px; border-radius: 6px; margin: 4px 0; }
-.answer-line.good { background: var(--good-soft); }
-.answer-line.bad { background: var(--bad-soft); }
-.explanation { margin-top: 10px; color: var(--muted); }
 
 .user-answer, .model-answer { white-space: pre-wrap; background: var(--code-bg); border-radius: 8px; padding: 10px 12px; margin: 0 0 10px; }
 .checklist { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }

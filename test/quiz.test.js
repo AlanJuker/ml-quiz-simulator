@@ -1,105 +1,27 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const QUESTIONS = require("../questions.js");
 const MIDTERM = require("../midterm.js");
-const { buildQuiz, buildMidterm, suggestPoints, itemScore, grade } = require("../quiz.js");
+const { buildMidterm, suggestPoints, itemScore, grade } = require("../quiz.js");
 
 const SECTIONS = ["Workflow & methodology", "Python code interpretation", "Model output & interpretation"];
 
-test("question bank is well formed", () => {
-  const ids = new Set();
-  for (const q of QUESTIONS) {
-    assert.ok(!ids.has(q.id), `duplicate id ${q.id}`);
-    ids.add(q.id);
-    assert.ok([1, 2, 3].includes(q.module), q.id);
-    assert.ok(["theory", "code"].includes(q.kind), q.id);
-    assert.ok(q.prompt.length > 10, q.id);
-    if (q.kind === "code") assert.ok(q.code, `${q.id} is a code question without code`);
-    if (q.type === "mc") {
-      assert.equal(q.options.length, 4, q.id);
-      assert.equal(new Set(q.options).size, 4, `${q.id} has duplicate options`);
-      assert.ok(Number.isInteger(q.answer) && q.answer >= 0 && q.answer < 4, q.id);
-      assert.ok(q.explanation, q.id);
-      assert.ok(!/(all|none) of the above/i.test(q.options.join(" ")), `${q.id} breaks under option shuffling`);
-      const longestWrong = Math.max(...q.options.filter((_, i) => i !== q.answer).map((o) => o.length));
-      assert.ok(q.options[q.answer].length <= Math.max(30, longestWrong * 1.2), `${q.id}: correct option is a giveaway by length`);
-    } else {
-      assert.equal(q.type, "open", q.id);
-      assert.ok(q.modelAnswer && q.keyPoints.length >= 3, q.id);
-      for (const p of q.keyPoints) assert.ok(p.text && p.keywords.length, q.id);
-    }
-  }
-});
-
-test("bank has enough questions per module for a 30-question quiz", () => {
-  for (const m of [1, 2, 3]) {
-    const quiz = buildQuiz(QUESTIONS, { modules: [m], total: 30 });
-    assert.equal(quiz.length, 30, `module ${m}`);
-  }
-});
-
-test("quiz respects the 80/20 MC/open and theory/code mix", () => {
-  const quiz = buildQuiz(QUESTIONS, { modules: [1, 2, 3], total: 20 });
-  const mc = quiz.filter((it) => it.q.type === "mc");
-  const open = quiz.filter((it) => it.q.type === "open");
-  assert.equal(mc.length, 16);
-  assert.equal(open.length, 4);
-  assert.equal(new Set(quiz.map((it) => it.q.id)).size, 20, "no repeated questions");
-  assert.equal(mc.filter((it) => it.q.kind === "code").length, 3);
-  assert.equal(open.filter((it) => it.q.kind === "code").length, 1);
-  const sections = quiz.map((it) => `${it.q.type}-${it.q.kind}`);
-  assert.deepEqual(sections, [
-    ...Array(13).fill("mc-theory"), ...Array(3).fill("mc-code"),
-    ...Array(3).fill("open-theory"), "open-code",
-  ], "theory MC first, then code MC, then open questions");
-});
-
-test("only selected modules are used", () => {
-  const quiz = buildQuiz(QUESTIONS, { modules: [2], total: 10 });
-  assert.ok(quiz.every((it) => it.q.module === 2));
-});
-
-test("shuffled options still grade against the original answer", () => {
-  for (let run = 0; run < 50; run++) {
-    const [item] = buildQuiz(QUESTIONS, { modules: [1, 2, 3], total: 1 });
-    if (item.q.type !== "mc") continue;
-    assert.deepEqual([...item.order].sort(), [0, 1, 2, 3]);
-    item.choice = item.order.indexOf(item.q.answer);
-    assert.equal(itemScore(item), 1);
-    item.choice = (item.choice + 1) % 4;
-    assert.equal(itemScore(item), 0);
-  }
-});
-
-test("open answers earn partial credit from the rubric", () => {
-  const q = QUESTIONS.find((x) => x.id === "m1-o5");
-  const text = "It is scored on the same data it was trained on, so it may overfit. Use train_test_split.";
-  const item = { q, text, points: suggestPoints(q, text) };
-  assert.deepEqual(item.points, [true, true, true, false]);
-  assert.equal(itemScore(item), 0.75);
-  assert.equal(itemScore({ ...item, text: "  " }), 0, "blank answers score zero even if ticked");
-});
-
-test("grade aggregates totals and groups", () => {
-  const mcQ = QUESTIONS.find((x) => x.type === "mc" && x.module === 1);
-  const openQ = QUESTIONS.find((x) => x.type === "open" && x.module === 2);
-  const items = [
-    { q: mcQ, order: [0, 1, 2, 3], choice: mcQ.answer },
-    { q: openQ, text: "x", points: openQ.keyPoints.map((_, i) => i === 0) },
-  ];
-  const g = grade(items);
-  assert.equal(g.total, 2);
-  assert.equal(g.groups["Module 1"].earned, 1);
-  assert.equal(g.groups["Open answer"].earned, 1 / openQ.keyPoints.length);
-  assert.equal(g.percent, Math.round(((1 + 1 / openQ.keyPoints.length) / 2) * 100));
-});
+// Runs attempts the way the app does: each one counts as seen and becomes `last` as soon as it starts.
+function attempts(n) {
+  const seen = {};
+  let last = [];
+  return Array.from({ length: n }, () => {
+    const ids = buildMidterm(MIDTERM, { seen, last }).map((it) => it.q.id);
+    ids.forEach((id) => (seen[id] = (seen[id] || 0) + 1));
+    last = ids;
+    return ids;
+  });
+}
 
 test("midterm bank: 10 written questions per section, one key point per mark", () => {
-  const ids = new Set(QUESTIONS.map((q) => q.id));
+  const ids = new Set();
   for (const q of MIDTERM) {
     assert.ok(!ids.has(q.id), `duplicate id ${q.id}`);
     ids.add(q.id);
-    assert.equal(q.type, "open", q.id);
     assert.ok([2, 3, 4, 5, 6].includes(q.module), q.id);
     assert.ok(SECTIONS.includes(q.section), q.id);
     assert.equal(q.marks, q.section === SECTIONS[2] ? 4 : 5, q.id);
@@ -112,24 +34,44 @@ test("midterm bank: 10 written questions per section, one key point per mark", (
   for (const section of SECTIONS) assert.equal(MIDTERM.filter((q) => q.section === section).length, 10, section);
 });
 
-test("midterm: 2 questions per section in exam order, unseen questions first", () => {
-  const seen = {};
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const exam = buildMidterm(MIDTERM, seen);
-    assert.deepEqual(exam.map((it) => it.q.section), SECTIONS.flatMap((s) => [s, s]));
-    exam.forEach((it) => (seen[it.q.id] = (seen[it.q.id] || 0) + 1));
-  }
-  assert.ok(MIDTERM.every((q) => seen[q.id] === 1), "5 attempts cover all 30 questions once each");
+test("each attempt has 2 questions per section in exam order", () => {
+  const exam = buildMidterm(MIDTERM);
+  assert.deepEqual(exam.map((it) => it.q.section), SECTIONS.flatMap((s) => [s, s]));
 });
 
-test("midterm score is weighted by marks", () => {
+test("every 5 attempts cover the whole bank once", () => {
+  const runs = attempts(20);
+  for (let round = 0; round < 4; round++) {
+    const ids = runs.slice(round * 5, round * 5 + 5).flat();
+    assert.equal(new Set(ids).size, MIDTERM.length, `round ${round + 1} covers all 30 questions`);
+  }
+});
+
+test("two attempts in a row never share a question, even across rounds", () => {
+  for (let trial = 0; trial < 20; trial++) {
+    const runs = attempts(30);
+    for (let i = 1; i < runs.length; i++) {
+      assert.ok(!runs[i].some((id) => runs[i - 1].includes(id)), `attempt ${i + 1} repeats attempt ${i}`);
+    }
+  }
+});
+
+test("open answers earn partial credit from the rubric", () => {
+  const q = MIDTERM.find((x) => x.id === "mt-o10");
+  const text = "Degree 2 is the best choice. Degree 10 overfits.";
+  const item = { q, text, points: suggestPoints(q, text) };
+  assert.deepEqual(item.points, [true, false, true, false]);
+  assert.equal(itemScore(item), 0.5);
+  assert.equal(itemScore({ ...item, text: "  " }), 0, "blank answers score zero even if ticked");
+});
+
+test("the score is weighted by marks", () => {
   const five = MIDTERM.find((q) => q.marks === 5);
   const four = MIDTERM.find((q) => q.marks === 4);
-  const items = [
+  const g = grade([
     { q: five, text: "x", points: five.keyPoints.map(() => true) },
     { q: four, text: "x", points: [true, true, false, false] },
-  ];
-  const g = grade(items);
+  ]);
   assert.equal(g.earned, 7);
   assert.equal(g.total, 9);
   assert.equal(g.percent, 78);

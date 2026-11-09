@@ -1,22 +1,17 @@
-/* global QUESTIONS, MIDTERM, buildQuiz, buildMidterm, suggestPoints, itemScore, grade */
-// UI layer: renders the four screens (setup → quiz → self-grading → results) into #app.
+/* global MIDTERM, buildMidterm, suggestPoints, itemScore, grade */
+// UI layer: renders the four screens (start → midterm → self-marking → results) into #app.
 
 const app = document.getElementById("app");
 const HISTORY_KEY = "mlquiz.history";
-const SEEN_KEY = "mlquiz.midterm.seen"; // midterm question id → times shown, so new attempts prefer unseen ones
+const SEEN_KEY = "mlquiz.midterm.seen"; // question id → times shown, so new attempts prefer unseen ones
+const LAST_KEY = "mlquiz.midterm.last"; // the previous attempt's question ids, never repeated straight away
 const PASS_MARK = 70;
-const LETTERS = "ABCD";
-const MODULES = [
-  [1, "M1 · ML landscape"],
-  [2, "M2 · End-to-end workflow"],
-  [3, "M3 · Classification"],
-];
 
-let state = null; // { screen, settings, items, index, startedAt, deadline, finishedAt, timerId, saved }
+let state = null; // { screen, items, index, startedAt, finishedAt, timerId, saved }
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const fmt = (sec) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
-const isAnswered = (it) => (it.q.type === "mc" ? it.choice !== null : it.text.trim() !== "");
+const isAnswered = (it) => it.text.trim() !== "";
 
 function load(key, fallback) {
   try {
@@ -34,13 +29,13 @@ function save(key, value) {
   }
 }
 
-const chip = (type, name, value, label, checked) =>
-  `<label class="chip"><input type="${type}" name="${name}" value="${value}" ${checked ? "checked" : ""}> ${label}</label>`;
+// Older versions also stored practice-quiz attempts under this key; show only the midterm ones.
+const loadHistory = () => load(HISTORY_KEY, []).filter((h) => h.midterm);
 
-// ───────────── Setup ─────────────
-function renderSetup(settings = { modules: [1, 2, 3], total: 20, perQuestion: 60 }) {
+// ───────────── Start ─────────────
+function renderStart() {
   state = null;
-  const history = load(HISTORY_KEY, []);
+  const history = loadHistory();
   const seen = load(SEEN_KEY, {});
   const seenCount = MIDTERM.filter((q) => seen[q.id]).length;
   const seenPct = Math.round((seenCount / MIDTERM.length) * 100);
@@ -49,75 +44,46 @@ function renderSetup(settings = { modules: [1, 2, 3], total: 20, perQuestion: 60
       <h2>Midterm simulation</h2>
       <p class="muted">6 written questions from Modules 2–6, in the format of the real midterm: 2 on workflow and
       methodology (5 marks each), 2 on Python code interpretation (5 marks each) and 2 on model output and
-      interpretation (4 marks each). Questions you haven't seen yet come first. After you submit, you mark your
-      answers against a model answer and a rubric worth one mark per key point.</p>
+      interpretation (4 marks each). Every new attempt gives you different questions: the ones you haven't seen
+      come first, so 5 attempts cover all 30. After you submit, you mark your answers against a model answer and
+      a rubric worth one mark per key point.</p>
       <div class="bar-row" style="margin-bottom: 16px">
         <span>Seen ${seenCount} / ${MIDTERM.length}</span>
         <div class="bar"><span style="width: ${seenPct}%"></span></div>
         <span class="small">${seenPct}%</span>
       </div>
-      <button class="primary" data-act="midterm">Start midterm simulation</button>
-    </section>
-    <section class="card">
-      <h2>Set up your practice quiz</h2>
-      <p class="muted">80% multiple choice, 20% open answer, and roughly 80% theory, 20% code interpretation.
-      You grade your open answers yourself against a rubric after you submit.</p>
-      <form id="setup">
-        <fieldset><legend>Modules</legend><div class="chips">
-          ${MODULES.map(([m, l]) => chip("checkbox", "module", m, l, settings.modules.includes(m))).join("")}
-        </div></fieldset>
-        <fieldset><legend>Number of questions</legend><div class="chips">
-          ${[10, 20, 30].map((n) => chip("radio", "total", n, n, settings.total === n)).join("")}
-        </div></fieldset>
-        <fieldset><legend>Timer</legend><div class="chips">
-          ${[[0, "Off"], [60, "60 s / question"], [90, "90 s / question"]]
-            .map(([v, l]) => chip("radio", "perQuestion", v, l, settings.perQuestion === v)).join("")}
-        </div></fieldset>
-        <p id="setup-error" class="small" style="color: var(--bad)" hidden>Pick at least one module.</p>
-        <button class="primary" type="submit">Start quiz</button>
-      </form>
+      <button class="primary" data-act="start">Start midterm simulation</button>
     </section>
     ${history.length ? `
     <section class="card">
       <div class="row spread"><h2>Your attempts</h2><button class="link" data-act="clear-history">Clear</button></div>
       <table>
-        <thead><tr><th>Date</th><th>Modules</th><th class="num">Questions</th><th class="num">Score</th></tr></thead>
+        <thead><tr><th>Date</th><th class="num">Score</th></tr></thead>
         <tbody>${history.map((h) => `
-          <tr><td>${esc(new Date(h.date).toLocaleString())}</td><td>${h.midterm ? "Midterm" : esc(h.modules.join(", "))}</td>
-          <td class="num">${h.total}</td><td class="num">${h.percent}%</td></tr>`).join("")}
+          <tr><td>${esc(new Date(h.date).toLocaleString())}</td><td class="num">${h.percent}%</td></tr>`).join("")}
         </tbody>
       </table>
     </section>` : ""}`;
 }
 
-function startQuiz(settings) {
-  const items = settings.midterm ? buildMidterm(MIDTERM, load(SEEN_KEY, {})) : buildQuiz(QUESTIONS, settings);
-  const now = Date.now();
-  state = {
-    screen: "quiz",
-    settings,
-    items,
-    index: 0,
-    startedAt: now,
-    deadline: settings.perQuestion ? now + settings.perQuestion * items.length * 1000 : null,
-    saved: false,
-  };
+// An attempt counts as seen as soon as it starts, so even an abandoned attempt is not repeated next time.
+function startMidterm() {
+  const seen = load(SEEN_KEY, {});
+  const items = buildMidterm(MIDTERM, { seen, last: load(LAST_KEY, []) });
+  items.forEach((it) => (seen[it.q.id] = (seen[it.q.id] || 0) + 1));
+  save(SEEN_KEY, seen);
+  save(LAST_KEY, items.map((it) => it.q.id));
+  state = { screen: "quiz", items, index: 0, startedAt: Date.now(), saved: false };
   state.timerId = setInterval(tick, 1000);
   renderQuestion();
 }
 
-// ───────────── Quiz ─────────────
-function timerText() {
-  if (!state.deadline) return `⏱ ${fmt(Math.floor((Date.now() - state.startedAt) / 1000))}`;
-  return `⏳ ${fmt(Math.max(0, Math.ceil((state.deadline - Date.now()) / 1000)))} left`;
-}
+// ───────────── Midterm ─────────────
+const timerText = () => `⏱ ${fmt(Math.floor((Date.now() - state.startedAt) / 1000))}`;
 
 function tick() {
-  if (state.deadline && Date.now() >= state.deadline) return finish(true);
   const el = document.getElementById("timer");
-  if (!el) return;
-  el.textContent = timerText();
-  el.classList.toggle("low", !!state.deadline && state.deadline - Date.now() < 60_000);
+  if (el) el.textContent = timerText();
 }
 
 function navClass(it, i) {
@@ -148,19 +114,13 @@ function renderQuestion() {
     <section class="card">
       <div class="badges">
         <span class="badge">Module ${q.module}</span>
-        ${q.section ? `<span class="badge">${esc(q.section)}</span><span class="badge">${q.marks} marks</span>`
-          : `<span class="badge">${q.type === "mc" ? "Multiple choice" : "Open answer"}</span>`}
+        <span class="badge">${esc(q.section)}</span>
+        <span class="badge">${q.marks} marks</span>
         ${q.kind === "code" ? '<span class="badge code">Code</span>' : ""}
       </div>
       <p class="prompt" id="prompt">${esc(q.prompt)}</p>
       ${q.code ? `<pre><code>${esc(q.code)}</code></pre>` : ""}
-      ${q.type === "mc"
-        ? `<div class="options" role="radiogroup" aria-labelledby="prompt">
-            ${it.order.map((orig, i) => `
-              <label class="option"><input type="radio" name="opt" value="${i}" ${it.choice === i ? "checked" : ""}>
-              <span class="letter">${LETTERS[i]}</span><span>${esc(q.options[orig])}</span></label>`).join("")}
-          </div>`
-        : `<textarea id="open-answer" aria-labelledby="prompt" placeholder="Write your answer as you would in the exam…">${esc(it.text)}</textarea>`}
+      <textarea id="open-answer" aria-labelledby="prompt" placeholder="Write your answer as you would in the exam…">${esc(it.text)}</textarea>
     </section>
     <div class="row spread">
       <div class="row">
@@ -169,10 +129,10 @@ function renderQuestion() {
       </div>
       <div class="row">
         ${last ? "" : '<button class="primary" data-act="next">Next →</button>'}
-        <button data-act="submit" class="${last ? "primary" : ""}">Submit quiz</button>
+        <button data-act="submit" class="${last ? "primary" : ""}">Submit midterm</button>
       </div>
     </div>
-    <p class="muted small kbd-hint">Shortcuts: 1–4 or A–D to answer · ← → to move · F to flag</p>`;
+    <p class="muted small kbd-hint">Shortcuts outside the answer box: ← → to move · F to flag</p>`;
 }
 
 function go(i) {
@@ -184,36 +144,31 @@ function go(i) {
 function submit() {
   const missing = state.items.filter((it) => !isAnswered(it)).length;
   if (missing && !confirm(`You have ${missing} unanswered question${missing > 1 ? "s" : ""}. Submit anyway?`)) return;
-  finish(false);
-}
-
-function finish(timeUp) {
   clearInterval(state.timerId);
   state.finishedAt = Date.now();
-  state.timeUp = timeUp;
-  const open = state.items.filter((it) => it.q.type === "open" && it.text.trim());
-  open.forEach((it) => (it.points = suggestPoints(it.q, it.text)));
-  if (open.length) renderSelfGrade();
+  const answered = state.items.filter(isAnswered);
+  answered.forEach((it) => (it.points = suggestPoints(it.q, it.text)));
+  if (answered.length) renderSelfGrade();
   else renderResults();
 }
 
-// ───────────── Self-grading of open answers ─────────────
+// ───────────── Self-marking ─────────────
 function renderSelfGrade() {
   state.screen = "grade";
   const blocks = state.items
     .map((it, i) => ({ it, i }))
-    .filter(({ it }) => it.q.type === "open" && it.text.trim())
+    .filter(({ it }) => isAnswered(it))
     .map(({ it, i }) => `
       <section class="card">
         <div class="badges"><span class="badge">Question ${i + 1}</span><span class="badge">Module ${it.q.module}</span>
-          ${it.q.marks ? `<span class="badge">${it.q.marks} marks</span>` : ""}</div>
+          <span class="badge">${it.q.marks} marks</span></div>
         <p class="prompt">${esc(it.q.prompt)}</p>
         ${it.q.code ? `<pre><code>${esc(it.q.code)}</code></pre>` : ""}
         <h3>Your answer</h3>
         <p class="user-answer">${esc(it.text)}</p>
         <h3>Model answer</h3>
         <p class="model-answer">${esc(it.q.modelAnswer)}</p>
-        <h3>Rubric: tick each point your answer covers${it.q.marks ? " (1 mark each)" : ""}</h3>
+        <h3>Rubric: tick each point your answer covers (1 mark each)</h3>
         <ul class="checklist">
           ${it.q.keyPoints.map((p, j) => `
             <li><label><input type="checkbox" data-item="${i}" data-point="${j}" ${it.points[j] ? "checked" : ""}> ${esc(p.text)}</label></li>`).join("")}
@@ -221,9 +176,8 @@ function renderSelfGrade() {
       </section>`)
     .join("");
   app.innerHTML = `
-    ${state.timeUp ? '<section class="card"><strong>Time is up.</strong> Your quiz was submitted automatically.</section>' : ""}
     <section class="card">
-      <h2>Grade your open answers</h2>
+      <h2>Mark your answers</h2>
       <p class="muted">Points were pre-ticked by keyword matching. Be honest: untick anything you did not really explain, and tick anything you covered in other words.</p>
     </section>
     ${blocks}
@@ -237,18 +191,11 @@ function renderResults() {
   const g = grade(state.items);
   const seconds = Math.round((state.finishedAt - state.startedAt) / 1000);
   if (!state.saved) {
-    const { midterm = false, modules = [] } = state.settings;
-    save(HISTORY_KEY, [{ date: new Date().toISOString(), midterm, modules, total: state.items.length, percent: g.percent }, ...load(HISTORY_KEY, [])].slice(0, 20));
-    if (midterm) {
-      const seen = load(SEEN_KEY, {});
-      state.items.forEach((it) => (seen[it.q.id] = (seen[it.q.id] || 0) + 1));
-      save(SEEN_KEY, seen);
-    }
+    save(HISTORY_KEY, [{ date: new Date().toISOString(), midterm: true, percent: g.percent }, ...loadHistory()].slice(0, 20));
     state.saved = true;
   }
   const pass = g.percent >= PASS_MARK;
   app.innerHTML = `
-    ${state.timeUp ? '<section class="card"><strong>Time is up.</strong> Your quiz was submitted automatically.</section>' : ""}
     <section class="card">
       <div class="row spread">
         <div>
@@ -256,7 +203,7 @@ function renderResults() {
           <div class="verdict ${pass ? "pass" : "fail"}">${pass ? "Pass" : "Below the pass mark"} (${PASS_MARK}%)</div>
         </div>
         <div class="muted small">
-          ${Math.round(g.earned * 10) / 10} / ${g.total} points<br>
+          ${Math.round(g.earned * 10) / 10} / ${g.total} marks<br>
           Time used: ${fmt(seconds)}
         </div>
       </div>
@@ -268,13 +215,13 @@ function renderResults() {
         }).join("")}
       </div>
       <div class="row" style="margin-top: 18px">
-        <button class="primary" data-act="retake">${state.settings.midterm ? "New midterm simulation" : "New quiz, same settings"}</button>
-        <button data-act="setup">Change settings</button>
+        <button class="primary" data-act="start">New midterm simulation</button>
+        <button data-act="home">Back to start</button>
       </div>
     </section>
     <div class="row spread">
       <h2>Review</h2>
-      <label class="small"><input type="checkbox" id="only-mistakes"> Only show mistakes</label>
+      <label class="small"><input type="checkbox" id="only-mistakes"> Only show answers that lost marks</label>
     </div>
     <div id="review">${state.items.map(reviewItem).join("")}</div>`;
   window.scrollTo(0, 0);
@@ -284,44 +231,23 @@ function reviewItem(it, i) {
   const q = it.q;
   const s = itemScore(it);
   const status = s === 1 ? "correct" : s === 0 ? "wrong" : "partial";
-  const head = `
+  return `<section class="card review-item ${status}">
     <div class="badges">
       <span class="badge">Q${i + 1}</span><span class="badge">Module ${q.module}</span>
       ${q.kind === "code" ? '<span class="badge code">Code</span>' : ""}
-      <span class="badge">${q.type === "mc" ? `${s} / 1` : q.marks ? `${Math.round(s * q.marks * 10) / 10} / ${q.marks} marks` : `${Math.round(s * 100)}%`}</span>
+      <span class="badge">${Math.round(s * q.marks * 10) / 10} / ${q.marks} marks</span>
     </div>
     <p class="prompt">${esc(q.prompt)}</p>
-    ${q.code ? `<pre><code>${esc(q.code)}</code></pre>` : ""}`;
-  if (q.type === "mc") {
-    const picked = it.choice === null ? null : it.order[it.choice];
-    return `<section class="card review-item ${status}">${head}
-      ${picked === null ? '<div class="answer-line bad">You did not answer.</div>'
-        : picked !== q.answer ? `<div class="answer-line bad">Your answer: ${esc(q.options[picked])}</div>` : ""}
-      <div class="answer-line good">Correct answer: ${esc(q.options[q.answer])}</div>
-      <p class="explanation">${esc(q.explanation)}</p>
-    </section>`;
-  }
-  return `<section class="card review-item ${status}">${head}
+    ${q.code ? `<pre><code>${esc(q.code)}</code></pre>` : ""}
     <h3>Your answer</h3>
-    <p class="user-answer">${it.text.trim() ? esc(it.text) : '<span class="muted">No answer.</span>'}</p>
+    <p class="user-answer">${isAnswered(it) ? esc(it.text) : '<span class="muted">No answer.</span>'}</p>
     <h3>Model answer</h3>
     <p class="model-answer">${esc(q.modelAnswer)}</p>
-    <ul class="checklist">${q.keyPoints.map((p, j) => `<li>${it.text.trim() && it.points[j] ? "✅" : "❌"} ${esc(p.text)}</li>`).join("")}</ul>
+    <ul class="checklist">${q.keyPoints.map((p, j) => `<li>${isAnswered(it) && it.points[j] ? "✅" : "❌"} ${esc(p.text)}</li>`).join("")}</ul>
   </section>`;
 }
 
 // ───────────── Events ─────────────
-app.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const form = new FormData(e.target);
-  const modules = form.getAll("module").map(Number);
-  if (!modules.length) {
-    document.getElementById("setup-error").hidden = false;
-    return;
-  }
-  startQuiz({ modules, total: Number(form.get("total")), perQuestion: Number(form.get("perQuestion")) });
-});
-
 app.addEventListener("click", (e) => {
   const goto = e.target.closest("[data-goto]");
   if (goto) return go(Number(goto.dataset.goto));
@@ -333,21 +259,17 @@ app.addEventListener("click", (e) => {
     renderQuestion();
   } else if (act === "submit") submit();
   else if (act === "results") renderResults();
-  else if (act === "midterm") startQuiz({ midterm: true });
-  else if (act === "retake") startQuiz(state.settings);
-  else if (act === "setup") renderSetup(state.settings.midterm ? undefined : state.settings);
+  else if (act === "start") startMidterm();
+  else if (act === "home") renderStart();
   else if (act === "clear-history" && confirm("Delete all saved attempts?")) {
     save(HISTORY_KEY, []);
-    renderSetup();
+    renderStart();
   }
 });
 
 app.addEventListener("change", (e) => {
   const t = e.target;
-  if (t.name === "opt") {
-    state.items[state.index].choice = Number(t.value);
-    updateProgress();
-  } else if (t.dataset.point !== undefined) {
+  if (t.dataset.point !== undefined) {
     state.items[Number(t.dataset.item)].points[Number(t.dataset.point)] = t.checked;
   } else if (t.id === "only-mistakes") {
     document.querySelectorAll("#review .review-item.correct").forEach((el) => (el.hidden = t.checked));
@@ -362,17 +284,11 @@ app.addEventListener("input", (e) => {
 
 document.addEventListener("keydown", (e) => {
   if (state?.screen !== "quiz" || e.metaKey || e.ctrlKey || e.altKey || e.target.tagName === "TEXTAREA") return;
-  const it = state.items[state.index];
-  const key = e.key.toLowerCase();
-  const opt = "1234".indexOf(key) >= 0 ? "1234".indexOf(key) : "abcd".indexOf(key);
   if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
     e.preventDefault();
     go(state.index + (e.key === "ArrowRight" ? 1 : -1));
-  } else if (key === "f") {
-    it.flagged = !it.flagged;
-    renderQuestion();
-  } else if (it.q.type === "mc" && opt >= 0) {
-    it.choice = opt;
+  } else if (e.key.toLowerCase() === "f") {
+    state.items[state.index].flagged = !state.items[state.index].flagged;
     renderQuestion();
   }
 });
@@ -381,4 +297,4 @@ window.addEventListener("beforeunload", (e) => {
   if (state?.screen === "quiz") e.preventDefault();
 });
 
-renderSetup();
+renderStart();
