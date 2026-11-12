@@ -6,14 +6,15 @@ const HISTORY_KEY = "mlquiz.history";
 const SEEN_KEY = "mlquiz.midterm.seen"; // question id → times shown, so new attempts prefer unseen ones
 const LAST_KEY = "mlquiz.midterm.last"; // the previous attempt's question ids, never repeated straight away
 const PASS_MARK = 70;
-// Quick is the default; the full exam is the real midterm's length.
+// Quick is the default; the full exam is the real midterm: 6 questions × 5 marks in 50 minutes.
+// Shorter lengths keep the same time per question (about 8 minutes).
 const MODES = {
-  single: { title: "Super quick midterm", short: "Super quick", total: 1, detail: "1 question from any section · 4 or 5 marks" },
-  quick: { title: "Quick midterm", short: "Quick", perSection: 1, detail: "3 questions, one from each section · 14 marks" },
-  full: { title: "Full midterm", short: "Full", perSection: 2, detail: "6 questions, like the real exam · 28 marks" },
+  single: { title: "Super quick midterm", short: "Super quick", total: 1, minutes: 8, detail: "1 question from any section · 5 marks · 8 minutes" },
+  quick: { title: "Quick midterm", short: "Quick", perSection: 1, minutes: 25, detail: "3 questions, one from each section · 15 marks · 25 minutes" },
+  full: { title: "Full midterm", short: "Full", perSection: 2, minutes: 50, detail: "6 questions, like the real exam · 30 marks · 50 minutes" },
 };
 
-let state = null; // { screen, mode, items, index, startedAt, finishedAt, timerId, saved }
+let state = null; // { screen, mode, items, index, startedAt, finishedAt, timerId, timeUp, saved }
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const fmt = (sec) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
@@ -48,10 +49,11 @@ function renderStart() {
   app.innerHTML = `
     <section class="card">
       <h2>Midterm simulation</h2>
-      <p class="muted">Written questions from Modules 2–6, in the format of the real midterm: workflow and methodology
-      (5 marks), Python code interpretation (5 marks) and model output and interpretation (4 marks). Every new attempt
-      gives you different questions: the ones you haven't seen come first. After you submit, you mark your answers
-      against a model answer and a rubric worth one mark per key point.</p>
+      <p class="muted">Written questions from Modules 2–6 (mostly 4, 5 and 6), in the format of the real midterm:
+      workflow and methodology, Python code interpretation, and model output interpretation and method selection,
+      5 marks each. Answer closed book: the clock gives you the real exam's time per question and submits when it runs
+      out. Every new attempt gives you different questions: the ones you haven't seen come first. After you submit,
+      you mark your answers against a model answer and a rubric worth one mark per key point.</p>
       <fieldset class="modes"><legend>Choose a length</legend>
         ${Object.entries(MODES).map(([k, m]) => `
           <label class="mode"><input type="radio" name="mode" value="${k}" ${k === "quick" ? "checked" : ""}>
@@ -92,9 +94,11 @@ function startMidterm(mode) {
 }
 
 // ───────────── Midterm ─────────────
-const timerText = () => `⏱ ${fmt(Math.floor((Date.now() - state.startedAt) / 1000))}`;
+const secondsLeft = () => MODES[state.mode].minutes * 60 - Math.floor((Date.now() - state.startedAt) / 1000);
+const timerText = () => `⏱ ${fmt(Math.max(0, secondsLeft()))} left`;
 
 function tick() {
+  if (secondsLeft() <= 0) return submit(true);
   const el = document.getElementById("timer");
   if (el) el.textContent = timerText();
 }
@@ -154,10 +158,12 @@ function go(i) {
   renderQuestion();
 }
 
-function submit() {
+// When time is up the attempt is submitted as it is, like the real exam.
+function submit(timeUp = false) {
   const missing = state.items.filter((it) => !isAnswered(it)).length;
-  if (missing && !confirm(`You have ${missing} unanswered question${missing > 1 ? "s" : ""}. Submit anyway?`)) return;
+  if (!timeUp && missing && !confirm(`You have ${missing} unanswered question${missing > 1 ? "s" : ""}. Submit anyway?`)) return;
   clearInterval(state.timerId);
+  state.timeUp = timeUp;
   state.finishedAt = Date.now();
   const answered = state.items.filter(isAnswered);
   answered.forEach((it) => (it.points = suggestPoints(it.q, it.text)));
@@ -191,7 +197,7 @@ function renderSelfGrade() {
   app.innerHTML = `
     <section class="card">
       <h2>Mark your answers</h2>
-      <p class="muted">Points were pre-ticked by keyword matching. Be honest: untick anything you did not really explain, and tick anything you covered in other words.</p>
+      <p class="muted">${state.timeUp ? "<strong>Time is up</strong>, so your answers were submitted. " : ""}Points were pre-ticked by keyword matching. Be honest: untick anything you did not really explain, and tick anything you covered in other words.</p>
     </section>
     ${blocks}
     <div class="row"><button class="primary" data-act="results">See my results</button></div>`;
@@ -218,7 +224,7 @@ function renderResults() {
         <div class="muted small">
           ${MODES[state.mode].title}<br>
           ${Math.round(g.earned * 10) / 10} / ${g.total} marks<br>
-          Time used: ${fmt(seconds)}
+          Time used: ${fmt(Math.min(seconds, MODES[state.mode].minutes * 60))} of ${MODES[state.mode].minutes}:00
         </div>
       </div>
       <h3>Breakdown</h3>

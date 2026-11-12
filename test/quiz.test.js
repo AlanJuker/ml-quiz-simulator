@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const MIDTERM = require("../midterm.js");
 const { buildMidterm, suggestPoints, itemScore, grade } = require("../quiz.js");
 
-const SECTIONS = ["Workflow & methodology", "Python code interpretation", "Model output & interpretation"];
+const SECTIONS = ["Workflow & methodology", "Python code interpretation", "Model output interpretation & method selection"];
 
 // Runs attempts the way the app does: each one counts as seen and becomes `last` as soon as it starts.
 // `size` is the mode's options ({ perSection } or { total }), or a function returning them, to mix modes.
@@ -22,14 +22,14 @@ function attempts(n, size = FULL) {
   });
 }
 
-test("midterm bank: 10 written questions per section, one key point per mark", () => {
+test("midterm bank: 10 written questions per section, 5 marks each, one key point per mark", () => {
   const ids = new Set();
   for (const q of MIDTERM) {
     assert.ok(!ids.has(q.id), `duplicate id ${q.id}`);
     ids.add(q.id);
     assert.ok([2, 3, 4, 5, 6].includes(q.module), q.id);
     assert.ok(SECTIONS.includes(q.section), q.id);
-    assert.equal(q.marks, q.section === SECTIONS[2] ? 4 : 5, q.id);
+    assert.equal(q.marks, 5, q.id);
     assert.equal(q.keyPoints.length, q.marks, `${q.id}: one key point per mark`);
     assert.ok(q.prompt.length > 10 && q.modelAnswer, q.id);
     if (q.kind === "code" || q.section === SECTIONS[2]) assert.ok(q.code, `${q.id} needs its code or output`);
@@ -68,20 +68,19 @@ test("open answers earn partial credit from the rubric", () => {
   const q = MIDTERM.find((x) => x.id === "mt-o10");
   const text = "Degree 2 is the best choice. Degree 10 overfits.";
   const item = { q, text, points: suggestPoints(q, text) };
-  assert.deepEqual(item.points, [true, false, true, false]);
-  assert.equal(itemScore(item), 0.5);
+  assert.deepEqual(item.points, [true, false, true, false, false]);
+  assert.equal(itemScore(item), 0.4);
   assert.equal(itemScore({ ...item, text: "  " }), 0, "blank answers score zero even if ticked");
 });
 
 test("the score is weighted by marks", () => {
-  const five = MIDTERM.find((q) => q.marks === 5);
-  const four = MIDTERM.find((q) => q.marks === 4);
+  const [a, b] = [MIDTERM[0], MIDTERM[MIDTERM.length - 1]];
   const g = grade([
-    { q: five, text: "x", points: five.keyPoints.map(() => true) },
-    { q: four, text: "x", points: [true, true, false, false] },
+    { q: a, text: "x", points: a.keyPoints.map(() => true) },
+    { q: b, text: "x", points: [true, true, false, false, false] },
   ]);
   assert.equal(g.earned, 7);
-  assert.equal(g.total, 9);
-  assert.equal(g.percent, 78);
-  assert.equal(g.groups[four.section].total, 4);
+  assert.equal(g.total, 10);
+  assert.equal(g.percent, 70);
+  assert.equal(g.groups[b.section].total, 5);
 });

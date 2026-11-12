@@ -10,21 +10,23 @@ A **midterm simulation** and a **study guide** for Machine Learning (MCAI/CSAI 5
 
 Written questions in the format of the real midterm, drawn from a bank of 30 (10 per section). There are three lengths:
 
-- **Super quick midterm:** 1 question from any section, 4 or 5 marks.
-- **Quick midterm (default):** 3 questions, one from each section, 14 marks.
-- **Full midterm:** 6 questions, two from each section, 28 marks, like the real exam.
+- **Super quick midterm:** 1 question from any section, 5 marks, 8 minutes.
+- **Quick midterm (default):** 3 questions, one from each section, 15 marks, 25 minutes.
+- **Full midterm:** 6 questions, two from each section, 30 marks, 50 minutes, like the real exam.
+
+This follows the format the professor announced: six written questions worth 5 marks each (30 marks), two picked at random from each area's pool, closed book, 50 minutes.
 
 The three sections:
 
 | Section | Marks | What it asks |
 | --- | --- | --- |
-| Workflow & methodology | 5 each | A scenario (often a hospital) with a flawed ML workflow: find the problems, say what the first step should be, and decide what to do |
-| Python code interpretation | 5 each | A short Scikit-Learn snippet: explain its purpose, the role of a function and why a parameter is used |
-| Model output & interpretation | 4 each | A classification report, confusion matrix or results table: compare classes or models, select one and explain the differences |
+| Workflow & methodology | 5 | A scenario (often a hospital) with a flawed ML workflow: find the problems, say what the first step should be, and decide what to do |
+| Python code interpretation | 5 | A short Scikit-Learn snippet: explain its purpose, the role of a function and why a parameter is used |
+| Model output interpretation & method selection | 5 | A classification report, confusion matrix or results table: compare classes or models, explain the differences, and select a model, threshold or setting and say how to confirm it |
 
 - **Always a different attempt:** questions you have not seen come first, so every 30 super quick, 10 quick or 5 full attempts cover all 30. An attempt counts as soon as it starts, and the next one never repeats any question from it, even when the bank starts a new round.
-- **During the attempt:** a question navigator, flags, an elapsed-time clock, and `←` `→` / `F` shortcuts.
-- **Marking:** after you submit, you see each model answer and a rubric with one key point per mark. Points are pre-ticked by keyword matching, and you confirm or correct them. The score is in marks (out of 4–5, 14 or 28), against a 70% pass mark, with a breakdown by section and module.
+- **During the attempt:** a countdown with the real exam's time per question (about 8 minutes) that submits the attempt when it runs out, a question navigator, flags, and `←` `→` / `F` shortcuts.
+- **Marking:** after you submit, you see each model answer and a rubric with one key point per mark. Points are pre-ticked by keyword matching, and you confirm or correct them. The score is in marks (out of 5, 15 or 30), against a 70% pass mark, with a breakdown by section and module.
 - The outputs in the third section come from the class demos (Modules 3, 5 and 6) or from running the Module 4 lab code.
 - Past attempts and the questions you have seen are saved in your browser.
 

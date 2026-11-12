@@ -306,10 +306,10 @@ gb.fit(X_train, y_train)`,
     ],
   },
 
-  // ───────────────────────── Section 3: Model output & interpretation (4 marks) ─────────────────────────
+  // ───────────────────────── Section 3: Model output interpretation & method selection (5 marks) ─────────────────────────
   {
-    id: "mt-o1", module: 4, type: "open", kind: "theory", section: "Model output & interpretation", marks: 4,
-    prompt: "A logistic regression model for breast-tumour diagnosis produced this output. Which class does the model predict better, and why might it perform differently on the two classes? Is it acceptable for medical screening? Justify with the numbers.",
+    id: "mt-o1", module: 4, type: "open", kind: "theory", section: "Model output interpretation & method selection", marks: 5,
+    prompt: "A logistic regression model for breast-tumour diagnosis produced this output. Which class does the model predict better, and why might it perform differently on the two classes? Is it acceptable for medical screening, and if not, what would you change? Justify with the numbers.",
     code: `Logistic Regression, test set (positive class = malignant)
 
               precision    recall  f1-score   support
@@ -325,16 +325,17 @@ Confusion matrix (rows = actual, columns = predicted)
                   benign  malignant
 actual benign         71          1
 actual malignant       3         39`,
-    modelAnswer: "Accuracy is 0.96 (110 of 114 correct). The model is better on the benign class: recall 0.99 (71 of 72 benign tumours found, 1 false positive) and F1 0.97, against recall 0.93 (39 of 42 found, 3 false negatives) and F1 0.95 for malignant. One reason is class imbalance: there are more benign examples (72 vs 42 here, 357 vs 212 in the full dataset), so the model sees more benign patterns, and the default 0.5 threshold favours the majority class. Malignant tumours that look like benign ones (borderline probabilities) are also harder to separate. For screening, the 3 missed cancers are the most serious error, so although malignant precision is high (0.97), I would raise malignant recall, for example by lowering the threshold, before using it.",
+    modelAnswer: "Accuracy is 0.96 (110 of 114 correct). The model is better on the benign class: recall 0.99 (71 of 72 benign tumours found, 1 false positive) and F1 0.97, against recall 0.93 (39 of 42 found, 3 false negatives) and F1 0.95 for malignant. One reason is class imbalance: there are more benign examples (72 vs 42 here, 357 vs 212 in the full dataset), so the model sees more benign patterns, and the default 0.5 threshold favours the majority class. Malignant tumours that look like benign ones (borderline probabilities) are also harder to separate. For screening, the 3 missed cancers are the most serious error, so although malignant precision is high (0.97), it is not ready as it is. I would raise malignant recall before using it, for example by lowering the decision threshold (chosen on validation data) or training with class_weight='balanced'.",
     keyPoints: [
       { text: "Benign is predicted better (recall 0.99, F1 0.97 vs 0.93 and 0.95); accuracy 0.96", keywords: ["benign", "0.99", "better"] },
       { text: "Reads the confusion matrix: 3 malignant cases missed (false negatives), 1 false positive", keywords: ["three", "3 false", "3 malignant", "false negative", "missed"] },
       { text: "Explains the difference: class imbalance, default threshold or borderline cases", keywords: ["imbalanc", "more benign", "majority", "fewer malignant", "borderline", "threshold"] },
-      { text: "Screening judgement: false negatives are costly → raise malignant recall", keywords: ["screening", "costly", "dangerous", "serious", "lower the threshold", "lower threshold"] },
+      { text: "Screening judgement: the 3 missed cancers are the most costly error, so it is not ready as it is", keywords: ["screening", "costly", "dangerous", "serious", "not ready", "not acceptable"] },
+      { text: "Method to fix it: lower the threshold (chosen on validation data) or class_weight='balanced' to raise malignant recall", keywords: ["lower the threshold", "lower threshold", "lowering the", "class_weight", "balanced"] },
     ],
   },
   {
-    id: "mt-o2", module: 3, type: "open", kind: "theory", section: "Model output & interpretation", marks: 4,
+    id: "mt-o2", module: 3, type: "open", kind: "theory", section: "Model output interpretation & method selection", marks: 5,
     prompt: "Logistic Regression and Random Forest have the same accuracy on this test set. Which model would you select to detect malignant tumours, and why? Why do the three models perform differently on the same data?",
     code: `Test-set results (positive class = malignant)
 
@@ -348,10 +349,11 @@ KNN                     0.956      0.974   0.905  0.938    0.982`,
       { text: "Selects Logistic Regression for its higher recall/F1 (fewer missed cancers)", keywords: ["0.929", "higher recall", "highest recall", "choose logistic", "select logistic"] },
       { text: "Notes Random Forest's perfect precision but lower recall (more false negatives)", keywords: ["1.000", "perfect precision", "no false positive", "lower recall", "0.905"] },
       { text: "Explains why models differ: linear boundary vs trees vs neighbours", keywords: ["linear", "neighbo", "different algorithm", "learn differently", "boundary", "assumption"] },
+      { text: "Confirms the choice with cross-validation: one split of 114 rows can be lucky", keywords: ["cross-val", "lucky", "one split", "114"] },
     ],
   },
   {
-    id: "mt-o3", module: 4, type: "open", kind: "theory", section: "Model output & interpretation", marks: 4,
+    id: "mt-o3", module: 4, type: "open", kind: "theory", section: "Model output interpretation & method selection", marks: 5,
     prompt: "This table shows the same logistic regression model evaluated with three decision thresholds. Explain what happens to precision and recall as the threshold changes, and which threshold you would choose for cancer screening.",
     code: `Logistic Regression, malignant = positive class
 
@@ -365,10 +367,11 @@ KNN                     0.956      0.974   0.905  0.938    0.982`,
       { text: "Higher threshold (0.7): precision up to 1.000, recall down to 0.905", keywords: ["0.7", "stricter", "precision increases", "higher precision", "1.000"] },
       { text: "Lower threshold (0.3): recall up to 0.976 — the precision-recall trade-off", keywords: ["trade-off", "trade off", "tradeoff", "0.976", "recall increases", "higher recall"] },
       { text: "Chooses 0.3 for screening because false negatives are the worst error", keywords: ["0.3", "screening", "false negative", "miss"] },
+      { text: "The threshold must be chosen on validation data or CV, not the test set (otherwise optimistic)", keywords: ["validation", "cross-val", "optimistic"] },
     ],
   },
   {
-    id: "mt-o4", module: 5, type: "open", kind: "theory", section: "Model output & interpretation", marks: 4,
+    id: "mt-o4", module: 5, type: "open", kind: "theory", section: "Model output interpretation & method selection", marks: 5,
     prompt: "Interpret this output. Why is the test accuracy lower than the cross-validation accuracy, which number should be reported as the expected performance, and what do the tied combinations tell you about model selection?",
     code: `Decision tree tuned with GridSearchCV (cv=5, scoring="accuracy") on Iris
 
@@ -389,12 +392,13 @@ criterion  max_depth  min_samples_leaf  mean_cv_accuracy  rank
       { text: "Identifies the selected tree (gini, depth 3, 5 leaves) and the CV vs test numbers", keywords: ["0.938", "0.895", "depth 3", "max_depth=3", "5 leaves"] },
       { text: "Explains the gap: the best CV score is optimistic and/or the test set is small", keywords: ["optimistic", "small test", "few samples", "maximum", "38", "small"] },
       { text: "The test accuracy is the unbiased number to report", keywords: ["report", "unbiased", "unseen"] },
-      { text: "Ties → prefer the simplest model (shallow tree, fewer leaves)", keywords: ["tie", "simpl", "fewer leaves", "shallow"] },
+      { text: "Ties: the data cannot tell these combinations apart", keywords: ["tie", "cannot tell", "can't tell", "same score", "noise"] },
+      { text: "Selection rule: prefer the simplest of the tied models (shallow tree, few leaves)", keywords: ["simpl", "fewer leaves", "few leaves", "shallow"] },
     ],
   },
   {
-    id: "mt-o5", module: 5, type: "open", kind: "theory", section: "Model output & interpretation", marks: 4,
-    prompt: "Which max_depth would you choose and why? Identify where the model underfits and where it overfits, using the numbers.",
+    id: "mt-o5", module: 5, type: "open", kind: "theory", section: "Model output interpretation & method selection", marks: 5,
+    prompt: "Which max_depth would you choose and why? Identify where the model underfits and where it overfits, using the numbers, and say how you would confirm your choice.",
     code: `Decision trees on the moons dataset (noise=0.25)
 
 max_depth            train_accuracy  test_accuracy  leaves
@@ -408,12 +412,13 @@ None (unrestricted)           1.000          0.947      22`,
       { text: "Depth 1 underfits (both accuracies lowest, only 2 leaves)", keywords: ["underfit", "depth 1", "too simple", "0.807"] },
       { text: "The unrestricted tree overfits (1.000 training accuracy, 22 leaves)", keywords: ["overfit", "memori", "22 leaves", "unrestricted"] },
       { text: "Chooses depth 5: best test accuracy with fewer leaves", keywords: ["depth 5", "max_depth=5", "max_depth 5", "10 leaves"] },
-      { text: "Justifies with simplicity / generalisation (or confirms with cross-validation)", keywords: ["simpl", "generali", "fewer leaves", "cross-val", "gap"] },
+      { text: "Justifies with simplicity / generalisation (smaller gap, 10 vs 22 leaves)", keywords: ["simpl", "generali", "fewer leaves", "gap", "interpret"] },
+      { text: "Confirms the choice with cross-validation rather than one test split", keywords: ["cross-val", "one split", "one test split"] },
     ],
   },
   {
-    id: "mt-o6", module: 6, type: "open", kind: "theory", section: "Model output & interpretation", marks: 4,
-    prompt: "Interpret these results. Why do the ensembles outperform the single tree, what do the OOB scores tell you, and why is the OOB score NaN for two models?",
+    id: "mt-o6", module: 6, type: "open", kind: "theory", section: "Model output interpretation & method selection", marks: 5,
+    prompt: "Interpret these results. Why do the ensembles outperform the single tree, what do the OOB scores tell you, and why is the OOB score NaN for two models? Which model would you select?",
     code: `Breast cancer test set (143 patients)
 
 Model           Test accuracy   OOB accuracy
@@ -421,16 +426,17 @@ Extra Trees             0.965            NaN
 Random Forest           0.958          0.962
 Bagging                 0.951          0.955
 Single tree             0.944            NaN`,
-    modelAnswer: "All three ensembles beat the single depth-4 tree (0.944): Extra Trees is best (0.965), then Random Forest (0.958) and Bagging (0.951). A single tree has high variance; an ensemble trains many diverse trees and combines their votes, so individual errors partly cancel out and variance falls. Random Forest adds random feature subsets to bagging, and Extra Trees also uses random thresholds, so their trees are even more diverse, which matches the ranking. The OOB accuracies (0.962 and 0.955) are very close to the test accuracies, so the out-of-bag estimate, computed only from training rows left out of each bootstrap sample, is a reliable estimate of generalisation. OOB is NaN for the single tree (no bootstrap samples) and for Extra Trees, which by default trains every tree on the whole training set without bootstrapping, so there are no out-of-bag rows. The differences are small (1 to 3 errors out of 143).",
+    modelAnswer: "All three ensembles beat the single depth-4 tree (0.944): Extra Trees is best (0.965), then Random Forest (0.958) and Bagging (0.951). A single tree has high variance; an ensemble trains many diverse trees and combines their votes, so individual errors partly cancel out and variance falls. Random Forest adds random feature subsets to bagging, and Extra Trees also uses random thresholds, so their trees are even more diverse, which matches the ranking. The OOB accuracies (0.962 and 0.955) are very close to the test accuracies, so the out-of-bag estimate, computed only from training rows left out of each bootstrap sample, is a reliable estimate of generalisation. OOB is NaN for the single tree (no bootstrap samples) and for Extra Trees, which by default trains every tree on the whole training set without bootstrapping, so there are no out-of-bag rows. I would select Extra Trees (best test accuracy) or Random Forest (almost as good, with an OOB estimate that agrees), but the differences are small (1 to 3 errors out of 143), so I would confirm the ranking with cross-validation.",
     keyPoints: [
       { text: "The ensembles beat the single tree; Extra Trees is best", keywords: ["extra trees", "0.965", "outperform", "better than the single"] },
       { text: "Reason: many diverse trees vote, so variance falls", keywords: ["variance", "divers", "average", "vot", "cancel"] },
       { text: "OOB close to test accuracy → reliable estimate without a validation set", keywords: ["close", "similar", "reliable", "out-of-bag", "out of bag"] },
       { text: "NaN: the single tree and Extra Trees (default) use no bootstrap → no OOB rows", keywords: ["nan", "no bootstrap", "without bootstrap", "bootstrap=false", "whole training", "whole dataset", "entire"] },
+      { text: "Selects a model, noting the differences are small (1–3 errors of 143) → confirm with CV", keywords: ["select", "choose", "recommend", "small"] },
     ],
   },
   {
-    id: "mt-o7", module: 6, type: "open", kind: "theory", section: "Model output & interpretation", marks: 4,
+    id: "mt-o7", module: 6, type: "open", kind: "theory", section: "Model output interpretation & method selection", marks: 5,
     prompt: "A hospital asks you to pick one of these models. Which would you recommend, and why might a simple Logistic Regression beat the ensemble methods on this dataset?",
     code: `Breast cancer test set (143 patients)
 
@@ -451,12 +457,13 @@ Gradient Boosting        0.944        8`,
       { text: "Recommends Logistic Regression (ties for best: 0.986, 2 errors)", keywords: ["logistic", "0.986", "2 errors"] },
       { text: "Justification: simpler, faster, more interpretable than an ensemble", keywords: ["simpl", "interpret", "faster", "explain"] },
       { text: "Why it can win: data nearly linearly separable; ensembles add complexity without gain", keywords: ["linear", "separable", "not always", "complex"] },
-      { text: "Differences are small → confirm with CV and check recall, not only accuracy", keywords: ["small", "cross-val", "recall", "few errors", "one split"] },
+      { text: "Differences are small (2 vs 6 errors) → could change with another split; confirm with CV", keywords: ["small", "cross-val", "few errors", "one split", "another split"] },
+      { text: "Checks malignant recall (missed cancers), not only accuracy, before deciding", keywords: ["recall", "false negative", "not only accuracy"] },
     ],
   },
   {
-    id: "mt-o8", module: 4, type: "open", kind: "theory", section: "Model output & interpretation", marks: 4,
-    prompt: "These coefficients come from the Module 4 lab (Linear, Ridge and Lasso Regression on California Housing, features not scaled). What did Ridge and Lasso do, which model performed feature selection, and why should you be careful before concluding that Population is unimportant?",
+    id: "mt-o8", module: 4, type: "open", kind: "theory", section: "Model output interpretation & method selection", marks: 5,
+    prompt: "These coefficients come from the Module 4 lab (Linear, Ridge and Lasso Regression on California Housing, features not scaled). What did Ridge and Lasso do, which model performed feature selection, and why should you be careful before concluding that Population is unimportant? Which model would you choose for a simpler model, and how would you set alpha?",
     code: `   Feature  Linear  Ridge(alpha=10)  Lasso(alpha=0.1)
     MedInc  0.4367           0.4357            0.3906
   HouseAge  0.0094           0.0095            0.0151
@@ -466,17 +473,18 @@ Population -0.0000          -0.0000            0.0000
   AveOccup -0.0038          -0.0038           -0.0033
   Latitude -0.4213          -0.4212           -0.1142
  Longitude -0.4345          -0.4342           -0.0992`,
-    modelAnswer: "Ridge (L2) shrank the coefficients only slightly (e.g. AveBedrms 0.6451 → 0.6352) and kept every feature; alpha=10 is a weak penalty for about 20,000 rows. Lasso (L1) shrank more strongly and set AveRooms and AveBedrms exactly to 0, so it performed feature selection and produced a simpler model; it also shrank Latitude and Longitude a lot. MedInc stays the largest positive coefficient in all three models, so median income is the strongest positive predictor of house value. Population is about 0 in every model, but the features are not scaled: Population is counted in hundreds or thousands of people, so a tiny coefficient per person can still add up. Coefficients can only be compared fairly after standardising the features, which is also needed for the penalty to treat all features equally.",
+    modelAnswer: "Ridge (L2) shrank the coefficients only slightly (e.g. AveBedrms 0.6451 → 0.6352) and kept every feature; alpha=10 is a weak penalty for about 20,000 rows. Lasso (L1) shrank more strongly and set AveRooms and AveBedrms exactly to 0, so it performed feature selection and produced a simpler model; it also shrank Latitude and Longitude a lot. MedInc stays the largest positive coefficient in all three models, so median income is the strongest positive predictor of house value. Population is about 0 in every model, but the features are not scaled: Population is counted in hundreds or thousands of people, so a tiny coefficient per person can still add up. Coefficients can only be compared fairly after standardising the features, which is also needed for the penalty to treat all features equally. For a simpler model with fewer features I would choose Lasso, and tune alpha with cross-validation (comparing validation RMSE) on the scaled features.",
     keyPoints: [
       { text: "Ridge shrinks the coefficients slightly and keeps all features", keywords: ["slight", "keeps", "keep all", "all features", "l2"] },
       { text: "Lasso sets AveRooms and AveBedrms to zero → feature selection", keywords: ["zero", "feature selection", "l1"] },
       { text: "Reads a key coefficient (MedInc strongest positive; lat/long shrunk by Lasso)", keywords: ["medinc", "income", "latitude", "longitude"] },
       { text: "Unscaled features: a small coefficient ≠ unimportant; standardise before comparing", keywords: ["scale", "standardi", "units", "unscaled"] },
+      { text: "Selects Lasso for a simpler model and tunes alpha with cross-validation", keywords: ["choose lasso", "select lasso", "prefer lasso", "tune alpha", "alpha with cross", "cross-val"] },
     ],
   },
   {
-    id: "mt-o9", module: 6, type: "open", kind: "theory", section: "Model output & interpretation", marks: 4,
-    prompt: "Interpret this feature-importance output from a Random Forest trained to classify breast tumours. What does it tell the doctors, and what are two limitations of drawing conclusions from it?",
+    id: "mt-o9", module: 6, type: "open", kind: "theory", section: "Model output interpretation & method selection", marks: 5,
+    prompt: "Interpret this feature-importance output from a Random Forest trained to classify breast tumours. What does it tell the doctors, how could you use it to simplify the model, and what are two limitations of drawing conclusions from it?",
     code: `Random Forest feature importances (top 10)
 
 worst perimeter         0.1457
@@ -489,16 +497,17 @@ mean radius             0.0552
 mean concavity          0.0485
 mean area               0.0406
 worst concavity         0.0294`,
-    modelAnswer: "Importance is each feature's share of the total impurity reduction across all trees, so higher values mean the forest relied more on that feature to separate malignant from benign tumours. The top features describe tumour size (worst perimeter 0.146, worst area 0.137, radius) and shape irregularity (concave points); the top four alone account for about half of the importance, so large, irregular tumours drive the predictions. Limitation 1: importance shows association, not causation; it says what the model uses, not what causes cancer. Limitation 2: correlated features share importance: perimeter, area and radius all measure size, so the credit is split between them and each one can look less important than size really is. The scores also describe this particular model and dataset.",
+    modelAnswer: "Importance is each feature's share of the total impurity reduction across all trees, so higher values mean the forest relied more on that feature to separate malignant from benign tumours. The top features describe tumour size (worst perimeter 0.146, worst area 0.137, radius) and shape irregularity (concave points); the top four alone account for about half of the importance, so large, irregular tumours drive the predictions. It is also useful for feature selection: the team could train a simpler model on the top features only and keep it if its cross-validated score is as good. Limitation 1: importance shows association, not causation; it says what the model uses, not what causes cancer. Limitation 2: correlated features share importance: perimeter, area and radius all measure size, so the credit is split between them and each one can look less important than size really is. The scores also describe this particular model and dataset.",
     keyPoints: [
       { text: "Meaning: each feature's share of impurity reduction (how much the model relies on it)", keywords: ["impurity", "relies", "contribut", "rely"] },
       { text: "Top features: tumour size (perimeter, area, radius) and concave points", keywords: ["perimeter", "size", "concave"] },
+      { text: "Use: feature selection, a simpler model on the top features, compared with CV", keywords: ["feature selection", "simpler model", "top features", "fewer features"] },
       { text: "Limitation: association, not causation", keywords: ["causation", "causal", "association", "cause"] },
       { text: "Limitation: correlated features share or split the importance", keywords: ["correlat", "share", "split", "redundan"] },
     ],
   },
   {
-    id: "mt-o10", module: 4, type: "open", kind: "theory", section: "Model output & interpretation", marks: 4,
+    id: "mt-o10", module: 4, type: "open", kind: "theory", section: "Model output interpretation & method selection", marks: 5,
     prompt: "Polynomial regression was fitted to 40 noisy points from a quadratic curve and evaluated with 5-fold cross-validation. Interpret the results: which degree would you choose, and how do degrees 1 and 10 behave in terms of bias and variance?",
     code: `5-fold cross-validation (RMSE, lower is better)
 
@@ -506,11 +515,12 @@ degree  train_RMSE  validation_RMSE
      1       1.719            1.839
      2       0.744            0.772
     10       0.656            1.148`,
-    modelAnswer: "Degree 2 should be chosen: it has the lowest validation RMSE (0.772) and a very small gap to its training RMSE (0.744), so it generalises well; it matches the true quadratic shape. Degree 1 underfits: a straight line cannot follow the curve, so both training (1.719) and validation (1.839) errors are high (high bias, low variance). Degree 10 overfits: it has the lowest training error (0.656) because it bends to fit the noise, but its validation error rises to 1.148, a large gap (low bias, high variance). So a lower training error does not mean a better model; the choice must be based on validation (cross-validation) error.",
+    modelAnswer: "Degree 2 should be chosen: it has the lowest validation RMSE (0.772) and a very small gap to its training RMSE (0.744), so it generalises well; it matches the true quadratic shape. Degree 1 underfits: a straight line cannot follow the curve, so both training (1.719) and validation (1.839) errors are high (high bias, low variance). Degree 10 overfits: it has the lowest training error (0.656) because it bends to fit the noise, but its validation error rises to 1.148, a large gap (low bias, high variance). This is the bias-variance trade-off: as the degree grows, bias falls and variance rises, and degree 2 balances the two. So a lower training error does not mean a better model; the choice must be based on validation (cross-validation) error.",
     keyPoints: [
       { text: "Choose degree 2: lowest validation RMSE and a small gap", keywords: ["degree 2", "0.772", "lowest validation"] },
       { text: "Degree 1 underfits: both errors high (high bias)", keywords: ["underfit", "high bias", "1.839", "too simple"] },
       { text: "Degree 10 overfits: lowest training error, higher validation error (high variance)", keywords: ["overfit", "high variance", "1.148", "0.656"] },
+      { text: "Bias-variance trade-off: as the degree grows, bias falls and variance rises", keywords: ["trade-off", "tradeoff", "trade off", "balance"] },
       { text: "Lower training error ≠ better model; decide with validation error", keywords: ["training error", "cross-val", "not mean", "doesn't mean", "does not mean"] },
     ],
   },

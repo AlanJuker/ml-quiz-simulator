@@ -6,7 +6,7 @@
   <title>ML Midterm Study Guide</title>
   <meta name="description" content="Plain-English study guide for the Machine Learning midterm (Modules 1-6), built from the Cascade content, the teaching demos and the in-class activities, with code explained line by line.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
-  <link rel="stylesheet" href="styles.css?v=20261109-2">
+  <link rel="stylesheet" href="styles.css?v=20261112-1">
 </head>
 <body class="guide-page">
   <header class="site-header">
@@ -58,7 +58,7 @@
       <!-- ───────────────────────── Start here ───────────────────────── -->
       <section class="chapter" id="top">
         <header class="chapter-head"><span class="chapter-num">★</span><div><p class="eyebrow">Start here</p><h2>The midterm in one page</h2></div></header>
-        <p class="one-liner">About <strong>6 written questions</strong> on Modules 2–6 (mostly 4, 5 and 6). Cascade picks 2 questions from each bank of 10.</p>
+        <p class="one-liner"><strong>6 written questions, 5 marks each (30 marks)</strong> on Modules 2–6, with more weight on Modules 4, 5 and 6. Cascade picks 2 questions at random from each area's pool. In person, closed book, <strong>50 minutes</strong> in LockDown Browser (install and test it before the day). Worth 30% of the course grade.</p>
         <div class="tiles">
           <a class="tile" href="#how-workflow">
             <span class="tile-top"><span class="pill">Section 1</span><span class="marks">5 marks each</span></span>
@@ -67,16 +67,16 @@
             <span class="tile-row"><em>You do</em>Find the problems, say the first step, decide what to do</span>
           </a>
           <a class="tile" href="#how-code">
-            <span class="tile-top"><span class="pill">Section 2</span><span class="marks">5 marks each (assumed)</span></span>
+            <span class="tile-top"><span class="pill">Section 2</span><span class="marks">5 marks each</span></span>
             <strong>Python code interpretation</strong>
             <span class="tile-row"><em>You get</em>About 5 lines of Scikit-Learn code</span>
             <span class="tile-row"><em>You do</em>Explain the purpose, the role of each function and why each parameter is used</span>
           </a>
           <a class="tile" href="#how-output">
-            <span class="tile-top"><span class="pill">Section 3</span><span class="marks">4 marks each</span></span>
-            <strong>Model output &amp; interpretation</strong>
+            <span class="tile-top"><span class="pill">Section 3</span><span class="marks">5 marks each</span></span>
+            <strong>Model output interpretation &amp; method selection</strong>
             <span class="tile-row"><em>You get</em>A classification report, confusion matrix or results table</span>
-            <span class="tile-row"><em>You do</em>Read the numbers, compare classes or models, explain why, choose a model</span>
+            <span class="tile-row"><em>You do</em>Read the numbers, compare classes or models, explain why, then select a model or method and justify it</span>
           </a>
         </div>
 
@@ -108,6 +108,7 @@
       <section class="chapter" id="how">
         <header class="chapter-head"><span class="chapter-num">✎</span><div><p class="eyebrow">Exam technique</p><h2>How to answer each section</h2></div></header>
         <p class="one-liner">Every good answer has the same shape: <strong>name the concept → explain it with the numbers or code you were given → say what to do and why</strong>.</p>
+        <p>You have <strong>50 minutes for 6 questions, about 8 minutes each</strong>, and every question is worth 5 marks. Write short paragraphs, not essays: aim for 5 clear points per answer. It is closed book, so the cheat sheet has to be in your head.</p>
 
         <div class="sub" id="how-workflow">
           <h3><span class="idx">Section 1</span>Workflow &amp; methodology <span class="marks">5 marks</span></h3>
@@ -152,12 +153,13 @@
         </div>
 
         <div class="sub" id="how-output">
-          <h3><span class="idx">Section 3</span>Model output &amp; interpretation <span class="marks">4 marks</span></h3>
+          <h3><span class="idx">Section 3</span>Model output interpretation &amp; method selection <span class="marks">5 marks</span></h3>
           <ol class="recipe">
             <li><strong>Quote the numbers</strong> ("recall for malignant is 0.93, so 3 of 42 cancers are missed").</li>
             <li><strong>Compare</strong>: class vs class, model vs model, train vs test, CV vs test.</li>
             <li><strong>Explain why</strong>: class imbalance, overfitting, variance, a linear vs non-linear model, a small test set.</li>
             <li><strong>Decide in context</strong>: in a hospital, missing a sick patient (false negative) is usually the worst error, so prefer recall.</li>
+            <li><strong>Select a method and confirm it</strong>: name the model, threshold, depth, degree or alpha you would use, and say how you would check it (cross-validation or validation data, never the test set).</li>
           </ol>
         </div>
 
