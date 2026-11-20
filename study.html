@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ML Quiz 2 Study Guide</title>
+  <meta name="description" content="Plain-English study guide for Machine Learning Quiz 2: Module 7 (support vector machines) and Module 8 (dimensionality reduction: PCA, LDA, t-SNE), built from the Cascade content, the teaching demos and the in-class activities.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+  <link rel="stylesheet" href="styles.css?v=20261120-1">
+</head>
+<body class="guide-page">
+  <header class="site-header">
+    <h1>ML Quiz 2 Study Guide</h1>
+    <p class="subtitle">MCAI/CSAI 500 · Module 7 (SVM) and Module 8 (dimensionality reduction)</p>
+    <nav class="site-nav" aria-label="Site">
+      <a href="index.html">Quiz 2 practice</a>
+      <a href="study.html" aria-current="page">Study guide</a>
+    </nav>
+  </header>
+
+  <nav class="toc-chips" aria-label="Chapters"><a href="#top">Start</a><a href="#how">How to answer</a><a href="#m7">M7 · SVM</a><a href="#m8">M8 · Reduction</a><a href="#choose">Choose</a><a href="#cheat">Code</a><a href="#traps">Traps</a><a href="#review">Review</a></nav>
+  <div class="guide-layout">
+    <aside class="toc" aria-label="Contents">
+      <p class="toc-title">Contents</p>
+      <ol>
+        <li><a href="#top">Start here</a>
+          <ol><li><a href="#top-map">The two modules</a></li><li><a href="#top-plan">How to study</a></li></ol></li>
+        <li><a href="#how">How to answer</a>
+          <ol><li><a href="#how-mc">Multiple choice</a></li><li><a href="#how-sa">Short answer</a></li><li><a href="#how-code">Code and outputs</a></li></ol></li>
+        <li><a href="#m7">M7 · Support vector machines</a>
+          <ol><li><a href="#m7-1">7.1 · Margin and support vectors</a></li><li><a href="#m7-2">7.2 · Hard vs soft margin, and C</a></li><li><a href="#m7-3">7.3 · Feature scaling</a></li><li><a href="#m7-4">7.4 · Kernels and the kernel trick</a></li><li><a href="#m7-5">7.5 · Tuning C, gamma and degree</a></li><li><a href="#m7-6">7.6 · SVMs in scikit-learn</a></li><li><a href="#m7-7">7.7 · Support vector regression</a></li><li><a href="#m7-8">7.8 · Strengths and limits</a></li></ol></li>
+        <li><a href="#m8">M8 · Dimensionality reduction</a>
+          <ol><li><a href="#m8-1">8.1 · Curse of dimensionality</a></li><li><a href="#m8-2">8.2 · Why reduce; selection vs extraction</a></li><li><a href="#m8-3">8.3 · PCA</a></li><li><a href="#m8-4">8.4 · How many components?</a></li><li><a href="#m8-5">8.5 · LDA</a></li><li><a href="#m8-6">8.6 · PCA vs LDA</a></li><li><a href="#m8-7">8.7 · t-SNE</a></li><li><a href="#m8-8">8.8 · Reduction inside a pipeline</a></li></ol></li>
+        <li><a href="#choose">Which method or setting?</a></li>
+        <li><a href="#cheat">Code cheat sheet</a></li>
+        <li><a href="#traps">Common traps</a></li>
+        <li><a href="#review">Last-minute review</a></li>
+      </ol>
+    </aside>
+    <main class="guide">
+      <!-- ───────────────────────── Start here ───────────────────────── -->
+      <section class="chapter" id="top">
+        <header class="chapter-head"><span class="chapter-num">★</span><div><p class="eyebrow">Start here</p><h2>Quiz 2 in one page</h2></div></header>
+        <p class="one-liner"><strong>10 multiple-choice and 2 short-answer questions</strong> on Module 7 (support vector machines) and Module 8 (dimensionality reduction). The questions are drawn from a bank covering both modules, so expect about half from each, though one quiz can lean 7–3 toward one module.</p>
+        <div class="tiles">
+          <a class="tile" href="#how-mc">
+            <span class="tile-top"><span class="pill">Part 1</span><span class="marks">10 questions</span></span>
+            <strong>Multiple choice</strong>
+            <span class="tile-row"><em>You get</em>A concept question, or a short piece of scikit-learn code or a results table from class</span>
+            <span class="tile-row"><em>You do</em>Pick the option that matches what the method actually does</span>
+          </a>
+          <a class="tile" href="#how-sa">
+            <span class="tile-top"><span class="pill">Part 2</span><span class="marks">2 questions</span></span>
+            <strong>Short answer</strong>
+            <span class="tile-row"><em>You get</em>"Explain…", "compare…" or "interpret this output"</span>
+            <span class="tile-row"><em>You do</em>Answer in 3–4 sentences: the idea, why, and what it means here</span>
+          </a>
+        </div>
+
+        <div class="sub" id="top-map">
+          <h3>The two modules</h3>
+          <div class="module-grid">
+            <a class="mtile focus" href="#m7"><span class="mnum">7</span><span><strong>Support vector machines</strong><span class="mq">How does an SVM draw a boundary, and how do I tune it?</span><span class="mr">Widest <strong>margin</strong>, set by the <strong>support vectors</strong>. <strong>C</strong> trades margin for errors; <strong>kernels</strong> bend the boundary; always <strong>scale</strong>.</span></span></a>
+            <a class="mtile focus" href="#m8"><span class="mnum">8</span><span><strong>Dimensionality reduction</strong><span class="mq">How do I shrink many features without losing what matters?</span><span class="mr"><strong>PCA</strong> keeps variance (no labels), <strong>LDA</strong> keeps class separation (labels, at most C − 1), <strong>t-SNE</strong> is for pictures.</span></span></a>
+          </div>
+          <p class="muted small">Both modules reuse the class datasets: Palmer Penguins (342 penguins, 4 measurements, 3 species), Breast Cancer Wisconsin (569 tumours, 30 features) and MNIST (784 pixels, 10 digits).</p>
+        </div>
+
+        <div class="sub" id="top-plan">
+          <h3>How to study</h3>
+          <ol class="recipe">
+            <li><strong>Read each module chapter</strong> and the "What it means" notes under every output.</li>
+            <li><strong>Answer the "Check yourself" questions</strong> at the end of each chapter out loud.</li>
+            <li><strong>Take a <a href="index.html">Quick practice</a></strong> (5 + 1) after each module, then a Real Quiz 2 (10 + 2).</li>
+            <li><strong>The day before</strong>, use <a href="#choose">Which method</a>, the <a href="#cheat">code cheat sheet</a> and <a href="#traps">common traps</a>.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- ───────────────────────── How to answer ───────────────────────── -->
+      <section class="chapter" id="how">
+        <header class="chapter-head"><span class="chapter-num">✎</span><div><p class="eyebrow">Exam technique</p><h2>How to answer</h2></div></header>
+        <p class="one-liner">Name the idea, connect it to the numbers or code you were given, then say what it means for the model.</p>
+
+        <div class="sub" id="how-mc">
+          <h3><span class="idx">Part 1</span>Multiple choice</h3>
+          <ol class="recipe">
+            <li><strong>Find the knob being asked about</strong>: C, gamma, degree, kernel, scaling, n_components, or which method (PCA, LDA, t-SNE).</li>
+            <li><strong>Recall its direction</strong>: small C = wide margin; large gamma = wiggly boundary; PCA = variance; LDA = class separation.</li>
+            <li><strong>For a table, compare CV scores, not training scores</strong>, and treat gaps smaller than one standard deviation as a tie.</li>
+            <li><strong>Distrust absolute words</strong>: "always more accurate", "the most flexible kernel is best", "t-SNE distances are exact".</li>
+          </ol>
+        </div>
+
+        <div class="sub" id="how-sa">
+          <h3><span class="idx">Part 2</span>Short answer</h3>
+          <ol class="recipe">
+            <li><strong>Define the idea</strong> in one sentence ("Support vectors are the training points closest to the boundary").</li>
+            <li><strong>Explain why or how</strong> ("They define the margin, so other points do not move the boundary").</li>
+            <li><strong>Use the numbers</strong> if there is an output ("C = 30 used 13 support vectors, C = 0.03 used 72").</li>
+            <li><strong>Conclude or recommend</strong> ("so choose C with cross-validation, then test once").</li>
+          </ol>
+          <p class="example"><strong>Example.</strong> <em>"Compare PCA and LDA."</em> PCA is unsupervised: it ignores the labels and keeps the directions of maximum variance, so it suits compression and visualization. LDA is supervised: it uses the labels to maximize class separation and gives at most C − 1 components, so it suits preprocessing for classification. High variance does not guarantee separation: on the penguins, PCA (2) scored 0.872 but LDA (2) scored 0.981.</p>
+        </div>
+
+        <div class="sub" id="how-code">
+          <h3><span class="idx">Code</span>Reading code and outputs</h3>
+          <ul>
+            <li><strong>Code:</strong> say what each step does in order (scale → reduce → model), what each parameter controls, and what would go wrong without it.</li>
+            <li><strong>Outputs:</strong> quote the number, compare (train vs CV, model vs model), explain why, and choose.</li>
+            <li>In a pipeline, a parameter is named <code>step__parameter</code>: <code>svc__C</code> is the C of the step called <code>svc</code>.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ───────────────────────── Module 7 ───────────────────────── -->
+      <section class="chapter" id="m7">
+        <header class="chapter-head"><span class="chapter-num">7</span><div><p class="eyebrow">Module 7</p><h2>Support vector machines</h2></div></header>
+        <p class="one-liner">An SVM draws the boundary with the <strong>widest margin</strong> between classes. Only the closest points, the <strong>support vectors</strong>, decide where it goes. <strong>C</strong> trades margin width for errors, <strong>kernels</strong> allow curved boundaries, and features <strong>must be scaled</strong>.</p>
+
+        <div class="sub" id="m7-1">
+          <h3><span class="idx">7.1</span>Margin and support vectors</h3>
+          <figure class="fig"><svg viewBox="0 0 640 300" role="img" aria-label="SVM decision boundary with the widest margin; the ringed points on the margin are the support vectors"><title>SVM decision boundary with the widest margin; the ringed points on the margin are the support vectors</title><rect class="s-zone" x="262" y="26" width="116" height="224"/><line class="s-dash" x1="262" y1="26" x2="262" y2="250"/><line class="s-dash" x1="378" y1="26" x2="378" y2="250"/><line class="s-line" x1="320" y1="22" x2="320" y2="254"/><circle class="s-a" cx="123.8" cy="70.2" r="5.5"/><circle class="s-a" cx="178.1" cy="54.5" r="5.5"/><circle class="s-a" cx="159.0" cy="113.1" r="5.5"/><circle class="s-a" cx="79.6" cy="141.5" r="5.5"/><circle class="s-a" cx="76.2" cy="126.7" r="5.5"/><circle class="s-a" cx="81.6" cy="58.1" r="5.5"/><circle class="s-a" cx="140.5" cy="205.4" r="5.5"/><circle class="s-a" cx="90.6" cy="84.6" r="5.5"/><circle class="s-a" cx="174.2" cy="229.5" r="5.5"/><circle class="s-a" cx="165.8" cy="119.3" r="5.5"/><circle class="s-a" cx="232.1" cy="49.3" r="5.5"/><circle class="s-a" cx="212.5" cy="97.9" r="5.5"/><circle class="s-a" cx="93.9" cy="63.6" r="5.5"/><circle class="s-a" cx="121.2" cy="203.2" r="5.5"/><circle class="s-a" cx="100.0" cy="156.3" r="5.5"/><circle class="s-a" cx="176.1" cy="114.5" r="5.5"/><rect class="s-b" x="491.0" y="47.6" width="10" height="10" rx="1.5"/><rect class="s-b" x="409.0" y="76.2" width="10" height="10" rx="1.5"/><rect class="s-b" x="513.3" y="120.5" width="10" height="10" rx="1.5"/><rect class="s-b" x="451.8" y="152.1" width="10" height="10" rx="1.5"/><rect class="s-b" x="475.1" y="95.0" width="10" height="10" rx="1.5"/><rect class="s-b" x="532.5" y="174.8" width="10" height="10" rx="1.5"/><rect class="s-b" x="440.0" y="149.9" width="10" height="10" rx="1.5"/><rect class="s-b" x="487.2" y="210.0" width="10" height="10" rx="1.5"/><rect class="s-b" x="521.5" y="92.6" width="10" height="10" rx="1.5"/><rect class="s-b" x="563.7" y="58.6" width="10" height="10" rx="1.5"/><rect class="s-b" x="469.2" y="186.4" width="10" height="10" rx="1.5"/><rect class="s-b" x="424.5" y="132.8" width="10" height="10" rx="1.5"/><rect class="s-b" x="405.6" y="168.6" width="10" height="10" rx="1.5"/><rect class="s-b" x="527.4" y="149.6" width="10" height="10" rx="1.5"/><rect class="s-b" x="546.1" y="97.7" width="10" height="10" rx="1.5"/><rect class="s-b" x="515.8" y="153.9" width="10" height="10" rx="1.5"/><circle class="s-a" cx="262.0" cy="82.0" r="5.5"/><circle class="s-ring" cx="262" cy="82" r="12"/><circle class="s-a" cx="262.0" cy="196.0" r="5.5"/><circle class="s-ring" cx="262" cy="196" r="12"/><rect class="s-b" x="373.0" y="135.0" width="10" height="10" rx="1.5"/><circle class="s-ring" cx="378" cy="140" r="12"/><line class="s-arrow" x1="262.0" y1="270.0" x2="378.0" y2="270.0"/><path class="s-head" d="M378.0,270.0 L369.7,273.5 L369.7,266.5 Z"/><path class="s-head" d="M262.0,270.0 L270.3,266.5 L270.3,273.5 Z"/><text class="t-strong" x="320.0" y="290.0" text-anchor="middle">margin (as wide as possible)</text><text class="t-strong" x="320.0" y="16.0" text-anchor="middle">decision boundary</text><text x="150.0" y="16.0" text-anchor="middle">Class A</text><text x="490.0" y="16.0" text-anchor="middle">Class B</text><circle class="s-ring" cx="470" cy="268" r="8"/><text x="484.0" y="272.0" text-anchor="start">support vector</text></svg><figcaption>The SVM picks the boundary (solid) that leaves the widest street (between the dashed lines). The ringed points on the edges are the support vectors.</figcaption></figure>
+          <ul>
+            <li><strong>Margin</strong>: the distance from the boundary to the nearest training points of each class. A wide margin is less sensitive to small changes, so it generalizes better.</li>
+            <li><strong>Support vectors</strong>: the points on or inside the margin. They fix the boundary; points far away have <strong>no influence</strong>, so removing them changes nothing.</li>
+            <li>With two features the boundary is a line; with more it is a <strong>hyperplane</strong>.</li>
+          </ul>
+        </div>
+
+        <div class="sub" id="m7-2">
+          <h3><span class="idx">7.2</span>Hard vs soft margin, and C</h3>
+          <div class="flow">
+            <div class="step"><strong>Hard margin</strong><span>No point may be inside the margin or on the wrong side. Only works when the classes separate perfectly, and one outlier can ruin it. Rarely used.</span></div>
+            <div class="step"><strong>Soft margin</strong><span>Allows some margin violations and errors. Used in practice. <strong>C</strong> sets how much a violation costs.</span></div>
+          </div>
+          <figure class="fig"><svg viewBox="0 0 640 244" role="img" aria-label="Small C keeps a wide margin with many support vectors; large C narrows the margin with few"><title>Small C keeps a wide margin with many support vectors; large C narrows the margin with few</title><rect class="s-panel" x="10" y="4" width="300" height="236" rx="10"/><rect class="s-zone" x="108" y="40" width="104" height="150"/><line class="s-dash" x1="108" y1="40" x2="108" y2="190"/><line class="s-dash" x1="212" y1="40" x2="212" y2="190"/><line class="s-line" x1="160" y1="36" x2="160" y2="194"/><circle class="s-a" cx="54.3" cy="119.5" r="5.5"/><circle class="s-a" cx="70.5" cy="126.9" r="5.5"/><circle class="s-a" cx="102.0" cy="60.1" r="5.5"/><circle class="s-a" cx="26.6" cy="155.8" r="5.5"/><circle class="s-a" cx="56.9" cy="81.1" r="5.5"/><circle class="s-a" cx="147.5" cy="110.3" r="5.5"/><circle class="s-ring" cx="147.5" cy="110.3" r="11"/><circle class="s-a" cx="127.9" cy="111.1" r="5.5"/><circle class="s-ring" cx="127.9" cy="111.1" r="11"/><circle class="s-a" cx="103.6" cy="70.7" r="5.5"/><circle class="s-a" cx="103.1" cy="159.6" r="5.5"/><circle class="s-a" cx="89.4" cy="143.9" r="5.5"/><circle class="s-a" cx="107.6" cy="59.9" r="5.5"/><circle class="s-ring" cx="107.6" cy="59.9" r="11"/><circle class="s-a" cx="118.3" cy="125.3" r="5.5"/><circle class="s-ring" cx="118.3" cy="125.3" r="11"/><circle class="s-a" cx="62.1" cy="55.8" r="5.5"/><circle class="s-a" cx="166.0" cy="92.0" r="5.5"/><circle class="s-ring" cx="166.0" cy="92.0" r="11"/><circle class="s-a" cx="178.0" cy="150.0" r="5.5"/><circle class="s-ring" cx="178.0" cy="150.0" r="11"/><rect class="s-b" x="273.5" y="105.6" width="10" height="10" rx="1.5"/><rect class="s-b" x="255.4" y="156.0" width="10" height="10" rx="1.5"/><rect class="s-b" x="254.8" y="161.2" width="10" height="10" rx="1.5"/><rect class="s-b" x="215.6" y="146.3" width="10" height="10" rx="1.5"/><rect class="s-b" x="221.7" y="163.0" width="10" height="10" rx="1.5"/><rect class="s-b" x="275.1" y="59.1" width="10" height="10" rx="1.5"/><rect class="s-b" x="183.7" y="73.9" width="10" height="10" rx="1.5"/><circle class="s-ring" cx="188.7" cy="78.9" r="11"/><rect class="s-b" x="285.8" y="101.1" width="10" height="10" rx="1.5"/><rect class="s-b" x="244.1" y="84.3" width="10" height="10" rx="1.5"/><rect class="s-b" x="229.4" y="94.8" width="10" height="10" rx="1.5"/><rect class="s-b" x="210.2" y="119.5" width="10" height="10" rx="1.5"/><circle class="s-ring" cx="215.2" cy="124.5" r="11"/><rect class="s-b" x="238.9" y="159.1" width="10" height="10" rx="1.5"/><rect class="s-b" x="250.9" y="162.2" width="10" height="10" rx="1.5"/><rect class="s-b" x="146.0" y="115.0" width="10" height="10" rx="1.5"/><circle class="s-ring" cx="151.0" cy="120.0" r="11"/><rect class="s-b" x="133.0" y="65.0" width="10" height="10" rx="1.5"/><circle class="s-ring" cx="138.0" cy="70.0" r="11"/><text class="t-strong t-big" x="160.0" y="26.0" text-anchor="middle">Small C: wide margin</text><text class="t-strong" x="160.0" y="210.0" text-anchor="middle">10 support vectors</text><text x="160.0" y="228.0" text-anchor="middle">violations allowed → may underfit</text><rect class="s-panel" x="330" y="4" width="300" height="236" rx="10"/><rect class="s-zone" x="464" y="40" width="32" height="150"/><line class="s-dash" x1="464" y1="40" x2="464" y2="190"/><line class="s-dash" x1="496" y1="40" x2="496" y2="190"/><line class="s-line" x1="480" y1="36" x2="480" y2="194"/><circle class="s-a" cx="374.3" cy="119.5" r="5.5"/><circle class="s-a" cx="390.5" cy="126.9" r="5.5"/><circle class="s-a" cx="422.0" cy="60.1" r="5.5"/><circle class="s-a" cx="346.6" cy="155.8" r="5.5"/><circle class="s-a" cx="376.9" cy="81.1" r="5.5"/><circle class="s-a" cx="467.5" cy="110.3" r="5.5"/><circle class="s-ring" cx="467.5" cy="110.3" r="11"/><circle class="s-a" cx="447.9" cy="111.1" r="5.5"/><circle class="s-a" cx="423.6" cy="70.7" r="5.5"/><circle class="s-a" cx="423.1" cy="159.6" r="5.5"/><circle class="s-a" cx="409.4" cy="143.9" r="5.5"/><circle class="s-a" cx="427.6" cy="59.9" r="5.5"/><circle class="s-a" cx="438.3" cy="125.3" r="5.5"/><circle class="s-a" cx="382.1" cy="55.8" r="5.5"/><circle class="s-a" cx="486.0" cy="92.0" r="5.5"/><circle class="s-ring" cx="486.0" cy="92.0" r="11"/><circle class="s-a" cx="498.0" cy="150.0" r="5.5"/><circle class="s-ring" cx="498.0" cy="150.0" r="11"/><rect class="s-b" x="593.5" y="105.6" width="10" height="10" rx="1.5"/><rect class="s-b" x="575.4" y="156.0" width="10" height="10" rx="1.5"/><rect class="s-b" x="574.8" y="161.2" width="10" height="10" rx="1.5"/><rect class="s-b" x="535.6" y="146.3" width="10" height="10" rx="1.5"/><rect class="s-b" x="541.7" y="163.0" width="10" height="10" rx="1.5"/><rect class="s-b" x="595.1" y="59.1" width="10" height="10" rx="1.5"/><rect class="s-b" x="503.7" y="73.9" width="10" height="10" rx="1.5"/><rect class="s-b" x="605.8" y="101.1" width="10" height="10" rx="1.5"/><rect class="s-b" x="564.1" y="84.3" width="10" height="10" rx="1.5"/><rect class="s-b" x="549.4" y="94.8" width="10" height="10" rx="1.5"/><rect class="s-b" x="530.2" y="119.5" width="10" height="10" rx="1.5"/><rect class="s-b" x="558.9" y="159.1" width="10" height="10" rx="1.5"/><rect class="s-b" x="570.9" y="162.2" width="10" height="10" rx="1.5"/><rect class="s-b" x="466.0" y="115.0" width="10" height="10" rx="1.5"/><circle class="s-ring" cx="471.0" cy="120.0" r="11"/><rect class="s-b" x="453.0" y="65.0" width="10" height="10" rx="1.5"/><text class="t-strong t-big" x="480.0" y="26.0" text-anchor="middle">Large C: narrow margin</text><text class="t-strong" x="480.0" y="210.0" text-anchor="middle">4 support vectors</text><text x="480.0" y="228.0" text-anchor="middle">fits the training points → may overfit</text></svg><figcaption>Small C accepts violations and keeps a wide margin with many support vectors; large C narrows the margin to avoid violations.</figcaption></figure>
+          <div class="table-wrap"><table>
+            <thead><tr><th></th><th>Small C</th><th>Large C</th></tr></thead>
+            <tbody>
+              <tr><td data-label="">Margin</td><td data-label="Small C">Wider</td><td data-label="Large C">Narrower</td></tr>
+              <tr><td data-label="">Violations</td><td data-label="Small C">Tolerated</td><td data-label="Large C">Heavily penalized</td></tr>
+              <tr><td data-label="">Regularization</td><td data-label="Small C">Stronger</td><td data-label="Large C">Weaker</td></tr>
+              <tr><td data-label="">Risk</td><td data-label="Small C">Underfitting</td><td data-label="Large C">Overfitting</td></tr>
+            </tbody>
+          </table></div>
+          <figure class="code out"><figcaption>Output · Module 7 demo (linear SVM, Adelie vs Chinstrap)</figcaption><pre><code>    C    Train accuracy   CV balanced accuracy   Support vectors
+ 0.03        0.953               0.929                  72
+30.00        0.976               0.945                  13</code></pre></figure>
+          <ul class="explain">
+            <li>Large C fits the training data more closely and keeps fewer support vectors (13 vs 72), because the margin is narrower.</li>
+            <li>Judge it by the CV score, not the training score. No value of C is best for every dataset: choose it with cross-validation.</li>
+          </ul>
+        </div>
+
+        <div class="sub" id="m7-3">
+          <h3><span class="idx">7.3</span>Feature scaling (always)</h3>
+          <p>SVMs work with distances. Body mass is in grams (thousands) while bills are in millimetres, so without scaling body mass decides everything. <code>StandardScaler</code> gives every feature mean 0 and SD 1. Trees and forests do not need this; SVMs do.</p>
+          <figure class="code"><figcaption>Python</figcaption><pre><code>model = make_pipeline(StandardScaler(), SVC(kernel="rbf", C=1, gamma="scale"))</code></pre></figure>
+          <figure class="code out"><figcaption>Output · Module 7 demo (5-fold CV)</figcaption><pre><code>model              CV balanced accuracy
+RBF · raw units           0.594
+RBF · scaled              0.968
+Linear · scaled           0.974</code></pre></figure>
+          <ul class="explain">
+            <li>Scaling lifts the RBF model from 0.594 to 0.968: the raw units were distorting the distances.</li>
+            <li>The scaler sits <strong>inside the pipeline</strong>, so each CV training fold learns its own mean and SD and nothing leaks from the validation fold. Fit on training data, then <code>transform</code> the test data.</li>
+          </ul>
+        </div>
+
+        <div class="sub" id="m7-4">
+          <h3><span class="idx">7.4</span>Kernels and the kernel trick</h3>
+          <figure class="fig"><svg viewBox="0 0 640 230" role="img" aria-label="Points that one cut cannot separate on a line become separable after adding the feature x squared"><title>Points that one cut cannot separate on a line become separable after adding the feature x squared</title><rect class="s-panel" x="10" y="4" width="300" height="222" rx="10"/><rect class="s-panel" x="330" y="4" width="300" height="222" rx="10"/><line class="s-axis" x1="30" y1="140" x2="290" y2="140"/><circle class="s-a" cx="118.2" cy="140.0" r="5.5"/><circle class="s-a" cx="137.2" cy="140.0" r="5.5"/><circle class="s-a" cx="152.4" cy="140.0" r="5.5"/><circle class="s-a" cx="171.4" cy="140.0" r="5.5"/><circle class="s-a" cx="186.6" cy="140.0" r="5.5"/><circle class="s-a" cx="199.9" cy="140.0" r="5.5"/><rect class="s-b" x="41.0" y="135.0" width="10" height="10" rx="1.5"/><rect class="s-b" x="56.2" y="135.0" width="10" height="10" rx="1.5"/><rect class="s-b" x="71.4" y="135.0" width="10" height="10" rx="1.5"/><rect class="s-b" x="234.8" y="135.0" width="10" height="10" rx="1.5"/><rect class="s-b" x="250.0" y="135.0" width="10" height="10" rx="1.5"/><rect class="s-b" x="267.1" y="135.0" width="10" height="10" rx="1.5"/><text x="160.0" y="166.0" text-anchor="middle">x (one feature)</text><text class="t-strong t-big" x="160.0" y="28.0" text-anchor="middle">1 feature: no single cut separates</text><text x="160.0" y="196.0" text-anchor="middle">blue sits between the orange points</text><line class="s-axis" x1="350" y1="196" x2="612" y2="196"/><line class="s-axis" x1="480" y1="196" x2="480" y2="44"/><path class="s-dash" d="M354.6,32.7 L358.4,42.4 L362.2,51.8 L366.0,61.0 L369.8,69.8 L373.6,78.4 L377.4,86.6 L381.2,94.6 L385.0,102.2 L388.8,109.6 L392.6,116.7 L396.4,123.4 L400.2,129.8 L404.0,136.0 L407.8,141.8 L411.6,147.4 L415.4,152.7 L419.2,157.6 L423.0,162.2 L426.8,166.6 L430.6,170.7 L434.4,174.4 L438.2,177.8 L442.0,181.0 L445.8,183.8 L449.6,186.4 L453.4,188.7 L457.2,190.6 L461.0,192.2 L464.8,193.6 L468.6,194.7 L472.4,195.4 L476.2,195.8 L480.0,196.0 L483.8,195.8 L487.6,195.4 L491.4,194.7 L495.2,193.6 L499.0,192.2 L502.8,190.6 L506.6,188.7 L510.4,186.4 L514.2,183.8 L518.0,181.0 L521.8,177.8 L525.6,174.4 L529.4,170.7 L533.2,166.6 L537.0,162.2 L540.8,157.6 L544.6,152.7 L548.4,147.4 L552.2,141.8 L556.0,136.0 L559.8,129.8 L563.6,123.4 L567.4,116.7 L571.2,109.6 L575.0,102.2 L578.8,94.6 L582.6,86.6 L586.4,78.4 L590.2,69.8 L594.0,61.0 L597.8,51.8 L601.6,42.4 L605.4,32.7"/><circle class="s-a" cx="438.2" cy="177.8" r="5.5"/><circle class="s-a" cx="457.2" cy="190.6" r="5.5"/><circle class="s-a" cx="472.4" cy="195.4" r="5.5"/><circle class="s-a" cx="491.4" cy="194.7" r="5.5"/><circle class="s-a" cx="506.6" cy="188.7" r="5.5"/><circle class="s-a" cx="519.9" cy="179.5" r="5.5"/><rect class="s-b" x="361.0" y="56.0" width="10" height="10" rx="1.5"/><rect class="s-b" x="376.2" y="89.6" width="10" height="10" rx="1.5"/><rect class="s-b" x="391.4" y="118.4" width="10" height="10" rx="1.5"/><rect class="s-b" x="554.8" y="124.8" width="10" height="10" rx="1.5"/><rect class="s-b" x="570.0" y="97.2" width="10" height="10" rx="1.5"/><rect class="s-b" x="587.1" y="60.5" width="10" height="10" rx="1.5"/><line class="s-good" x1="352" y1="150" x2="610" y2="150"/><text x="606.0" y="168.0" text-anchor="end">a straight line now separates</text><text class="t-strong t-big" x="480.0" y="28.0" text-anchor="middle">Add x²: separable in 2-D</text><text x="600.0" y="212.0" text-anchor="end">x</text><text x="486.0" y="54.0" text-anchor="start">x²</text></svg><figcaption>With one feature no single cut separates the classes. Adding x² lifts the outer points up, and a straight line now separates them. A kernel gets this effect without building the new features.</figcaption></figure>
+          <p>The <strong>kernel trick</strong> computes the similarity between points <em>as if</em> they had been mapped to a higher-dimensional space, without creating those features. The SVM can then draw curved boundaries cheaply.</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Kernel</th><th>Formula</th><th>Boundary</th><th>Use it for</th></tr></thead>
+            <tbody>
+              <tr><td data-label="">Linear</td><td data-label="Formula"><code>xᵢ · xⱼ</code></td><td data-label="Boundary">Straight (a linear SVM)</td><td data-label="Use it for">Linearly separable or high-dimensional data (text). Fast; a good baseline.</td></tr>
+              <tr><td data-label="">Polynomial</td><td data-label="Formula"><code>(xᵢ · xⱼ + c)ᵈ</code></td><td data-label="Boundary">Curved, feature interactions</td><td data-label="Use it for">Moderately nonlinear data. Higher degree d = more complex.</td></tr>
+              <tr><td data-label="">Gaussian RBF</td><td data-label="Formula"><code>exp(−γ‖xᵢ − xⱼ‖²)</code></td><td data-label="Boundary">Very flexible</td><td data-label="Use it for">Complex nonlinear data; often the best. Tune C and γ.</td></tr>
+              <tr><td data-label="">Sigmoid</td><td data-label="Formula"><code>tanh(β xᵢ · xⱼ + θ)</code></td><td data-label="Boundary">Like a neural-network activation</td><td data-label="Use it for">Rarely: sensitive to settings, usually worse than RBF.</td></tr>
+            </tbody>
+          </table></div>
+          <p class="example"><strong>Rule of thumb.</strong> Start with a <strong>linear</strong> kernel for linearly separable or high-dimensional data and an <strong>RBF</strong> kernel for nonlinear problems. There is no universally best kernel: compare them with cross-validation.</p>
+          <figure class="code out"><figcaption>Output · Module 7 demo (Adelie vs Chinstrap, 5-fold CV)</figcaption><pre><code>kernel    CV balanced accuracy   CV SD
+rbf              0.949            0.039
+linear           0.940            0.023
+sigmoid          0.927            0.028
+poly             0.876            0.040</code></pre></figure>
+          <ul class="explain">
+            <li>RBF and linear differ by 0.009, less than one SD: a tie. The most flexible kernel is not automatically the best.</li>
+          </ul>
+        </div>
+
+        <div class="sub" id="m7-5">
+          <h3><span class="idx">7.5</span>Tuning C, gamma and degree</h3>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Hyperparameter</th><th>Small value</th><th>Large value</th></tr></thead>
+            <tbody>
+              <tr><td data-label="">C (all kernels)</td><td data-label="Small value">Wide margin, strong regularization → may underfit</td><td data-label="Large value">Narrow margin, fits training data → may overfit</td></tr>
+              <tr><td data-label="">γ gamma (RBF)</td><td data-label="Small value">Each point reaches far → smooth boundary</td><td data-label="Large value">Each point reaches only nearby → wiggly boundary → may overfit</td></tr>
+              <tr><td data-label="">degree (polynomial)</td><td data-label="Small value">Simple curve</td><td data-label="Large value">High-order curve, slower → may overfit</td></tr>
+            </tbody>
+          </table></div>
+          <figure class="fig"><svg viewBox="0 0 640 222" role="img" aria-label="A small gamma gives a smooth RBF boundary; a large gamma bends around individual points"><title>A small gamma gives a smooth RBF boundary; a large gamma bends around individual points</title><rect class="s-panel" x="10" y="4" width="300" height="212" rx="10"/><circle class="s-a" cx="148.2" cy="173.9" r="4.5"/><rect class="s-b" x="261.2" y="39.1" width="8" height="8" rx="1.5"/><circle class="s-a" cx="161.9" cy="167.3" r="4.5"/><rect class="s-b" x="77.8" y="96.7" width="8" height="8" rx="1.5"/><circle class="s-a" cx="192.2" cy="156.9" r="4.5"/><rect class="s-b" x="55.3" y="96.4" width="8" height="8" rx="1.5"/><circle class="s-a" cx="58.5" cy="183.1" r="4.5"/><rect class="s-b" x="204.0" y="72.9" width="8" height="8" rx="1.5"/><circle class="s-a" cx="279.6" cy="144.1" r="4.5"/><rect class="s-b" x="194.2" y="52.4" width="8" height="8" rx="1.5"/><circle class="s-a" cx="75.1" cy="154.5" r="4.5"/><rect class="s-b" x="163.0" y="98.3" width="8" height="8" rx="1.5"/><circle class="s-a" cx="83.2" cy="167.8" r="4.5"/><rect class="s-b" x="39.5" y="79.5" width="8" height="8" rx="1.5"/><circle class="s-a" cx="145.3" cy="188.3" r="4.5"/><rect class="s-b" x="160.7" y="73.1" width="8" height="8" rx="1.5"/><circle class="s-a" cx="159.9" cy="171.9" r="4.5"/><rect class="s-b" x="145.4" y="98.7" width="8" height="8" rx="1.5"/><circle class="s-a" cx="283.4" cy="146.8" r="4.5"/><circle class="s-a" cx="114.2" cy="170.0" r="4.5"/><rect class="s-b" x="103.7" y="120.7" width="8" height="8" rx="1.5"/><circle class="s-a" cx="226.0" cy="120.5" r="4.5"/><rect class="s-b" x="242.0" y="42.9" width="8" height="8" rx="1.5"/><circle class="s-a" cx="273.6" cy="137.1" r="4.5"/><rect class="s-b" x="32.1" y="86.4" width="8" height="8" rx="1.5"/><circle class="s-a" cx="261.7" cy="117.8" r="4.5"/><rect class="s-b" x="275.1" y="45.3" width="8" height="8" rx="1.5"/><circle class="s-a" cx="54.1" cy="172.4" r="4.5"/><rect class="s-b" x="225.1" y="52.6" width="8" height="8" rx="1.5"/><circle class="s-a" cx="57.6" cy="160.7" r="4.5"/><circle class="s-a" cx="65.3" cy="160.8" r="4.5"/><rect class="s-b" x="57.1" y="108.5" width="8" height="8" rx="1.5"/><circle class="s-a" cx="233.7" cy="107.6" r="4.5"/><rect class="s-b" x="170.7" y="75.5" width="8" height="8" rx="1.5"/><rect class="s-b" x="64.5" y="85.4" width="8" height="8" rx="1.5"/><circle class="s-a" cx="64.9" cy="168.6" r="4.5"/><rect class="s-b" x="84.8" y="109.7" width="8" height="8" rx="1.5"/><circle class="s-a" cx="276.8" cy="135.9" r="4.5"/><rect class="s-b" x="107.4" y="83.0" width="8" height="8" rx="1.5"/><circle class="s-a" cx="88.3" cy="176.1" r="4.5"/><rect class="s-b" x="243.9" y="31.0" width="8" height="8" rx="1.5"/><rect class="s-b" x="84.9" y="110.2" width="8" height="8" rx="1.5"/><circle class="s-a" cx="227.6" cy="116.6" r="4.5"/><rect class="s-b" x="105.5" y="120.5" width="8" height="8" rx="1.5"/><circle class="s-a" cx="58.3" cy="172.6" r="4.5"/><rect class="s-b" x="92.3" y="95.8" width="8" height="8" rx="1.5"/><circle class="s-a" cx="128.2" cy="177.3" r="4.5"/><rect class="s-b" x="269.9" y="39.9" width="8" height="8" rx="1.5"/><circle class="s-a" cx="80.0" cy="125.6" r="4.5"/><rect class="s-b" x="156.0" y="134.4" width="8" height="8" rx="1.5"/><circle class="s-a" cx="232.0" cy="69.0" r="4.5"/><path class="s-line" d="M30.0,112.0 L30.5,112.3 L31.0,112.7 L31.5,113.0 L32.0,113.3 L32.5,113.7 L33.0,114.0 L33.5,114.3 L34.0,114.7 L34.5,115.0 L35.0,115.3 L35.5,115.7 L36.0,116.0 L36.5,116.3 L37.0,116.7 L37.5,117.0 L38.0,117.3 L38.5,117.6 L39.0,118.0 L39.5,118.3 L40.0,118.6 L40.5,118.9 L41.0,119.3 L41.5,119.6 L42.0,119.9 L42.5,120.2 L43.0,120.6 L43.5,120.9 L44.0,121.2 L44.5,121.5 L45.0,121.8 L45.5,122.2 L46.0,122.5 L46.5,122.8 L47.0,123.1 L47.5,123.4 L48.0,123.7 L48.5,124.0 L49.0,124.3 L49.5,124.6 L50.0,125.0 L50.5,125.3 L51.0,125.6 L51.5,125.9 L52.0,126.2 L52.5,126.5 L53.0,126.8 L53.5,127.0 L54.0,127.3 L54.5,127.6 L55.0,127.9 L55.5,128.2 L56.0,128.5 L56.5,128.8 L57.0,129.1 L57.5,129.3 L58.0,129.6 L58.5,129.9 L59.0,130.2 L59.5,130.5 L60.0,130.7 L60.5,131.0 L61.0,131.3 L61.5,131.5 L62.0,131.8 L62.5,132.0 L63.0,132.3 L63.5,132.6 L64.0,132.8 L64.5,133.1 L65.0,133.3 L65.5,133.6 L66.0,133.8 L66.5,134.1 L67.0,134.3 L67.5,134.5 L68.0,134.8 L68.5,135.0 L69.0,135.2 L69.5,135.5 L70.0,135.7 L70.5,135.9 L71.0,136.1 L71.5,136.3 L72.0,136.6 L72.5,136.8 L73.0,137.0 L73.5,137.2 L74.0,137.4 L74.5,137.6 L75.0,137.8 L75.5,138.0 L76.0,138.2 L76.5,138.4 L77.0,138.6 L77.5,138.7 L78.0,138.9 L78.5,139.1 L79.0,139.3 L79.5,139.5 L80.0,139.6 L80.5,139.8 L81.0,140.0 L81.5,140.1 L82.0,140.3 L82.5,140.4 L83.0,140.6 L83.5,140.7 L84.0,140.9 L84.5,141.0 L85.0,141.2 L85.5,141.3 L86.0,141.4 L86.5,141.6 L87.0,141.7 L87.5,141.8 L88.0,141.9 L88.5,142.0 L89.0,142.2 L89.5,142.3 L90.0,142.4 L90.5,142.5 L91.0,142.6 L91.5,142.7 L92.0,142.8 L92.5,142.9 L93.0,142.9 L93.5,143.0 L94.0,143.1 L94.5,143.2 L95.0,143.3 L95.5,143.3 L96.0,143.4 L96.5,143.5 L97.0,143.5 L97.5,143.6 L98.0,143.6 L98.5,143.7 L99.0,143.7 L99.5,143.8 L100.0,143.8 L100.5,143.8 L101.0,143.9 L101.5,143.9 L102.0,143.9 L102.5,143.9 L103.0,144.0 L103.5,144.0 L104.0,144.0 L104.5,144.0 L105.0,144.0 L105.5,144.0 L106.0,144.0 L106.5,144.0 L107.0,144.0 L107.5,144.0 L108.0,144.0 L108.5,143.9 L109.0,143.9 L109.5,143.9 L110.0,143.9 L110.5,143.8 L111.0,143.8 L111.5,143.7 L112.0,143.7 L112.5,143.7 L113.0,143.6 L113.5,143.5 L114.0,143.5 L114.5,143.4 L115.0,143.4 L115.5,143.3 L116.0,143.2 L116.5,143.1 L117.0,143.1 L117.5,143.0 L118.0,142.9 L118.5,142.8 L119.0,142.7 L119.5,142.6 L120.0,142.5 L120.5,142.4 L121.0,142.3 L121.5,142.2 L122.0,142.1 L122.5,142.0 L123.0,141.9 L123.5,141.8 L124.0,141.6 L124.5,141.5 L125.0,141.4 L125.5,141.2 L126.0,141.1 L126.5,141.0 L127.0,140.8 L127.5,140.7 L128.0,140.5 L128.5,140.4 L129.0,140.2 L129.5,140.1 L130.0,139.9 L130.5,139.7 L131.0,139.6 L131.5,139.4 L132.0,139.2 L132.5,139.0 L133.0,138.9 L133.5,138.7 L134.0,138.5 L134.5,138.3 L135.0,138.1 L135.5,137.9 L136.0,137.7 L136.5,137.5 L137.0,137.3 L137.5,137.1 L138.0,136.9 L138.5,136.7 L139.0,136.5 L139.5,136.3 L140.0,136.0 L140.5,135.8 L141.0,135.6 L141.5,135.4 L142.0,135.1 L142.5,134.9 L143.0,134.7 L143.5,134.4 L144.0,134.2 L144.5,134.0 L145.0,133.7 L145.5,133.5 L146.0,133.2 L146.5,133.0 L147.0,132.7 L147.5,132.5 L148.0,132.2 L148.5,131.9 L149.0,131.7 L149.5,131.4 L150.0,131.2 L150.5,130.9 L151.0,130.6 L151.5,130.3 L152.0,130.1 L152.5,129.8 L153.0,129.5 L153.5,129.2 L154.0,129.0 L154.5,128.7 L155.0,128.4 L155.5,128.1 L156.0,127.8 L156.5,127.5 L157.0,127.2 L157.5,126.9 L158.0,126.6 L158.5,126.3 L159.0,126.0 L159.5,125.7 L160.0,125.4 L160.5,125.1 L161.0,124.8 L161.5,124.5 L162.0,124.2 L162.5,123.9 L163.0,123.6 L163.5,123.3 L164.0,123.0 L164.5,122.7 L165.0,122.3 L165.5,122.0 L166.0,121.7 L166.5,121.4 L167.0,121.1 L167.5,120.8 L168.0,120.4 L168.5,120.1 L169.0,119.8 L169.5,119.5 L170.0,119.1 L170.5,118.8 L171.0,118.5 L171.5,118.2 L172.0,117.8 L172.5,117.5 L173.0,117.2 L173.5,116.8 L174.0,116.5 L174.5,116.2 L175.0,115.9 L175.5,115.5 L176.0,115.2 L176.5,114.9 L177.0,114.5 L177.5,114.2 L178.0,113.9 L178.5,113.5 L179.0,113.2 L179.5,112.9 L180.0,112.5 L180.5,112.2 L181.0,111.9 L181.5,111.5 L182.0,111.2 L182.5,110.9 L183.0,110.5 L183.5,110.2 L184.0,109.9 L184.5,109.5 L185.0,109.2 L185.5,108.9 L186.0,108.5 L186.5,108.2 L187.0,107.9 L187.5,107.5 L188.0,107.2 L188.5,106.9 L189.0,106.6 L189.5,106.2 L190.0,105.9 L190.5,105.6 L191.0,105.2 L191.5,104.9 L192.0,104.6 L192.5,104.3 L193.0,104.0 L193.5,103.6 L194.0,103.3 L194.5,103.0 L195.0,102.7 L195.5,102.4 L196.0,102.0 L196.5,101.7 L197.0,101.4 L197.5,101.1 L198.0,100.8 L198.5,100.5 L199.0,100.2 L199.5,99.8 L200.0,99.5 L200.5,99.2 L201.0,98.9 L201.5,98.6 L202.0,98.3 L202.5,98.0 L203.0,97.7 L203.5,97.4 L204.0,97.1 L204.5,96.8 L205.0,96.5 L205.5,96.2 L206.0,96.0 L206.5,95.7 L207.0,95.4 L207.5,95.1 L208.0,94.8 L208.5,94.5 L209.0,94.3 L209.5,94.0 L210.0,93.7 L210.5,93.4 L211.0,93.2 L211.5,92.9 L212.0,92.6 L212.5,92.4 L213.0,92.1 L213.5,91.8 L214.0,91.6 L214.5,91.3 L215.0,91.1 L215.5,90.8 L216.0,90.6 L216.5,90.3 L217.0,90.1 L217.5,89.8 L218.0,89.6 L218.5,89.4 L219.0,89.1 L219.5,88.9 L220.0,88.7 L220.5,88.4 L221.0,88.2 L221.5,88.0 L222.0,87.8 L222.5,87.6 L223.0,87.4 L223.5,87.1 L224.0,86.9 L224.5,86.7 L225.0,86.5 L225.5,86.3 L226.0,86.1 L226.5,85.9 L227.0,85.7 L227.5,85.5 L228.0,85.4 L228.5,85.2 L229.0,85.0 L229.5,84.8 L230.0,84.6 L230.5,84.5 L231.0,84.3 L231.5,84.1 L232.0,84.0 L232.5,83.8 L233.0,83.7 L233.5,83.5 L234.0,83.4 L234.5,83.2 L235.0,83.1 L235.5,82.9 L236.0,82.8 L236.5,82.7 L237.0,82.5 L237.5,82.4 L238.0,82.3 L238.5,82.1 L239.0,82.0 L239.5,81.9 L240.0,81.8 L240.5,81.7 L241.0,81.6 L241.5,81.5 L242.0,81.4 L242.5,81.3 L243.0,81.2 L243.5,81.1 L244.0,81.0 L244.5,80.9 L245.0,80.9 L245.5,80.8 L246.0,80.7 L246.5,80.7 L247.0,80.6 L247.5,80.5 L248.0,80.5 L248.5,80.4 L249.0,80.4 L249.5,80.3 L250.0,80.3 L250.5,80.2 L251.0,80.2 L251.5,80.2 L252.0,80.1 L252.5,80.1 L253.0,80.1 L253.5,80.1 L254.0,80.0 L254.5,80.0 L255.0,80.0 L255.5,80.0 L256.0,80.0 L256.5,80.0 L257.0,80.0 L257.5,80.0 L258.0,80.0 L258.5,80.0 L259.0,80.1 L259.5,80.1 L260.0,80.1 L260.5,80.1 L261.0,80.2 L261.5,80.2 L262.0,80.2 L262.5,80.3 L263.0,80.3 L263.5,80.4 L264.0,80.4 L264.5,80.5 L265.0,80.5 L265.5,80.6 L266.0,80.7 L266.5,80.7 L267.0,80.8 L267.5,80.9 L268.0,81.0 L268.5,81.0 L269.0,81.1 L269.5,81.2 L270.0,81.3 L270.5,81.4 L271.0,81.5 L271.5,81.6 L272.0,81.7 L272.5,81.8 L273.0,81.9 L273.5,82.1 L274.0,82.2 L274.5,82.3 L275.0,82.4 L275.5,82.6 L276.0,82.7 L276.5,82.8 L277.0,83.0 L277.5,83.1 L278.0,83.2 L278.5,83.4 L279.0,83.5 L279.5,83.7 L280.0,83.9 L280.5,84.0 L281.0,84.2 L281.5,84.3 L282.0,84.5 L282.5,84.7 L283.0,84.9 L283.5,85.0 L284.0,85.2 L284.5,85.4 L285.0,85.6 L285.5,85.8 L286.0,86.0 L286.5,86.2 L287.0,86.4 L287.5,86.6 L288.0,86.8 L288.5,87.0 L289.0,87.2 L289.5,87.4 L290.0,87.6"/><text class="t-strong t-big" x="160.0" y="26.0" text-anchor="middle">Small γ: smooth boundary</text><text x="160.0" y="206.0" text-anchor="middle">may underfit if too small</text><rect class="s-panel" x="330" y="4" width="300" height="212" rx="10"/><circle class="s-a" cx="468.2" cy="173.9" r="4.5"/><rect class="s-b" x="581.2" y="39.1" width="8" height="8" rx="1.5"/><circle class="s-a" cx="481.9" cy="167.3" r="4.5"/><rect class="s-b" x="397.8" y="96.7" width="8" height="8" rx="1.5"/><circle class="s-a" cx="512.2" cy="156.9" r="4.5"/><rect class="s-b" x="375.3" y="96.4" width="8" height="8" rx="1.5"/><circle class="s-a" cx="378.5" cy="183.1" r="4.5"/><rect class="s-b" x="524.0" y="72.9" width="8" height="8" rx="1.5"/><circle class="s-a" cx="599.6" cy="144.1" r="4.5"/><rect class="s-b" x="514.2" y="52.4" width="8" height="8" rx="1.5"/><circle class="s-a" cx="395.1" cy="154.5" r="4.5"/><rect class="s-b" x="483.0" y="98.3" width="8" height="8" rx="1.5"/><circle class="s-a" cx="403.2" cy="167.8" r="4.5"/><rect class="s-b" x="359.5" y="79.5" width="8" height="8" rx="1.5"/><circle class="s-a" cx="465.3" cy="188.3" r="4.5"/><rect class="s-b" x="480.7" y="73.1" width="8" height="8" rx="1.5"/><circle class="s-a" cx="479.9" cy="171.9" r="4.5"/><rect class="s-b" x="465.4" y="98.7" width="8" height="8" rx="1.5"/><circle class="s-a" cx="603.4" cy="146.8" r="4.5"/><circle class="s-a" cx="434.2" cy="170.0" r="4.5"/><rect class="s-b" x="423.7" y="120.7" width="8" height="8" rx="1.5"/><circle class="s-a" cx="546.0" cy="120.5" r="4.5"/><rect class="s-b" x="562.0" y="42.9" width="8" height="8" rx="1.5"/><circle class="s-a" cx="593.6" cy="137.1" r="4.5"/><rect class="s-b" x="352.1" y="86.4" width="8" height="8" rx="1.5"/><circle class="s-a" cx="581.7" cy="117.8" r="4.5"/><rect class="s-b" x="595.1" y="45.3" width="8" height="8" rx="1.5"/><circle class="s-a" cx="374.1" cy="172.4" r="4.5"/><rect class="s-b" x="545.1" y="52.6" width="8" height="8" rx="1.5"/><circle class="s-a" cx="377.6" cy="160.7" r="4.5"/><circle class="s-a" cx="385.3" cy="160.8" r="4.5"/><rect class="s-b" x="377.1" y="108.5" width="8" height="8" rx="1.5"/><circle class="s-a" cx="553.7" cy="107.6" r="4.5"/><rect class="s-b" x="490.7" y="75.5" width="8" height="8" rx="1.5"/><rect class="s-b" x="384.5" y="85.4" width="8" height="8" rx="1.5"/><circle class="s-a" cx="384.9" cy="168.6" r="4.5"/><rect class="s-b" x="404.8" y="109.7" width="8" height="8" rx="1.5"/><circle class="s-a" cx="596.8" cy="135.9" r="4.5"/><rect class="s-b" x="427.4" y="83.0" width="8" height="8" rx="1.5"/><circle class="s-a" cx="408.3" cy="176.1" r="4.5"/><rect class="s-b" x="563.9" y="31.0" width="8" height="8" rx="1.5"/><rect class="s-b" x="404.9" y="110.2" width="8" height="8" rx="1.5"/><circle class="s-a" cx="547.6" cy="116.6" r="4.5"/><rect class="s-b" x="425.5" y="120.5" width="8" height="8" rx="1.5"/><circle class="s-a" cx="378.3" cy="172.6" r="4.5"/><rect class="s-b" x="412.3" y="95.8" width="8" height="8" rx="1.5"/><circle class="s-a" cx="448.2" cy="177.3" r="4.5"/><rect class="s-b" x="589.9" y="39.9" width="8" height="8" rx="1.5"/><circle class="s-a" cx="400.0" cy="125.6" r="4.5"/><rect class="s-b" x="476.0" y="134.4" width="8" height="8" rx="1.5"/><circle class="s-a" cx="552.0" cy="69.0" r="4.5"/><path class="s-line" d="M350.0,112.0 L350.5,112.3 L351.0,112.7 L351.5,113.0 L352.0,113.3 L352.5,113.7 L353.0,114.0 L353.5,114.3 L354.0,114.7 L354.5,115.0 L355.0,115.3 L355.5,115.7 L356.0,116.0 L356.5,116.3 L357.0,116.7 L357.5,117.0 L358.0,117.3 L358.5,117.6 L359.0,118.0 L359.5,118.3 L360.0,118.6 L360.5,118.9 L361.0,119.3 L361.5,119.6 L362.0,119.9 L362.5,120.2 L363.0,120.6 L363.5,120.9 L364.0,121.2 L364.5,121.5 L365.0,121.8 L365.5,122.2 L366.0,122.5 L366.5,122.8 L367.0,123.1 L367.5,123.4 L368.0,123.7 L368.5,124.0 L369.0,124.3 L369.5,124.6 L370.0,125.0 L370.5,125.3 L371.0,125.6 L371.5,125.9 L372.0,126.2 L372.5,126.5 L373.0,126.8 L373.5,127.0 L374.0,127.3 L374.5,127.6 L375.0,127.9 L375.5,128.2 L376.0,128.5 L376.5,128.8 L377.0,129.0 L377.5,129.3 L378.0,129.6 L378.5,129.8 L379.0,130.1 L379.5,130.3 L380.0,130.5 L380.5,130.8 L381.0,131.0 L381.5,131.1 L382.0,131.3 L382.5,131.5 L383.0,131.6 L383.5,131.7 L384.0,131.7 L384.5,131.7 L385.0,131.7 L385.5,131.6 L386.0,131.5 L386.5,131.3 L387.0,131.1 L387.5,130.8 L388.0,130.4 L388.5,129.9 L389.0,129.4 L389.5,128.8 L390.0,128.1 L390.5,127.4 L391.0,126.6 L391.5,125.7 L392.0,124.8 L392.5,123.8 L393.0,122.8 L393.5,121.8 L394.0,120.7 L394.5,119.7 L395.0,118.7 L395.5,117.7 L396.0,116.8 L396.5,116.0 L397.0,115.3 L397.5,114.7 L398.0,114.2 L398.5,113.8 L399.0,113.6 L399.5,113.5 L400.0,113.6 L400.5,113.9 L401.0,114.3 L401.5,114.8 L402.0,115.5 L402.5,116.4 L403.0,117.3 L403.5,118.4 L404.0,119.5 L404.5,120.8 L405.0,122.1 L405.5,123.4 L406.0,124.8 L406.5,126.1 L407.0,127.5 L407.5,128.8 L408.0,130.1 L408.5,131.4 L409.0,132.6 L409.5,133.7 L410.0,134.8 L410.5,135.8 L411.0,136.7 L411.5,137.6 L412.0,138.4 L412.5,139.1 L413.0,139.7 L413.5,140.3 L414.0,140.8 L414.5,141.2 L415.0,141.6 L415.5,142.0 L416.0,142.3 L416.5,142.5 L417.0,142.8 L417.5,143.0 L418.0,143.1 L418.5,143.3 L419.0,143.4 L419.5,143.5 L420.0,143.6 L420.5,143.7 L421.0,143.8 L421.5,143.8 L422.0,143.9 L422.5,143.9 L423.0,143.9 L423.5,143.9 L424.0,144.0 L424.5,144.0 L425.0,144.0 L425.5,144.0 L426.0,144.0 L426.5,144.0 L427.0,144.0 L427.5,144.0 L428.0,144.0 L428.5,143.9 L429.0,143.9 L429.5,143.9 L430.0,143.9 L430.5,143.8 L431.0,143.8 L431.5,143.7 L432.0,143.7 L432.5,143.7 L433.0,143.6 L433.5,143.5 L434.0,143.5 L434.5,143.4 L435.0,143.4 L435.5,143.3 L436.0,143.2 L436.5,143.1 L437.0,143.1 L437.5,143.0 L438.0,142.9 L438.5,142.8 L439.0,142.7 L439.5,142.6 L440.0,142.5 L440.5,142.4 L441.0,142.3 L441.5,142.2 L442.0,142.1 L442.5,142.0 L443.0,141.9 L443.5,141.8 L444.0,141.6 L444.5,141.5 L445.0,141.4 L445.5,141.2 L446.0,141.1 L446.5,141.0 L447.0,140.8 L447.5,140.7 L448.0,140.5 L448.5,140.4 L449.0,140.2 L449.5,140.1 L450.0,139.9 L450.5,139.7 L451.0,139.6 L451.5,139.4 L452.0,139.2 L452.5,139.0 L453.0,138.9 L453.5,138.7 L454.0,138.5 L454.5,138.3 L455.0,138.1 L455.5,137.9 L456.0,137.7 L456.5,137.5 L457.0,137.3 L457.5,137.2 L458.0,137.0 L458.5,136.8 L459.0,136.6 L459.5,136.4 L460.0,136.2 L460.5,136.0 L461.0,135.9 L461.5,135.7 L462.0,135.6 L462.5,135.5 L463.0,135.4 L463.5,135.3 L464.0,135.3 L464.5,135.2 L465.0,135.3 L465.5,135.3 L466.0,135.4 L466.5,135.6 L467.0,135.8 L467.5,136.1 L468.0,136.4 L468.5,136.8 L469.0,137.3 L469.5,137.8 L470.0,138.4 L470.5,139.1 L471.0,139.8 L471.5,140.6 L472.0,141.4 L472.5,142.3 L473.0,143.2 L473.5,144.1 L474.0,145.0 L474.5,145.9 L475.0,146.7 L475.5,147.6 L476.0,148.3 L476.5,149.0 L477.0,149.6 L477.5,150.1 L478.0,150.4 L478.5,150.7 L479.0,150.7 L479.5,150.7 L480.0,150.4 L480.5,150.1 L481.0,149.5 L481.5,148.8 L482.0,148.0 L482.5,147.0 L483.0,146.0 L483.5,144.8 L484.0,143.5 L484.5,142.1 L485.0,140.7 L485.5,139.2 L486.0,137.7 L486.5,136.2 L487.0,134.7 L487.5,133.2 L488.0,131.8 L488.5,130.4 L489.0,129.0 L489.5,127.7 L490.0,126.4 L490.5,125.2 L491.0,124.1 L491.5,123.0 L492.0,122.1 L492.5,121.1 L493.0,120.3 L493.5,119.5 L494.0,118.7 L494.5,118.1 L495.0,117.4 L495.5,116.8 L496.0,116.3 L496.5,115.7 L497.0,115.2 L497.5,114.8 L498.0,114.3 L498.5,113.9 L499.0,113.5 L499.5,113.1 L500.0,112.7 L500.5,112.3 L501.0,112.0 L501.5,111.6 L502.0,111.3 L502.5,110.9 L503.0,110.6 L503.5,110.2 L504.0,109.9 L504.5,109.5 L505.0,109.2 L505.5,108.9 L506.0,108.5 L506.5,108.2 L507.0,107.9 L507.5,107.5 L508.0,107.2 L508.5,106.9 L509.0,106.6 L509.5,106.2 L510.0,105.9 L510.5,105.6 L511.0,105.2 L511.5,104.9 L512.0,104.6 L512.5,104.3 L513.0,104.0 L513.5,103.6 L514.0,103.3 L514.5,103.0 L515.0,102.7 L515.5,102.4 L516.0,102.0 L516.5,101.7 L517.0,101.4 L517.5,101.1 L518.0,100.8 L518.5,100.5 L519.0,100.2 L519.5,99.8 L520.0,99.5 L520.5,99.2 L521.0,98.9 L521.5,98.6 L522.0,98.3 L522.5,98.0 L523.0,97.7 L523.5,97.4 L524.0,97.1 L524.5,96.8 L525.0,96.5 L525.5,96.2 L526.0,96.0 L526.5,95.7 L527.0,95.4 L527.5,95.1 L528.0,94.8 L528.5,94.5 L529.0,94.2 L529.5,93.9 L530.0,93.6 L530.5,93.3 L531.0,93.1 L531.5,92.7 L532.0,92.4 L532.5,92.1 L533.0,91.8 L533.5,91.5 L534.0,91.1 L534.5,90.7 L535.0,90.3 L535.5,89.9 L536.0,89.4 L536.5,88.9 L537.0,88.4 L537.5,87.8 L538.0,87.2 L538.5,86.5 L539.0,85.8 L539.5,85.0 L540.0,84.1 L540.5,83.2 L541.0,82.2 L541.5,81.1 L542.0,79.9 L542.5,78.7 L543.0,77.4 L543.5,76.1 L544.0,74.7 L544.5,73.2 L545.0,71.8 L545.5,70.3 L546.0,68.8 L546.5,67.3 L547.0,65.9 L547.5,64.5 L548.0,63.2 L548.5,62.0 L549.0,60.8 L549.5,59.8 L550.0,58.9 L550.5,58.2 L551.0,57.6 L551.5,57.2 L552.0,57.0 L552.5,56.9 L553.0,57.0 L553.5,57.3 L554.0,57.7 L554.5,58.2 L555.0,58.9 L555.5,59.7 L556.0,60.6 L556.5,61.6 L557.0,62.7 L557.5,63.8 L558.0,65.0 L558.5,66.1 L559.0,67.3 L559.5,68.4 L560.0,69.6 L560.5,70.6 L561.0,71.7 L561.5,72.6 L562.0,73.5 L562.5,74.4 L563.0,75.1 L563.5,75.8 L564.0,76.5 L564.5,77.0 L565.0,77.5 L565.5,77.9 L566.0,78.3 L566.5,78.6 L567.0,78.9 L567.5,79.1 L568.0,79.3 L568.5,79.5 L569.0,79.6 L569.5,79.7 L570.0,79.8 L570.5,79.8 L571.0,79.9 L571.5,79.9 L572.0,79.9 L572.5,79.9 L573.0,80.0 L573.5,80.0 L574.0,80.0 L574.5,80.0 L575.0,80.0 L575.5,80.0 L576.0,80.0 L576.5,80.0 L577.0,80.0 L577.5,80.0 L578.0,80.0 L578.5,80.0 L579.0,80.1 L579.5,80.1 L580.0,80.1 L580.5,80.1 L581.0,80.2 L581.5,80.2 L582.0,80.2 L582.5,80.3 L583.0,80.3 L583.5,80.4 L584.0,80.4 L584.5,80.5 L585.0,80.5 L585.5,80.6 L586.0,80.7 L586.5,80.7 L587.0,80.8 L587.5,80.9 L588.0,81.0 L588.5,81.0 L589.0,81.1 L589.5,81.2 L590.0,81.3 L590.5,81.4 L591.0,81.5 L591.5,81.6 L592.0,81.7 L592.5,81.8 L593.0,81.9 L593.5,82.1 L594.0,82.2 L594.5,82.3 L595.0,82.4 L595.5,82.6 L596.0,82.7 L596.5,82.8 L597.0,83.0 L597.5,83.1 L598.0,83.2 L598.5,83.4 L599.0,83.5 L599.5,83.7 L600.0,83.9 L600.5,84.0 L601.0,84.2 L601.5,84.3 L602.0,84.5 L602.5,84.7 L603.0,84.9 L603.5,85.0 L604.0,85.2 L604.5,85.4 L605.0,85.6 L605.5,85.8 L606.0,86.0 L606.5,86.2 L607.0,86.4 L607.5,86.6 L608.0,86.8 L608.5,87.0 L609.0,87.2 L609.5,87.4 L610.0,87.6"/><text class="t-strong t-big" x="480.0" y="26.0" text-anchor="middle">Large γ: wiggly boundary</text><text x="480.0" y="206.0" text-anchor="middle">wraps single points → may overfit</text></svg><figcaption>Small gamma gives a smooth boundary; large gamma wraps around individual points.</figcaption></figure>
+          <figure class="code out"><figcaption>Output · Module 7 demo (RBF on two penguin features)</figcaption><pre><code>   C   gamma   train accuracy   CV balanced accuracy
+ 0.1    0.01        0.733              0.368
+ 0.1    5.00        0.947              0.839
+10.0    0.01        0.959              0.940
+10.0    5.00        0.992              0.934</code></pre></figure>
+          <ul class="explain">
+            <li>C = 0.1 with γ = 0.01 <strong>underfits</strong>: both scores are low.</li>
+            <li>C = 10 with γ = 5 has the best training score (0.992) but not the best CV score: a sign of <strong>overfitting</strong>.</li>
+            <li>C and γ interact, so tune them together with <code>GridSearchCV</code>.</li>
+          </ul>
+        </div>
+
+        <div class="sub" id="m7-6">
+          <h3><span class="idx">7.6</span>SVMs in scikit-learn: the full workflow</h3>
+          <figure class="code"><figcaption>Python · Module 7 demo</figcaption><pre><code>X_dev, X_test, y_dev, y_test = train_test_split(
+    X, y, test_size=0.22, random_state=42, stratify=y)       # locked test set
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+search = GridSearchCV(
+    make_pipeline(StandardScaler(), SVC()),
+    param_grid=[{"svc__kernel": ["linear"], "svc__C": [0.1, 1, 10]},
+                {"svc__kernel": ["rbf"], "svc__C": [0.1, 1, 10],
+                 "svc__gamma": ["scale", 0.1, 1]}],
+    cv=cv, scoring="balanced_accuracy")
+search.fit(X_dev, y_dev)                                     # tune on development data only
+final_pred = search.best_estimator_.predict(X_test)          # test once, at the end</code></pre></figure>
+          <ul class="explain">
+            <li><code>stratify=y</code> keeps the species proportions in both sets; the <strong>locked test set</strong> is used once, after tuning.</li>
+            <li><code>svc__C</code>: the C of the pipeline step named <code>svc</code>.</li>
+            <li><strong>Balanced accuracy</strong> averages each class's recall, so the small class (68 Chinstrap) counts as much as the large ones.</li>
+            <li>Result: best = <strong>linear, C = 10</strong> (CV 0.985, RBF 0.981: a tie). Locked test: 1.000 on 76 penguins, good but not proof of perfection.</li>
+          </ul>
+          <ul>
+            <li><strong>Multiclass:</strong> <code>SVC</code> uses <strong>one-versus-one</strong>. Three species → three pairwise classifiers (Adelie–Chinstrap, Adelie–Gentoo, Chinstrap–Gentoo).</li>
+            <li><strong>Cascade lab:</strong> <code>SVC(..., probability=True)</code> enables <code>predict_proba</code>, needed for ROC-AUC. Models were compared on accuracy, precision, recall, F1 and ROC-AUC, plus confusion matrices and ROC curves.</li>
+          </ul>
+        </div>
+
+        <div class="sub" id="m7-7">
+          <h3><span class="idx">7.7</span>Support vector regression (SVR)</h3>
+          <p>SVR predicts a number. It fits a tube of width <strong>ε</strong> around the prediction: errors <strong>inside the tube cost nothing</strong>, and only points outside it shape the model (C sets their penalty). This makes it less sensitive to small noise.</p>
+          <figure class="code out"><figcaption>Output · predicting penguin body mass (grams), 5-fold CV</figcaption><pre><code>model               CV MAE    CV SD
+RBF SVR             280.61    35.65
+linear regression   327.60    25.94
+linear SVR          331.11    27.98
+Selected: RBF SVR · locked test MAE 274.33 grams</code></pre></figure>
+          <ul class="explain">
+            <li>For MAE, lower is better: RBF SVR misses by about 280 g on average. SVR does not always beat linear regression; it depends on the data.</li>
+          </ul>
+        </div>
+
+        <div class="sub" id="m7-8">
+          <h3><span class="idx">7.8</span>Strengths and limits</h3>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Strengths</th><th>Limitations</th></tr></thead>
+            <tbody>
+              <tr><td data-label="Strength">Effective in high-dimensional spaces (text, images, genomics)</td><td data-label="Limitation">Sensitive to feature scaling</td></tr>
+              <tr><td data-label="Strength">Good generalization from the maximum margin</td><td data-label="Limitation">Needs tuning of C, γ and degree</td></tr>
+              <tr><td data-label="Strength">Strong on small and medium datasets</td><td data-label="Limitation">Slow on very large datasets</td></tr>
+              <tr><td data-label="Strength">Linear or nonlinear through kernels</td><td data-label="Limitation">Hard to interpret, especially with RBF</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="check"><p class="check-title">Check yourself</p>
+          <details><summary>What does an SVM maximize, and which points decide the boundary?</summary><p>The margin between the classes. The support vectors, the points on or inside the margin, decide it.</p></details>
+          <details><summary>Small C or large C: which gives a wider margin, and what is the risk?</summary><p>Small C: wider margin and stronger regularization, with a risk of underfitting. Large C narrows the margin and risks overfitting.</p></details>
+          <details><summary>Why did the raw-units RBF score only 0.594?</summary><p>RBF uses distances and body mass in grams dominated them. Scaling (StandardScaler in the pipeline) raised it to 0.968.</p></details>
+          <details><summary>What does the kernel trick do?</summary><p>It computes similarities as if the data were mapped to a higher-dimensional space, so the SVM can draw nonlinear boundaries without creating the new features.</p></details>
+          <details><summary>What does a large gamma do in an RBF SVM?</summary><p>It makes each point's influence very local, giving a complex, wiggly boundary that may overfit.</p></details>
+          <details><summary>How does SVC handle three classes?</summary><p>One-versus-one: one binary classifier for each pair of classes, three for three species.</p></details>
+        </div>
+      </section>
+
+      <!-- ───────────────────────── Module 8 ───────────────────────── -->
+      <section class="chapter" id="m8">
+        <header class="chapter-head"><span class="chapter-num">8</span><div><p class="eyebrow">Module 8</p><h2>Dimensionality reduction</h2></div></header>
+        <p class="one-liner">Too many features make data sparse, slow and easy to overfit. <strong>PCA</strong> keeps the directions of most <strong>variance</strong> (no labels), <strong>LDA</strong> keeps the directions that <strong>separate the classes</strong> (labels, at most C − 1), and <strong>t-SNE</strong> draws <strong>pictures</strong> of local neighbourhoods.</p>
+
+        <div class="sub" id="m8-1">
+          <h3><span class="idx">8.1</span>The curse of dimensionality</h3>
+          <div class="flow">
+            <div class="step"><strong>Sparsity</strong><span>The feature space grows so fast that the observations spread thin, and patterns are hard to find.</span></div>
+            <div class="step"><strong>Distances stop helping</strong><span>Distances between points become similar, so k-NN and clustering lose power.</span></div>
+            <div class="step"><strong>Cost</strong><span>More computation, memory and training time; models need more data.</span></div>
+            <div class="step"><strong>Overfitting</strong><span>Models learn noise from irrelevant features and generalize worse.</span></div>
+          </div>
+          <p class="example"><strong>Demo.</strong> With random points in 2, 10, 100 and 784 dimensions, the average distance grows but the relative spread (SD ÷ mean) shrinks: everyone becomes about equally far from everyone. MNIST has 784 pixel features per image.</p>
+        </div>
+
+        <div class="sub" id="m8-2">
+          <h3><span class="idx">8.2</span>Why reduce, and selection vs extraction</h3>
+          <p><strong>Benefits:</strong> faster training, lower storage, less noise, easier visualization (2D/3D), less overfitting. <strong>Cost:</strong> some information is lost, so accuracy can drop.</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th></th><th>Feature selection</th><th>Feature extraction</th></tr></thead>
+            <tbody>
+              <tr><td data-label="">What it does</td><td data-label="Selection">Keeps a subset of the original features</td><td data-label="Extraction">Creates new features by combining the originals</td></tr>
+              <tr><td data-label="">Meaning</td><td data-label="Selection">Features keep their meaning</td><td data-label="Extraction">New features are harder to interpret</td></tr>
+              <tr><td data-label="">Examples</td><td data-label="Selection">Lasso setting coefficients to 0</td><td data-label="Extraction"><strong>PCA, LDA</strong></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="sub" id="m8-3">
+          <h3><span class="idx">8.3</span>PCA: principal component analysis</h3>
+          <figure class="fig"><svg viewBox="0 0 640 290" role="img" aria-label="PCA: PC1 points along the direction of greatest spread and PC2 is perpendicular to it"><title>PCA: PC1 points along the direction of greatest spread and PC2 is perpendicular to it</title><circle class="s-a" cx="210.6" cy="171.0" r="4" fill-opacity=".55"/><circle class="s-a" cx="355.7" cy="78.8" r="4" fill-opacity=".55"/><circle class="s-a" cx="287.8" cy="110.0" r="4" fill-opacity=".55"/><circle class="s-a" cx="414.3" cy="112.9" r="4" fill-opacity=".55"/><circle class="s-a" cx="429.5" cy="89.1" r="4" fill-opacity=".55"/><circle class="s-a" cx="350.9" cy="129.4" r="4" fill-opacity=".55"/><circle class="s-a" cx="259.2" cy="180.5" r="4" fill-opacity=".55"/><circle class="s-a" cx="211.2" cy="189.9" r="4" fill-opacity=".55"/><circle class="s-a" cx="379.1" cy="125.1" r="4" fill-opacity=".55"/><circle class="s-a" cx="305.1" cy="209.4" r="4" fill-opacity=".55"/><circle class="s-a" cx="319.6" cy="136.0" r="4" fill-opacity=".55"/><circle class="s-a" cx="328.7" cy="133.5" r="4" fill-opacity=".55"/><circle class="s-a" cx="284.5" cy="157.4" r="4" fill-opacity=".55"/><circle class="s-a" cx="490.4" cy="74.7" r="4" fill-opacity=".55"/><circle class="s-a" cx="340.8" cy="157.0" r="4" fill-opacity=".55"/><circle class="s-a" cx="487.5" cy="70.0" r="4" fill-opacity=".55"/><circle class="s-a" cx="289.7" cy="223.1" r="4" fill-opacity=".55"/><circle class="s-a" cx="194.0" cy="197.2" r="4" fill-opacity=".55"/><circle class="s-a" cx="396.5" cy="170.9" r="4" fill-opacity=".55"/><circle class="s-a" cx="218.4" cy="136.8" r="4" fill-opacity=".55"/><circle class="s-a" cx="370.9" cy="114.8" r="4" fill-opacity=".55"/><circle class="s-a" cx="291.6" cy="173.8" r="4" fill-opacity=".55"/><circle class="s-a" cx="341.4" cy="147.5" r="4" fill-opacity=".55"/><circle class="s-a" cx="295.3" cy="192.0" r="4" fill-opacity=".55"/><circle class="s-a" cx="446.8" cy="94.3" r="4" fill-opacity=".55"/><circle class="s-a" cx="288.6" cy="181.6" r="4" fill-opacity=".55"/><circle class="s-a" cx="350.8" cy="111.2" r="4" fill-opacity=".55"/><circle class="s-a" cx="290.7" cy="188.3" r="4" fill-opacity=".55"/><circle class="s-a" cx="309.0" cy="147.0" r="4" fill-opacity=".55"/><circle class="s-a" cx="337.6" cy="141.4" r="4" fill-opacity=".55"/><circle class="s-a" cx="302.5" cy="111.3" r="4" fill-opacity=".55"/><circle class="s-a" cx="468.8" cy="88.5" r="4" fill-opacity=".55"/><circle class="s-a" cx="255.1" cy="202.5" r="4" fill-opacity=".55"/><circle class="s-a" cx="346.1" cy="138.8" r="4" fill-opacity=".55"/><circle class="s-a" cx="428.3" cy="156.2" r="4" fill-opacity=".55"/><circle class="s-a" cx="380.7" cy="161.1" r="4" fill-opacity=".55"/><circle class="s-a" cx="492.2" cy="48.8" r="4" fill-opacity=".55"/><circle class="s-a" cx="283.0" cy="185.2" r="4" fill-opacity=".55"/><circle class="s-a" cx="174.1" cy="208.5" r="4" fill-opacity=".55"/><circle class="s-a" cx="438.0" cy="122.6" r="4" fill-opacity=".55"/><circle class="s-a" cx="351.7" cy="90.2" r="4" fill-opacity=".55"/><circle class="s-a" cx="522.5" cy="73.1" r="4" fill-opacity=".55"/><circle class="s-a" cx="388.9" cy="131.2" r="4" fill-opacity=".55"/><circle class="s-a" cx="162.9" cy="185.4" r="4" fill-opacity=".55"/><circle class="s-a" cx="234.9" cy="234.1" r="4" fill-opacity=".55"/><circle class="s-a" cx="248.0" cy="176.2" r="4" fill-opacity=".55"/><circle class="s-a" cx="303.7" cy="171.0" r="4" fill-opacity=".55"/><circle class="s-a" cx="364.5" cy="136.7" r="4" fill-opacity=".55"/><circle class="s-a" cx="185.9" cy="134.1" r="4" fill-opacity=".55"/><circle class="s-a" cx="336.4" cy="149.2" r="4" fill-opacity=".55"/><circle class="s-a" cx="422.5" cy="101.9" r="4" fill-opacity=".55"/><circle class="s-a" cx="272.3" cy="181.1" r="4" fill-opacity=".55"/><circle class="s-a" cx="180.0" cy="187.2" r="4" fill-opacity=".55"/><circle class="s-a" cx="238.0" cy="193.4" r="4" fill-opacity=".55"/><circle class="s-a" cx="502.6" cy="87.1" r="4" fill-opacity=".55"/><circle class="s-a" cx="418.1" cy="112.1" r="4" fill-opacity=".55"/><circle class="s-a" cx="339.4" cy="130.5" r="4" fill-opacity=".55"/><circle class="s-a" cx="274.6" cy="111.7" r="4" fill-opacity=".55"/><circle class="s-a" cx="207.4" cy="169.1" r="4" fill-opacity=".55"/><circle class="s-a" cx="396.3" cy="132.0" r="4" fill-opacity=".55"/><circle class="s-a" cx="429.9" cy="138.5" r="4" fill-opacity=".55"/><circle class="s-a" cx="303.8" cy="182.6" r="4" fill-opacity=".55"/><circle class="s-a" cx="484.3" cy="76.6" r="4" fill-opacity=".55"/><circle class="s-a" cx="409.9" cy="106.0" r="4" fill-opacity=".55"/><circle class="s-a" cx="185.5" cy="212.8" r="4" fill-opacity=".55"/><circle class="s-a" cx="251.9" cy="183.0" r="4" fill-opacity=".55"/><circle class="s-a" cx="283.9" cy="173.8" r="4" fill-opacity=".55"/><circle class="s-a" cx="159.0" cy="271.9" r="4" fill-opacity=".55"/><circle class="s-a" cx="431.1" cy="92.1" r="4" fill-opacity=".55"/><circle class="s-a" cx="243.6" cy="184.1" r="4" fill-opacity=".55"/><circle class="s-a" cx="380.6" cy="133.2" r="4" fill-opacity=".55"/><circle class="s-a" cx="336.1" cy="95.4" r="4" fill-opacity=".55"/><circle class="s-a" cx="237.0" cy="219.3" r="4" fill-opacity=".55"/><circle class="s-a" cx="326.6" cy="110.4" r="4" fill-opacity=".55"/><circle class="s-a" cx="234.0" cy="153.4" r="4" fill-opacity=".55"/><circle class="s-a" cx="244.8" cy="211.9" r="4" fill-opacity=".55"/><circle class="s-a" cx="311.5" cy="181.1" r="4" fill-opacity=".55"/><circle class="s-a" cx="322.3" cy="112.3" r="4" fill-opacity=".55"/><circle class="s-a" cx="285.6" cy="221.2" r="4" fill-opacity=".55"/><circle class="s-a" cx="245.2" cy="157.7" r="4" fill-opacity=".55"/><circle class="s-a" cx="426.3" cy="104.9" r="4" fill-opacity=".55"/><circle class="s-a" cx="332.8" cy="180.2" r="4" fill-opacity=".55"/><circle class="s-a" cx="173.2" cy="225.6" r="4" fill-opacity=".55"/><circle class="s-a" cx="217.0" cy="161.5" r="4" fill-opacity=".55"/><circle class="s-a" cx="260.8" cy="204.6" r="4" fill-opacity=".55"/><circle class="s-a" cx="291.2" cy="117.8" r="4" fill-opacity=".55"/><circle class="s-a" cx="238.8" cy="223.6" r="4" fill-opacity=".55"/><circle class="s-a" cx="397.8" cy="88.5" r="4" fill-opacity=".55"/><circle class="s-a" cx="524.8" cy="49.8" r="4" fill-opacity=".55"/><circle class="s-a" cx="216.2" cy="192.8" r="4" fill-opacity=".55"/><line class="s-pc1" x1="320.0" y1="150.0" x2="493.6" y2="72.7"/><path class="s-a" d="M493.6,72.7 L484.7,82.2 L480.6,73.0 Z"/><line class="s-pc2" x1="320.0" y1="150.0" x2="348.5" y2="213.9"/><path class="s-b" d="M348.5,213.9 L339.0,205.1 L348.2,201.0 Z"/><text class="t-strong" x="505.1" y="64.3" text-anchor="start">PC1: most variance</text><text class="t-strong" x="345.7" y="235.3" text-anchor="end">PC2: perpendicular, the rest</text></svg><figcaption>PC1 follows the direction in which the data vary most; PC2 is perpendicular and captures most of what is left.</figcaption></figure>
+          <ul>
+            <li><strong>Unsupervised</strong>: never looks at the labels.</li>
+            <li><strong>PC1</strong> = direction of maximum variance; <strong>PC2</strong> = most remaining variance, <strong>orthogonal</strong> to PC1; and so on. Each component is a linear combination of all the features.</li>
+            <li><strong>Explained variance ratio</strong> = the share of total variance each component keeps. 72% + 18% = 90% kept by two components.</li>
+            <li><strong>Standardize first</strong>: PCA follows variance, and big-unit features would dominate.</li>
+          </ul>
+          <figure class="code"><figcaption>Python · Module 8 demo (MNIST)</figcaption><pre><code>pca_2d = PCA(n_components=2)                 # 2 components, for a picture
+X_pca_2d = pca_2d.fit_transform(X_train[:3000])
+pca95 = PCA(n_components=0.95)               # as many components as 95% of the variance needs
+X_reduced = pca95.fit_transform(X_train)
+X_recovered = pca95.inverse_transform(X_reduced)   # rebuild the images</code></pre></figure>
+          <figure class="code out"><figcaption>Output</figcaption><pre><code>Explained variance by PC1 and PC2: [0.099 0.073]   → total 0.172
+Original dimensions: 784 · PCA dimensions: 150 · Retained variance: 0.95</code></pre></figure>
+          <ul class="explain">
+            <li>Two components keep only 17% of the variance, so the 2-D PCA plot of the digits overlaps a lot.</li>
+            <li>150 components keep 95% of the variance of 784 pixels, and the reconstructed digits stay recognizable: compression with little loss.</li>
+            <li><strong>Limitations</strong>: assumes linear structure, components are hard to interpret, and maximum variance is not always the direction that separates the classes.</li>
+          </ul>
+        </div>
+
+        <div class="sub" id="m8-4">
+          <h3><span class="idx">8.4</span>How many components?</h3>
+          <figure class="fig"><svg viewBox="0 0 640 262" role="img" aria-label="Penguin PCA scree plot: PC1 69%, PC2 19.3%, PC3 8.8%, PC4 2.8%; cumulative 69%, 88%, 97%, 100%"><title>Penguin PCA scree plot: PC1 69%, PC2 19.3%, PC3 8.8%, PC4 2.8%; cumulative 69%, 88%, 97%, 100%</title><line class="s-axis" x1="70" y1="236" x2="600" y2="236"/><line class="s-axis" x1="70" y1="236" x2="70" y2="30"/><text x="62.0" y="240.0" text-anchor="end">0</text><text x="62.0" y="188.5" text-anchor="end">0.25</text><text x="62.0" y="137.0" text-anchor="end">0.5</text><text x="62.0" y="85.5" text-anchor="end">0.75</text><text x="62.0" y="34.0" text-anchor="end">1</text><line class="s-dash" x1="70" y1="40.3" x2="600" y2="40.3"/><text x="78.0" y="34.3" text-anchor="start">95% of the variance</text><rect class="s-bar" x="100.0" y="93.9" width="80" height="142.1" rx="3"/><text class="t-in" x="140.0" y="115.9" text-anchor="middle">69%</text><text x="140.0" y="254.0" text-anchor="middle">PC1</text><rect class="s-bar" x="232.0" y="196.2" width="80" height="39.8" rx="3"/><text class="t-strong" x="272.0" y="190.2" text-anchor="middle">19.3%</text><text x="272.0" y="254.0" text-anchor="middle">PC2</text><rect class="s-bar" x="364.0" y="217.9" width="80" height="18.1" rx="3"/><text class="t-strong" x="404.0" y="211.9" text-anchor="middle">8.8%</text><text x="404.0" y="254.0" text-anchor="middle">PC3</text><rect class="s-bar" x="496.0" y="230.2" width="80" height="5.8" rx="3"/><text class="t-strong" x="536.0" y="224.2" text-anchor="middle">2.8%</text><text x="536.0" y="254.0" text-anchor="middle">PC4</text><path class="s-cum" d="M140.0,93.9 L272.0,54.1 L404.0,35.8 L536.0,30.0"/><circle class="s-cumdot" cx="140.0" cy="93.9" r="5"/><circle class="s-cumdot" cx="272.0" cy="54.1" r="5"/><circle class="s-cumdot" cx="404.0" cy="35.8" r="5"/><circle class="s-cumdot" cx="536.0" cy="30.0" r="5"/><text x="282.0" y="74.1" text-anchor="start">88% with 2</text><text x="412.0" y="53.8" text-anchor="start">97% with 3</text></svg><figcaption>Scree plot for the standardized penguin measurements (Modules 7–8 notebook): bars per component, the line is the cumulative variance.</figcaption></figure>
+          <ol class="recipe">
+            <li><strong>Scree plot elbow</strong>: stop where the bars flatten; after it, extra components add little.</li>
+            <li><strong>95% rule</strong>: keep enough components for about 95% of the variance (<code>n_components=0.95</code>). For the penguins, 3 components keep 97%.</li>
+            <li><strong>Check with the model</strong>: compare cross-validated accuracy, because high variance ≠ good predictions.</li>
+          </ol>
+          <figure class="code out"><figcaption>Output · PCA loadings (penguins)</figcaption><pre><code>                     PC1     PC2
+bill_length_mm       0.46    0.60
+bill_depth_mm       -0.40    0.80
+flipper_length_mm    0.58    0.00
+body_mass_g          0.55    0.08</code></pre></figure>
+          <ul class="explain">
+            <li>PC1 grows with flipper length, body mass and bill length: a <strong>body size</strong> axis. PC2 is mostly bill depth and length: <strong>bill shape</strong>.</li>
+            <li>PCA with all 4 components only rotates the axes: same result as the original features.</li>
+          </ul>
+        </div>
+
+        <div class="sub" id="m8-5">
+          <h3><span class="idx">8.5</span>LDA: linear discriminant analysis</h3>
+          <ul>
+            <li><strong>Supervised</strong>: uses the class labels.</li>
+            <li>Finds directions that put <strong>class centres far apart</strong> while keeping <strong>each class tight</strong> (between-class ÷ within-class scatter).</li>
+            <li>At most <strong>C − 1 components</strong>, where C is the number of classes, no matter how many features.</li>
+            <li>Assumes roughly linear relationships and classes that are approximately normal with similar covariance. <strong>Shrinkage</strong> makes it more stable when features are strongly correlated.</li>
+          </ul>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Dataset (class demos)</th><th>Classes</th><th>Max LDA components</th></tr></thead>
+            <tbody>
+              <tr><td data-label="">Breast cancer (malignant / benign)</td><td data-label="Classes">2</td><td data-label="Max LDA components">1</td></tr>
+              <tr><td data-label="">Penguins (3 species)</td><td data-label="Classes">3</td><td data-label="Max LDA components">2 (LD1 carries 88% of the separation, LD2 12%)</td></tr>
+              <tr><td data-label="">MNIST (digits 0–9)</td><td data-label="Classes">10</td><td data-label="Max LDA components">9</td></tr>
+            </tbody>
+          </table></div>
+          <p class="example"><strong>Careful.</strong> LDA's ratio measures <em>class separation</em>; PCA's measures <em>total variance</em>. The two percentages are not comparable.</p>
+        </div>
+
+        <div class="sub" id="m8-6">
+          <h3><span class="idx">8.6</span>PCA vs LDA</h3>
+          <figure class="fig"><svg viewBox="0 0 640 330" role="img" aria-label="Two classes spread left to right: projected on the PCA axis they overlap, projected on the LDA axis they separate"><title>Two classes spread left to right: projected on the PCA axis they overlap, projected on the LDA axis they separate</title><circle class="s-a" cx="221.2" cy="94.4" r="4.5"/><circle class="s-a" cx="455.8" cy="108.9" r="4.5"/><circle class="s-a" cx="444.0" cy="92.5" r="4.5"/><circle class="s-a" cx="354.6" cy="89.3" r="4.5"/><circle class="s-a" cx="183.0" cy="86.9" r="4.5"/><circle class="s-a" cx="419.1" cy="94.7" r="4.5"/><circle class="s-a" cx="286.8" cy="80.4" r="4.5"/><circle class="s-a" cx="310.4" cy="85.6" r="4.5"/><circle class="s-a" cx="323.8" cy="97.3" r="4.5"/><circle class="s-a" cx="81.9" cy="91.0" r="4.5"/><circle class="s-a" cx="167.3" cy="81.8" r="4.5"/><circle class="s-a" cx="190.6" cy="104.2" r="4.5"/><circle class="s-a" cx="389.9" cy="97.4" r="4.5"/><circle class="s-a" cx="242.6" cy="76.3" r="4.5"/><circle class="s-a" cx="280.3" cy="94.2" r="4.5"/><circle class="s-a" cx="312.4" cy="99.5" r="4.5"/><circle class="s-a" cx="282.8" cy="111.6" r="4.5"/><circle class="s-a" cx="388.4" cy="113.8" r="4.5"/><circle class="s-a" cx="345.6" cy="89.5" r="4.5"/><circle class="s-a" cx="231.6" cy="100.8" r="4.5"/><circle class="s-a" cx="429.2" cy="93.7" r="4.5"/><circle class="s-a" cx="362.6" cy="89.0" r="4.5"/><circle class="s-a" cx="276.2" cy="88.8" r="4.5"/><circle class="s-a" cx="123.7" cy="80.9" r="4.5"/><circle class="s-a" cx="323.9" cy="93.4" r="4.5"/><circle class="s-a" cx="433.2" cy="98.9" r="4.5"/><circle class="s-a" cx="363.9" cy="92.5" r="4.5"/><circle class="s-a" cx="83.5" cy="92.5" r="4.5"/><circle class="s-a" cx="227.2" cy="97.3" r="4.5"/><circle class="s-a" cx="290.1" cy="88.3" r="4.5"/><circle class="s-a" cx="263.3" cy="88.7" r="4.5"/><circle class="s-a" cx="114.9" cy="74.5" r="4.5"/><circle class="s-a" cx="446.0" cy="96.7" r="4.5"/><circle class="s-a" cx="273.1" cy="88.1" r="4.5"/><rect class="s-b" x="276.8" y="181.5" width="8" height="8" rx="1.5"/><rect class="s-b" x="369.4" y="145.9" width="8" height="8" rx="1.5"/><rect class="s-b" x="244.8" y="120.0" width="8" height="8" rx="1.5"/><rect class="s-b" x="328.0" y="161.1" width="8" height="8" rx="1.5"/><rect class="s-b" x="412.6" y="148.8" width="8" height="8" rx="1.5"/><rect class="s-b" x="251.6" y="132.9" width="8" height="8" rx="1.5"/><rect class="s-b" x="322.9" y="141.4" width="8" height="8" rx="1.5"/><rect class="s-b" x="195.7" y="164.0" width="8" height="8" rx="1.5"/><rect class="s-b" x="216.7" y="139.9" width="8" height="8" rx="1.5"/><rect class="s-b" x="65.2" y="164.5" width="8" height="8" rx="1.5"/><rect class="s-b" x="298.0" y="145.0" width="8" height="8" rx="1.5"/><rect class="s-b" x="344.6" y="136.6" width="8" height="8" rx="1.5"/><rect class="s-b" x="249.5" y="149.1" width="8" height="8" rx="1.5"/><rect class="s-b" x="228.7" y="149.4" width="8" height="8" rx="1.5"/><rect class="s-b" x="441.5" y="154.2" width="8" height="8" rx="1.5"/><rect class="s-b" x="462.6" y="157.6" width="8" height="8" rx="1.5"/><rect class="s-b" x="496.6" y="149.0" width="8" height="8" rx="1.5"/><rect class="s-b" x="359.6" y="133.9" width="8" height="8" rx="1.5"/><rect class="s-b" x="296.0" y="138.0" width="8" height="8" rx="1.5"/><rect class="s-b" x="307.4" y="134.5" width="8" height="8" rx="1.5"/><rect class="s-b" x="348.3" y="174.2" width="8" height="8" rx="1.5"/><rect class="s-b" x="233.6" y="152.2" width="8" height="8" rx="1.5"/><rect class="s-b" x="380.2" y="137.9" width="8" height="8" rx="1.5"/><rect class="s-b" x="284.1" y="140.1" width="8" height="8" rx="1.5"/><rect class="s-b" x="361.0" y="138.9" width="8" height="8" rx="1.5"/><rect class="s-b" x="587.3" y="155.3" width="8" height="8" rx="1.5"/><rect class="s-b" x="434.5" y="169.5" width="8" height="8" rx="1.5"/><rect class="s-b" x="458.9" y="144.7" width="8" height="8" rx="1.5"/><rect class="s-b" x="353.1" y="146.3" width="8" height="8" rx="1.5"/><rect class="s-b" x="342.8" y="156.5" width="8" height="8" rx="1.5"/><rect class="s-b" x="106.9" y="127.5" width="8" height="8" rx="1.5"/><rect class="s-b" x="280.7" y="150.8" width="8" height="8" rx="1.5"/><rect class="s-b" x="263.2" y="143.7" width="8" height="8" rx="1.5"/><rect class="s-b" x="430.5" y="153.3" width="8" height="8" rx="1.5"/><line class="s-pc1" x1="70.0" y1="192.0" x2="590.0" y2="192.0"/><path class="s-a" d="M590.0,192.0 L578.9,196.7 L578.9,187.3 Z"/><text class="t-strong" x="590.0" y="210.0" text-anchor="end">PCA axis: most variance</text><line class="s-pc2" x1="36.0" y1="176.0" x2="36.0" y2="62.0"/><path class="s-b" d="M36.0,62.0 L40.7,73.1 L31.3,73.1 Z"/><text class="t-strong" x="46.0" y="60.0" text-anchor="start">LDA axis: separates</text><text x="20.0" y="244.0" text-anchor="start">Projected onto the PCA axis: the classes overlap</text><line class="s-axis" x1="40" y1="262" x2="600" y2="262"/><circle class="s-a" cx="221.2" cy="262.0" r="4"/><circle class="s-a" cx="455.8" cy="262.0" r="4"/><circle class="s-a" cx="444.0" cy="262.0" r="4"/><circle class="s-a" cx="354.6" cy="262.0" r="4"/><circle class="s-a" cx="183.0" cy="262.0" r="4"/><circle class="s-a" cx="419.1" cy="262.0" r="4"/><circle class="s-a" cx="286.8" cy="262.0" r="4"/><circle class="s-a" cx="310.4" cy="262.0" r="4"/><circle class="s-a" cx="323.8" cy="262.0" r="4"/><circle class="s-a" cx="81.9" cy="262.0" r="4"/><circle class="s-a" cx="167.3" cy="262.0" r="4"/><circle class="s-a" cx="190.6" cy="262.0" r="4"/><circle class="s-a" cx="389.9" cy="262.0" r="4"/><circle class="s-a" cx="242.6" cy="262.0" r="4"/><circle class="s-a" cx="280.3" cy="262.0" r="4"/><circle class="s-a" cx="312.4" cy="262.0" r="4"/><circle class="s-a" cx="282.8" cy="262.0" r="4"/><circle class="s-a" cx="388.4" cy="262.0" r="4"/><circle class="s-a" cx="345.6" cy="262.0" r="4"/><circle class="s-a" cx="231.6" cy="262.0" r="4"/><circle class="s-a" cx="429.2" cy="262.0" r="4"/><circle class="s-a" cx="362.6" cy="262.0" r="4"/><circle class="s-a" cx="276.2" cy="262.0" r="4"/><circle class="s-a" cx="123.7" cy="262.0" r="4"/><circle class="s-a" cx="323.9" cy="262.0" r="4"/><circle class="s-a" cx="433.2" cy="262.0" r="4"/><circle class="s-a" cx="363.9" cy="262.0" r="4"/><circle class="s-a" cx="83.5" cy="262.0" r="4"/><circle class="s-a" cx="227.2" cy="262.0" r="4"/><circle class="s-a" cx="290.1" cy="262.0" r="4"/><circle class="s-a" cx="263.3" cy="262.0" r="4"/><circle class="s-a" cx="114.9" cy="262.0" r="4"/><circle class="s-a" cx="446.0" cy="262.0" r="4"/><circle class="s-a" cx="273.1" cy="262.0" r="4"/><rect class="s-b" x="277.3" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="369.9" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="245.3" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="328.5" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="413.1" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="252.1" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="323.4" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="196.2" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="217.2" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="65.7" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="298.5" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="345.1" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="250.0" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="229.2" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="442.0" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="463.1" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="497.1" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="360.1" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="296.5" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="307.9" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="348.8" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="234.1" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="380.7" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="284.6" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="361.5" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="587.8" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="435.0" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="459.4" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="353.6" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="343.3" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="107.4" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="281.2" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="263.7" y="258.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="431.0" y="258.5" width="7" height="7" rx="1.5"/><text x="20.0" y="296.0" text-anchor="start">Projected onto the LDA axis: the classes separate</text><line class="s-axis" x1="40" y1="314" x2="600" y2="314"/><circle class="s-a" cx="230.2" cy="314.0" r="4"/><circle class="s-a" cx="276.4" cy="314.0" r="4"/><circle class="s-a" cx="224.1" cy="314.0" r="4"/><circle class="s-a" cx="213.8" cy="314.0" r="4"/><circle class="s-a" cx="206.1" cy="314.0" r="4"/><circle class="s-a" cx="231.1" cy="314.0" r="4"/><circle class="s-a" cx="185.4" cy="314.0" r="4"/><circle class="s-a" cx="202.1" cy="314.0" r="4"/><circle class="s-a" cx="239.4" cy="314.0" r="4"/><circle class="s-a" cx="219.3" cy="314.0" r="4"/><circle class="s-a" cx="189.7" cy="314.0" r="4"/><circle class="s-a" cx="261.3" cy="314.0" r="4"/><circle class="s-a" cx="239.8" cy="314.0" r="4"/><circle class="s-a" cx="172.1" cy="314.0" r="4"/><circle class="s-a" cx="229.5" cy="314.0" r="4"/><circle class="s-a" cx="246.4" cy="314.0" r="4"/><circle class="s-a" cx="285.3" cy="314.0" r="4"/><circle class="s-a" cx="292.1" cy="314.0" r="4"/><circle class="s-a" cx="214.3" cy="314.0" r="4"/><circle class="s-a" cx="250.7" cy="314.0" r="4"/><circle class="s-a" cx="227.8" cy="314.0" r="4"/><circle class="s-a" cx="212.9" cy="314.0" r="4"/><circle class="s-a" cx="212.2" cy="314.0" r="4"/><circle class="s-a" cx="186.9" cy="314.0" r="4"/><circle class="s-a" cx="226.7" cy="314.0" r="4"/><circle class="s-a" cx="244.4" cy="314.0" r="4"/><circle class="s-a" cx="224.0" cy="314.0" r="4"/><circle class="s-a" cx="224.0" cy="314.0" r="4"/><circle class="s-a" cx="239.5" cy="314.0" r="4"/><circle class="s-a" cx="210.5" cy="314.0" r="4"/><circle class="s-a" cx="212.0" cy="314.0" r="4"/><circle class="s-a" cx="166.3" cy="314.0" r="4"/><circle class="s-a" cx="237.4" cy="314.0" r="4"/><circle class="s-a" cx="210.0" cy="314.0" r="4"/><rect class="s-b" x="518.1" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="404.3" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="321.4" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="452.7" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="413.5" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="362.7" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="389.7" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="462.1" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="385.0" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="463.8" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="401.4" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="374.6" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="414.4" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="415.2" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="430.8" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="441.7" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="414.2" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="365.9" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="378.8" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="367.6" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="494.6" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="424.3" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="378.4" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="385.8" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="381.8" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="434.4" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="479.8" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="400.3" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="405.4" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="438.3" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="345.4" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="419.8" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="397.2" y="310.5" width="7" height="7" rx="1.5"/><rect class="s-b" x="427.7" y="310.5" width="7" height="7" rx="1.5"/></svg><figcaption>The classes vary most left to right, so PCA keeps that axis and the classes overlap on it. LDA keeps the axis that separates them.</figcaption></figure>
+          <div class="table-wrap"><table>
+            <thead><tr><th></th><th>PCA</th><th>LDA</th></tr></thead>
+            <tbody>
+              <tr><td data-label="">Learning type</td><td data-label="PCA">Unsupervised</td><td data-label="LDA">Supervised</td></tr>
+              <tr><td data-label="">Maximizes</td><td data-label="PCA">Total variance</td><td data-label="LDA">Class separation</td></tr>
+              <tr><td data-label="">Max components</td><td data-label="PCA">Up to the number of features</td><td data-label="LDA">C − 1</td></tr>
+              <tr><td data-label="">Typical use</td><td data-label="PCA">Compression, visualization, exploration</td><td data-label="LDA">Preprocessing for classification</td></tr>
+              <tr><td data-label="">Main caution</td><td data-label="PCA">High variance may not separate classes</td><td data-label="LDA">Needs labels; linear, normal-ish classes</td></tr>
+            </tbody>
+          </table></div>
+          <figure class="code out"><figcaption>Output · evidence from class (5-fold CV)</figcaption><pre><code>Penguins, linear SVM          Breast cancer, logistic regression
+Original (4)   0.974          Original (30)   0.979
+PCA (2)        0.872          PCA (1)         0.915
+LDA (2)        0.981          LDA (1)         0.955</code></pre></figure>
+          <ul class="explain">
+            <li>PCA (2) kept 88% of the penguin variance yet lost the Adelie–Chinstrap difference: that variance was mostly body size.</li>
+            <li>With the same number of dimensions, LDA wins because it uses the labels. <strong>High variance ≠ class separation.</strong></li>
+          </ul>
+        </div>
+
+        <div class="sub" id="m8-7">
+          <h3><span class="idx">8.7</span>t-SNE: for pictures only</h3>
+          <ul>
+            <li><strong>Nonlinear</strong>; turns distances into neighbourhood probabilities and keeps <strong>local neighbourhoods</strong>: close points stay close, so clusters appear.</li>
+            <li>Used for <strong>visualization</strong> in 2D/3D (images, text, genomics, customer segments).</li>
+            <li>Distances <strong>between</strong> clusters are not meaningful; results depend on <code>perplexity</code>, initialization and the random seed.</li>
+            <li>Slow, and it <strong>does not naturally transform new data</strong>, so it is not used before a classifier.</li>
+          </ul>
+          <div class="table-wrap"><table>
+            <thead><tr><th></th><th>PCA</th><th>t-SNE</th></tr></thead>
+            <tbody>
+              <tr><td data-label="">Type</td><td data-label="PCA">Linear</td><td data-label="t-SNE">Nonlinear</td></tr>
+              <tr><td data-label="">Preserves</td><td data-label="PCA">Maximum variance, global structure</td><td data-label="t-SNE">Local neighbourhoods</td></tr>
+              <tr><td data-label="">Speed</td><td data-label="PCA">Fast</td><td data-label="t-SNE">Computationally expensive</td></tr>
+              <tr><td data-label="">New data</td><td data-label="PCA">Can transform new data</td><td data-label="t-SNE">Does not generalize to new data</td></tr>
+              <tr><td data-label="">Used for</td><td data-label="PCA">Preprocessing and prediction</td><td data-label="t-SNE">Exploratory visualization</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="sub" id="m8-8">
+          <h3><span class="idx">8.8</span>Reduction inside a pipeline, and what the results show</h3>
+          <figure class="code"><figcaption>Python · Modules 7–8 notebook</figcaption><pre><code>pipe = make_pipeline(StandardScaler(),
+                     LinearDiscriminantAnalysis(n_components=2),   # or PCA(n_components=3)
+                     SVC(kernel="linear", C=1))
+scores = cross_val_score(pipe, X_dev, y_dev, cv=cv, scoring="balanced_accuracy")</code></pre></figure>
+          <ul class="explain">
+            <li>Order: <strong>scale → reduce → model</strong>. Inside the pipeline the reducer is refitted on each training fold, so nothing leaks (critical for LDA, which uses labels).</li>
+            <li><code>GridSearchCV</code> can swap the reducer like a hyperparameter. Best: LDA (2) + RBF SVM, 0.988, a tie with the original features (0.985) but with 2 inputs instead of 4.</li>
+          </ul>
+          <figure class="code out"><figcaption>Output · Module 8 demo (MNIST, logistic regression)</figcaption><pre><code>Representation        Dimensions   Test accuracy
+Original pixels          784          0.872
+PCA (95% variance)       150          0.876
+LDA (2 components)         2          0.533</code></pre></figure>
+          <figure class="fig"><svg viewBox="0 0 640 264" role="img" aria-label="MNIST test accuracy rises from 0.533 with 2 LDA components to 0.816 with 9, below 0.872 for the original pixels"><title>MNIST test accuracy rises from 0.533 with 2 LDA components to 0.816 with 9, below 0.872 for the original pixels</title><line class="s-axis" x1="70" y1="220" x2="600" y2="220"/><line class="s-axis" x1="70" y1="220" x2="70" y2="24"/><text x="62.0" y="224.0" text-anchor="end">0.4</text><text x="62.0" y="184.8" text-anchor="end">0.5</text><text x="62.0" y="145.6" text-anchor="end">0.6</text><text x="62.0" y="106.4" text-anchor="end">0.7</text><text x="62.0" y="67.2" text-anchor="end">0.8</text><text x="62.0" y="28.0" text-anchor="end">0.9</text><text x="85.0" y="238.0" text-anchor="middle">2</text><text x="156.4" y="238.0" text-anchor="middle">3</text><text x="227.9" y="238.0" text-anchor="middle">4</text><text x="299.3" y="238.0" text-anchor="middle">5</text><text x="370.7" y="238.0" text-anchor="middle">6</text><text x="442.1" y="238.0" text-anchor="middle">7</text><text x="513.6" y="238.0" text-anchor="middle">8</text><text x="585.0" y="238.0" text-anchor="middle">9</text><text x="335.0" y="256.0" text-anchor="middle">number of LDA components (max 9 for 10 digits)</text><line class="s-dash" x1="70" y1="35.0" x2="600" y2="35.0"/><text x="600.0" y="29.0" text-anchor="end">original 784 pixels: 0.872</text><path class="s-cum" d="M85.0,167.9 L156.4,124.4 L227.9,86.3 L299.3,82.8 L370.7,72.2 L442.1,60.1 L513.6,57.7 L585.0,56.9"/><circle class="s-cumdot" cx="85.0" cy="167.9" r="5"/><circle class="s-cumdot" cx="156.4" cy="124.4" r="5"/><circle class="s-cumdot" cx="227.9" cy="86.3" r="5"/><circle class="s-cumdot" cx="299.3" cy="82.8" r="5"/><circle class="s-cumdot" cx="370.7" cy="72.2" r="5"/><circle class="s-cumdot" cx="442.1" cy="60.1" r="5"/><circle class="s-cumdot" cx="513.6" cy="57.7" r="5"/><circle class="s-cumdot" cx="585.0" cy="56.9" r="5"/><text class="t-strong" x="93.0" y="171.9" text-anchor="start">0.533</text><text class="t-strong" x="585.0" y="76.9" text-anchor="middle">0.816</text></svg><figcaption>More LDA components help, up to the maximum of 9 for ten digits, but even 9 stay below the original pixels.</figcaption></figure>
+          <ul class="explain">
+            <li>PCA kept the accuracy with a fifth of the features: good compression.</li>
+            <li>Two LDA components are great for a plot but throw away too much to separate ten digits. Accuracy depends on the goal: compression, classification or visualization.</li>
+          </ul>
+        </div>
+
+        <div class="check"><p class="check-title">Check yourself</p>
+          <details><summary>Name two problems caused by the curse of dimensionality.</summary><p>Sparse data, distances that become similar (bad for k-NN and clustering), higher computation, and more overfitting.</p></details>
+          <details><summary>Is PCA feature selection or feature extraction?</summary><p>Extraction: it creates new features (components) by combining the original ones.</p></details>
+          <details><summary>Why standardize before PCA?</summary><p>PCA follows variance, so features in large units would dominate the components.</p></details>
+          <details><summary>A dataset has 4 classes. How many LDA components at most?</summary><p>3 (C − 1), whatever the number of features.</p></details>
+          <details><summary>Why can PCA with 88% of the variance classify worse than LDA?</summary><p>PCA ignores the labels; the high-variance directions (penguin body size) did not separate Adelie from Chinstrap. LDA keeps the separating directions.</p></details>
+          <details><summary>Why is t-SNE not used before a classifier?</summary><p>It cannot transform new data, it is slow and setting-sensitive, and only local structure is meaningful. It is for visualization.</p></details>
+        </div>
+      </section>
+
+      <!-- ───────────────────────── Choose ───────────────────────── -->
+      <section class="chapter" id="choose">
+        <header class="chapter-head"><span class="chapter-num">⇄</span><div><p class="eyebrow">Decide</p><h2>Which method or setting?</h2></div></header>
+        <p class="one-liner">Match the tool to the goal: separate classes with a margin (SVM), compress (PCA), separate labelled classes in fewer dimensions (LDA), or just look (t-SNE).</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Situation</th><th>Choose</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td data-label="">Classes look linearly separable, or many features (text)</td><td data-label="Choose">Linear SVM</td><td data-label="Why">Fast, strong baseline</td></tr>
+            <tr><td data-label="">Clearly curved class boundary</td><td data-label="Choose">RBF SVM, tune C and γ by CV</td><td data-label="Why">Flexible nonlinear boundary</td></tr>
+            <tr><td data-label="">Train ≫ CV score with RBF</td><td data-label="Choose">Lower γ and/or C</td><td data-label="Why">Smoother boundary, more regularization</td></tr>
+            <tr><td data-label="">Both train and CV low</td><td data-label="Choose">Raise C or γ, or a nonlinear kernel</td><td data-label="Why">The model is underfitting</td></tr>
+            <tr><td data-label="">Features in different units</td><td data-label="Choose">StandardScaler in the pipeline</td><td data-label="Why">SVM and PCA depend on scale</td></tr>
+            <tr><td data-label="">Predict a number</td><td data-label="Choose">SVR</td><td data-label="Why">ε-tube ignores small errors</td></tr>
+            <tr><td data-label="">Compress unlabelled data</td><td data-label="Choose">PCA (e.g. 95% variance)</td><td data-label="Why">Unsupervised, keeps variance</td></tr>
+            <tr><td data-label="">Fewer dimensions for a classifier, labels available</td><td data-label="Choose">LDA (≤ C − 1)</td><td data-label="Why">Keeps class separation</td></tr>
+            <tr><td data-label="">Explore clusters in a picture</td><td data-label="Choose">t-SNE (or PCA for a quick linear view)</td><td data-label="Why">Preserves local neighbourhoods</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <!-- ───────────────────────── Code cheat sheet ───────────────────────── -->
+      <section class="chapter" id="cheat">
+        <header class="chapter-head"><span class="chapter-num">{ }</span><div><p class="eyebrow">Code</p><h2>Code cheat sheet</h2></div></header>
+        <p class="one-liner">For any line of code, say what it does, what each parameter controls, and why it is there.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Code</th><th>What to say</th></tr></thead>
+          <tbody>
+            <tr><td data-label=""><code>SVC(kernel="linear", C=1)</code></td><td data-label="What to say">Linear SVM; C sets the margin/violation trade-off</td></tr>
+            <tr><td data-label=""><code>SVC(kernel="rbf", C=10, gamma="scale")</code></td><td data-label="What to say">Nonlinear SVM; gamma sets how local each point's influence is</td></tr>
+            <tr><td data-label=""><code>SVC(kernel="poly", degree=3)</code></td><td data-label="What to say">Polynomial kernel; higher degree = more complex boundary</td></tr>
+            <tr><td data-label=""><code>SVC(probability=True)</code></td><td data-label="What to say">Enables predict_proba, needed for ROC-AUC</td></tr>
+            <tr><td data-label=""><code>svc.support_</code></td><td data-label="What to say">Indices of the support vectors</td></tr>
+            <tr><td data-label=""><code>SVR(kernel="rbf", C=100, epsilon=50)</code></td><td data-label="What to say">Regression; errors under 50 inside the tube cost nothing</td></tr>
+            <tr><td data-label=""><code>make_pipeline(StandardScaler(), SVC())</code></td><td data-label="What to say">Scale then fit; each CV fold learns its own scaling (no leakage)</td></tr>
+            <tr><td data-label=""><code>"svc__C": [0.1, 1, 10]</code></td><td data-label="What to say">Grid values for C of the pipeline step named svc</td></tr>
+            <tr><td data-label=""><code>scoring="balanced_accuracy"</code></td><td data-label="What to say">Average recall per class; fair with imbalanced classes</td></tr>
+            <tr><td data-label=""><code>StratifiedKFold(n_splits=5, shuffle=True)</code></td><td data-label="What to say">5 folds that keep the class proportions</td></tr>
+            <tr><td data-label=""><code>PCA(n_components=2)</code></td><td data-label="What to say">Keep 2 components (e.g. for a plot)</td></tr>
+            <tr><td data-label=""><code>PCA(n_components=0.95)</code></td><td data-label="What to say">Keep enough components for 95% of the variance</td></tr>
+            <tr><td data-label=""><code>pca.explained_variance_ratio_</code></td><td data-label="What to say">Share of variance kept by each component</td></tr>
+            <tr><td data-label=""><code>pca.components_</code></td><td data-label="What to say">Loadings: how much each feature contributes to each component</td></tr>
+            <tr><td data-label=""><code>pca.inverse_transform(X_reduced)</code></td><td data-label="What to say">Rebuild the data from the kept components (shows what was lost)</td></tr>
+            <tr><td data-label=""><code>LinearDiscriminantAnalysis(n_components=2)</code></td><td data-label="What to say">Supervised reduction to 2 axes; needs y in fit; at most C − 1</td></tr>
+            <tr><td data-label=""><code>lda.fit_transform(X, y)</code></td><td data-label="What to say">LDA uses the labels; PCA's fit_transform only takes X</td></tr>
+            <tr><td data-label=""><code>TSNE(n_components=2, perplexity=30)</code></td><td data-label="What to say">2-D picture of local neighbourhoods; not for prediction</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <!-- ───────────────────────── Traps ───────────────────────── -->
+      <section class="chapter" id="traps">
+        <header class="chapter-head"><span class="chapter-num">!</span><div><p class="eyebrow">Avoid</p><h2>Common traps</h2></div></header>
+        <p class="one-liner">Most wrong options sound confident. Prefer careful answers: "tie within one SD", "choose by CV", "depends on the data".</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Wrong</th><th>Right</th></tr></thead>
+          <tbody>
+            <tr><td data-label="">"Small C gives a narrow margin"</td><td data-label="Right">Small C = wide margin, more regularization</td></tr>
+            <tr><td data-label="">"Large gamma gives a smoother boundary"</td><td data-label="Right">Large gamma = more local, wiggly boundary</td></tr>
+            <tr><td data-label="">"Every training point shapes the SVM"</td><td data-label="Right">Only the support vectors do</td></tr>
+            <tr><td data-label="">"Trees need scaling, SVMs don't"</td><td data-label="Right">The opposite: SVMs need scaling, trees don't</td></tr>
+            <tr><td data-label="">"The most flexible kernel is the best"</td><td data-label="Right">Compare kernels with cross-validation</td></tr>
+            <tr><td data-label="">"Pick C with the test set"</td><td data-label="Right">Tune with CV on development data; test once</td></tr>
+            <tr><td data-label="">"PCA uses the labels"</td><td data-label="Right">PCA is unsupervised; LDA uses labels</td></tr>
+            <tr><td data-label="">"More variance kept = better classification"</td><td data-label="Right">Not necessarily: PCA (2) 88% variance, 0.872 vs LDA 0.981</td></tr>
+            <tr><td data-label="">"LDA can give as many components as features"</td><td data-label="Right">At most C − 1</td></tr>
+            <tr><td data-label="">"PCA selects the best original features"</td><td data-label="Right">PCA creates new features (extraction)</td></tr>
+            <tr><td data-label="">"Far-apart t-SNE clusters are the most different"</td><td data-label="Right">Between-cluster distances are not meaningful</td></tr>
+            <tr><td data-label="">"Use t-SNE before the classifier"</td><td data-label="Right">t-SNE is for visualization; it cannot transform new data</td></tr>
+            <tr><td data-label="">"Reduction always improves accuracy"</td><td data-label="Right">It can lose information (LDA 2 on MNIST: 0.533)</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <!-- ───────────────────────── Review ───────────────────────── -->
+      <section class="chapter" id="review">
+        <header class="chapter-head"><span class="chapter-num">✓</span><div><p class="eyebrow">The day before</p><h2>Last-minute review</h2></div></header>
+        <p class="one-liner">If you can explain these eight lines, you are ready.</p>
+        <ol class="recipe">
+          <li><strong>SVM</strong> = widest margin; <strong>support vectors</strong> (closest points) define the boundary.</li>
+          <li><strong>Soft margin</strong>: small C = wide margin (may underfit); large C = narrow margin (may overfit).</li>
+          <li><strong>Always scale</strong> for SVM and PCA, inside the pipeline (no leakage).</li>
+          <li><strong>Kernel trick</strong> = curved boundaries without building features. Linear for separable/high-dimensional, RBF for nonlinear; large γ = wiggly.</li>
+          <li><strong>Tune with GridSearchCV</strong> (<code>svc__C</code>), test once; treat gaps under one SD as ties.</li>
+          <li><strong>PCA</strong>: unsupervised, max variance, orthogonal components, 95% rule or scree elbow.</li>
+          <li><strong>LDA</strong>: supervised, max class separation, at most C − 1 components.</li>
+          <li><strong>t-SNE</strong>: local neighbourhoods, visualization only. High variance ≠ class separation.</li>
+        </ol>
+        <p><a class="tile" style="display:inline-block" href="index.html"><strong>Take a Quiz 2 practice run →</strong></a></p>
+      </section>
+    </main>
+  </div>
+
+  <footer class="site-footer">Study aid, not official course material. Built from the Module 7–8 readings, teaching demos and in-class activities.</footer>
+
+  <script>
+    // Contents: highlight the chapter and topic being read, in the side menu and in the phone chip bar.
+    const marks = [...document.querySelectorAll(".chapter, .sub[id]")];
+    const links = [...document.querySelectorAll(".toc a, .toc-chips a")];
+    const chipBar = document.querySelector(".toc-chips");
+    let ticking = false;
+    function spy() {
+      ticking = false;
+      const current = marks.filter((el) => el.getBoundingClientRect().top <= 110);
+      const chapter = [...current].reverse().find((el) => el.classList.contains("chapter")) || marks[0];
+      const sub = [...current].reverse().find((el) => el.classList.contains("sub") && chapter.contains(el));
+      for (const a of links) a.classList.toggle("active", a.hash === `#${chapter.id}` || (!!sub && a.hash === `#${sub.id}`));
+      for (const li of document.querySelectorAll(".toc > ol > li")) li.classList.toggle("open", li.firstElementChild.hash === `#${chapter.id}`);
+      const chip = chipBar.querySelector(`a[href="#${chapter.id}"]`);
+      if (chip && getComputedStyle(chipBar).display !== "none") chipBar.scrollTo({ left: chip.offsetLeft - chipBar.clientWidth / 2 + chip.clientWidth / 2, behavior: "smooth" });
+    }
+    addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(spy); } }, { passive: true });
+    spy();
+  </script>
+</body>
+</html>
