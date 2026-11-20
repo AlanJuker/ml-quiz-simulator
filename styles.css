@@ -151,6 +151,20 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 }
 
 /* Midterm length picker */
+/* Quiz 2: multiple-choice options, answer review and the legacy link */
+.options { display: grid; gap: 8px; }
+.option { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; cursor: pointer; }
+.option:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.option input { margin-top: 4px; accent-color: var(--accent); }
+.letter { font-weight: 700; color: var(--muted); min-width: 1.2em; }
+.answer-line { padding: 6px 10px; border-radius: 6px; margin: 4px 0; }
+.answer-line.good { background: var(--good-soft); }
+.answer-line.bad { background: var(--bad-soft); }
+.explanation { margin-top: 10px; color: var(--muted); }
+.legacy { margin: 8px 0 16px; color: var(--muted); }
+.legacy summary { cursor: pointer; font-size: .85rem; font-weight: 600; }
+.legacy p { margin: 6px 0 0; }
+
 .modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin: 0 0 16px; padding: 0; border: 0; }
 .modes legend { margin-bottom: 8px; padding: 0; font-weight: 600; }
 .mode { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; cursor: pointer; }
@@ -328,3 +342,28 @@ figure.code pre { margin: 0; border: 0; border-radius: 0; }
   .chapter-num { width: 44px; height: 44px; font-size: 1.15rem; }
   .chapter-head h2 { font-size: 1.3rem; }
 }
+
+/* Study guide diagrams: inline SVG whose colours follow the light/dark theme */
+figure.fig { margin: 14px 0; overflow-x: auto; }
+figure.fig svg { display: block; width: 100%; min-width: 520px; height: auto; } /* phones scroll instead of shrinking the text */
+figure.fig figcaption { margin-top: 6px; color: var(--muted); font-size: .85rem; text-align: center; }
+.s-axis { stroke: var(--muted); stroke-width: 1.2; fill: none; }
+.s-line { stroke: var(--text); stroke-width: 2.5; fill: none; }
+.s-dash { stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 6 4; fill: none; }
+.s-a { fill: var(--accent); }
+.s-b { fill: var(--warn); }
+.s-ring { fill: none; stroke: var(--text); stroke-width: 1.8; }
+.s-arrow { stroke: var(--good); stroke-width: 2.5; fill: none; }
+.s-head { fill: var(--good); }
+.s-pc1 { stroke: var(--accent); stroke-width: 3.5; fill: none; }
+.s-pc2 { stroke: var(--warn); stroke-width: 3.5; fill: none; }
+.s-bar { fill: var(--accent); fill-opacity: .75; }
+.s-cum { stroke: var(--warn); stroke-width: 2.5; fill: none; }
+.s-cumdot { fill: var(--warn); }
+.s-good { stroke: var(--good); stroke-width: 2.5; fill: none; }
+.s-panel { fill: var(--bg); stroke: var(--border); }
+.s-zone { fill: var(--accent); fill-opacity: .08; }
+svg text { fill: var(--muted); font: 12px system-ui, -apple-system, "Segoe UI", sans-serif; }
+svg .t-strong { fill: var(--text); font-weight: 700; }
+svg .t-big { font-size: 14px; }
+svg .t-in { fill: #fff; font-weight: 700; }
