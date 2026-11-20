@@ -1,7 +1,7 @@
 {
   "name": "ml-quiz-simulator",
   "version": "1.0.0",
-  "description": "Midterm simulator and study guide for Machine Learning Modules 2-6.",
+  "description": "Quiz 2 practice and study guide for Machine Learning Modules 7-8 (SVM and dimensionality reduction), plus the legacy Modules 2-6 midterm.",
   "private": true,
   "license": "MIT",
   "scripts": {
