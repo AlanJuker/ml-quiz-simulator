@@ -1,10 +1,9 @@
-/* global MIDTERM, buildMidterm, suggestPoints, itemScore, grade */
+/* global MIDTERM, buildMidterm, markDone, suggestPoints, itemScore, grade */
 // UI layer: renders the four screens (start → midterm → self-marking → results) into #app.
 
 const app = document.getElementById("app");
 const HISTORY_KEY = "mlquiz.history";
-const SEEN_KEY = "mlquiz.midterm.seen"; // question id → times shown, so new attempts prefer unseen ones
-const LAST_KEY = "mlquiz.midterm.last"; // the previous attempt's question ids, never repeated straight away
+const SEEN_KEY = "mlquiz.midterm.seen"; // question id → { n, at }: times completed and when, so attempts walk the bank
 const PASS_MARK = 70;
 // Quick is the default; the full exam is the real midterm: 6 questions × 5 marks in 50 minutes.
 // Shorter lengths keep the same time per question (about 8 minutes).
@@ -52,8 +51,9 @@ function renderStart() {
       <p class="muted">Written questions from Modules 2–6 (mostly 4, 5 and 6), in the format of the real midterm:
       workflow and methodology, Python code interpretation, and model output interpretation and method selection,
       5 marks each. Answer closed book: the clock gives you the real exam's time per question and submits when it runs
-      out. Every new attempt gives you different questions: the ones you haven't seen come first. After you submit,
-      you mark your answers against a model answer and a rubric worth one mark per key point.</p>
+      out. Every new attempt continues through the bank with questions you have not done yet; an attempt counts once
+      you submit it, so an unfinished one gives the same questions next time. After you submit, you mark your answers
+      against a model answer and a rubric worth one mark per key point.</p>
       <fieldset class="modes"><legend>Choose a length</legend>
         ${Object.entries(MODES).map(([k, m]) => `
           <label class="mode"><input type="radio" name="mode" value="${k}" ${k === "quick" ? "checked" : ""}>
@@ -80,14 +80,10 @@ function renderStart() {
     </section>` : ""}`;
 }
 
-// An attempt counts as seen as soon as it starts, so even an abandoned attempt is not repeated next time.
+// Questions are recorded only when the attempt is submitted, so an unfinished attempt comes back unchanged.
 function startMidterm(mode) {
-  const seen = load(SEEN_KEY, {});
   const { perSection, total } = MODES[mode];
-  const items = buildMidterm(MIDTERM, { seen, last: load(LAST_KEY, []), perSection, total });
-  items.forEach((it) => (seen[it.q.id] = (seen[it.q.id] || 0) + 1));
-  save(SEEN_KEY, seen);
-  save(LAST_KEY, items.map((it) => it.q.id));
+  const items = buildMidterm(MIDTERM, { seen: load(SEEN_KEY, {}), perSection, total });
   state = { screen: "quiz", mode, items, index: 0, startedAt: Date.now(), saved: false };
   state.timerId = setInterval(tick, 1000);
   renderQuestion();
@@ -163,6 +159,7 @@ function submit(timeUp = false) {
   const missing = state.items.filter((it) => !isAnswered(it)).length;
   if (!timeUp && missing && !confirm(`You have ${missing} unanswered question${missing > 1 ? "s" : ""}. Submit anyway?`)) return;
   clearInterval(state.timerId);
+  save(SEEN_KEY, markDone(load(SEEN_KEY, {}), state.items.map((it) => it.q.id)));
   state.timeUp = timeUp;
   state.finishedAt = Date.now();
   const answered = state.items.filter(isAnswered);

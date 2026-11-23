@@ -1,7 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const QUIZ2 = require("../quiz2-bank.js");
-const { buildQuiz, suggestPoints, itemScore, grade } = require("../quiz2.js");
+const { buildQuiz, markDone, suggestPoints, itemScore, grade } = require("../quiz2.js");
 
 const REAL = { mcCount: 10, openCount: 2 };
 const QUICK = { mcCount: 5, openCount: 1 };
@@ -57,26 +57,33 @@ test("quick, multiple-choice-only and short-answer-only lengths", () => {
   assert.deepEqual(buildQuiz(QUIZ2, OPEN).map((it) => it.q.type), ["open"]);
 });
 
-test("the Module 7 / Module 8 split varies between attempts, as in a random draw", () => {
-  const splits = new Set();
-  for (let i = 0; i < 200; i++) splits.add(buildQuiz(QUIZ2, REAL).filter((it) => it.q.module === 7).length);
-  assert.ok(splits.size >= 3, `only saw splits ${[...splits]}`);
+test("selection is not random, and an unfinished attempt gives the same questions again", () => {
+  const ids = (seen) => buildQuiz(QUIZ2, { ...REAL, seen }).map((it) => it.q.id);
+  assert.deepEqual(ids({}), ids({}), "same history, same questions");
+  const first = ids({});
+  assert.deepEqual(ids({}), first, "nothing recorded (unfinished), so the next start is identical");
+  assert.ok(!ids(markDone({}, first, 1)).some((id) => first.includes(id)), "after submitting, all new questions");
 });
 
-// Runs attempts the way the app does: each one counts as seen and becomes `last` as soon as it starts.
+test("every real attempt mixes both modules", () => {
+  for (const ids of attempts(10, REAL)) {
+    const m7 = ids.filter((id) => id.startsWith("q7")).length;
+    assert.ok(m7 >= 4 && m7 <= 8, `Module 7 questions: ${m7} of 12`);
+  }
+});
+
+// Runs submitted attempts the way the app does: each one is recorded with markDone when it is submitted.
 function attempts(n, size) {
-  const seen = {};
-  let last = [];
-  return Array.from({ length: n }, () => {
+  let seen = {};
+  return Array.from({ length: n }, (_, i) => {
     const options = typeof size === "function" ? size() : size;
-    const ids = buildQuiz(QUIZ2, { ...options, seen, last }).map((it) => it.q.id);
-    ids.forEach((id) => (seen[id] = (seen[id] || 0) + 1));
-    last = ids;
+    const ids = buildQuiz(QUIZ2, { ...options, seen }).map((it) => it.q.id);
+    seen = markDone(seen, ids, i + 1);
     return ids;
   });
 }
 
-test("unseen questions come first: 7 real attempts cover the whole bank", () => {
+test("attempts walk through the bank: 7 real attempts cover every question", () => {
   const shown = new Set(attempts(7, REAL).flat());
   assert.deepEqual(QUIZ2.filter((q) => !shown.has(q.id)).map((q) => q.id), []);
 });

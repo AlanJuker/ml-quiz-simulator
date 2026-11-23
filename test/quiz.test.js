@@ -1,26 +1,32 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const MIDTERM = require("../midterm.js");
-const { buildMidterm, suggestPoints, itemScore, grade } = require("../quiz.js");
+const { buildMidterm, markDone, suggestPoints, itemScore, grade } = require("../quiz.js");
 
 const SECTIONS = ["Workflow & methodology", "Python code interpretation", "Model output interpretation & method selection"];
 
-// Runs attempts the way the app does: each one counts as seen and becomes `last` as soon as it starts.
+// Runs submitted attempts the way the app does: each one is recorded with markDone when it is submitted.
 // `size` is the mode's options ({ perSection } or { total }), or a function returning them, to mix modes.
 const FULL = { perSection: 2 };
 const QUICK = { perSection: 1 };
 const SINGLE = { total: 1 };
 function attempts(n, size = FULL) {
-  const seen = {};
-  let last = [];
-  return Array.from({ length: n }, () => {
+  let seen = {};
+  return Array.from({ length: n }, (_, i) => {
     const mode = typeof size === "function" ? size() : size;
-    const ids = buildMidterm(MIDTERM, { seen, last, ...mode }).map((it) => it.q.id);
-    ids.forEach((id) => (seen[id] = (seen[id] || 0) + 1));
-    last = ids;
+    const ids = buildMidterm(MIDTERM, { seen, ...mode }).map((it) => it.q.id);
+    seen = markDone(seen, ids, i + 1);
     return ids;
   });
 }
+
+test("selection is not random, and an unfinished attempt gives the same questions again", () => {
+  const ids = (seen) => buildMidterm(MIDTERM, { seen, ...FULL }).map((it) => it.q.id);
+  assert.deepEqual(ids({}), ids({}), "same history, same questions");
+  const first = ids({});
+  assert.deepEqual(ids({}), first, "nothing recorded (unfinished), so the next start is identical");
+  assert.ok(!ids(markDone({}, first, 1)).some((id) => first.includes(id)), "after submitting, all new questions");
+});
 
 test("midterm bank: 10 written questions per section, 5 marks each, one key point per mark", () => {
   const ids = new Set();

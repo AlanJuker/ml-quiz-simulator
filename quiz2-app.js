@@ -1,10 +1,9 @@
-/* global QUIZ2, buildQuiz, suggestPoints, itemScore, grade */
+/* global QUIZ2, buildQuiz, markDone, suggestPoints, itemScore, grade */
 // UI layer for Quiz 2: renders the four screens (setup → quiz → self-grading → results) into #app.
 
 const app = document.getElementById("app");
 const HISTORY_KEY = "mlquiz.quiz2.history";
-const SEEN_KEY = "mlquiz.quiz2.seen"; // question id → times shown, so new attempts prefer unseen ones
-const LAST_KEY = "mlquiz.quiz2.last"; // the previous attempt's question ids, never repeated straight away
+const SEEN_KEY = "mlquiz.quiz2.seen"; // question id → { n, at }: times completed and when, so attempts walk the bank
 const PASS_MARK = 70;
 const LETTERS = "ABCD";
 // Quiz 2 is 10 multiple choice + 2 short answer on Modules 7 and 8. Quick is the default. No time limit has
@@ -52,10 +51,10 @@ function renderSetup(format = "quick") {
       <h2>Quiz 2 practice</h2>
       <p class="muted">Questions on Module 7 (support vector machines) and Module 8 (dimensionality reduction).
       <strong>Real Quiz 2</strong> has 10 multiple-choice and 2 short-answer questions; <strong>Quick</strong> has 5 + 1.
-      Questions come at random from a bank split evenly between the two modules, so an attempt can lean toward one
-      module, as the real quiz can. About 1 in 5 multiple-choice questions asks you to read code or a model output.
-      Every new attempt shows the questions you have seen least. After you submit, you mark your short answers against
-      a model answer and a rubric.</p>
+      Each attempt mixes both modules. About 1 in 5 multiple-choice questions asks you to read code or a model output.
+      Every new attempt continues through the bank with questions you have not done yet, so nothing repeats until you
+      have done them all. An attempt counts once you submit it; if you leave one unfinished, you get the same questions
+      next time. After you submit, you mark your short answers against a model answer and a rubric.</p>
       <fieldset class="modes"><legend>Choose a length</legend>
         ${Object.entries(FORMATS).map(([k, f]) => `
           <label class="mode"><input type="radio" name="format" value="${k}" ${k === format ? "checked" : ""}>
@@ -87,14 +86,10 @@ function renderSetup(format = "quick") {
     </details>`;
 }
 
-// An attempt counts as seen as soon as it starts, so even an abandoned attempt is not repeated next time.
+// Questions are recorded only when the attempt is submitted, so an unfinished attempt comes back unchanged.
 function startQuiz(format) {
   const f = FORMATS[format];
-  const seen = load(SEEN_KEY, {});
-  const items = buildQuiz(QUIZ2, { mcCount: f.mc, openCount: f.open, seen, last: load(LAST_KEY, []) });
-  items.forEach((it) => (seen[it.q.id] = (seen[it.q.id] || 0) + 1));
-  save(SEEN_KEY, seen);
-  save(LAST_KEY, items.map((it) => it.q.id));
+  const items = buildQuiz(QUIZ2, { mcCount: f.mc, openCount: f.open, seen: load(SEEN_KEY, {}) });
   state = { screen: "quiz", format, items, index: 0, startedAt: Date.now(), saved: false };
   state.timerId = setInterval(tick, 1000);
   renderQuestion();
@@ -173,6 +168,7 @@ function submit() {
   if (missing && !confirm(`You have ${missing} unanswered question${missing > 1 ? "s" : ""}. Submit anyway?`)) return;
   clearInterval(state.timerId);
   state.finishedAt = Date.now();
+  save(SEEN_KEY, markDone(load(SEEN_KEY, {}), state.items.map((it) => it.q.id)));
   const open = state.items.filter((it) => it.q.type === "open" && it.text.trim());
   open.forEach((it) => (it.points = suggestPoints(it.q, it.text)));
   if (open.length) renderSelfGrade();

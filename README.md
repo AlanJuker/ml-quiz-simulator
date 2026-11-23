@@ -17,8 +17,8 @@ Questions come from a bank of 69: 59 multiple choice (28 on Module 7, 31 on Modu
 | Quick open | 1 short answer |
 | Real Quiz 2 | 10 multiple choice + 2 short answer |
 
-- **Like the real draw:** questions are picked at random from a bank split about evenly between the two modules, so an attempt can be 5–5 or lean 7–3 toward one module.
-- **Always a different attempt:** questions you have seen least come first, so 7 Real Quiz 2 attempts cover the whole bank. An attempt counts as soon as it starts, and the next one never repeats any of its questions. The start screen shows how much of the bank you have seen.
+- **Always a different attempt, never random:** each attempt takes the questions you have completed the fewest times, then the ones done longest ago, following a fixed walk through the bank that alternates Module 7 and Module 8. Nothing repeats until you have done every question (7 Real Quiz 2 attempts cover the whole bank), and every attempt mixes both modules. The start screen shows how much of the bank you have seen.
+- **Unfinished attempts come back:** an attempt counts only once you submit it, so if you leave one unfinished, the next start gives you the same questions.
 - **During the attempt:** a question navigator, flags, a clock showing the time used (no time limit has been announced), and shortcuts (`1`–`4` / `A`–`D` to answer, `←` `→` to move, `F` to flag).
 - **Marking:** multiple-choice answers are marked automatically, with an explanation for each question. Short answers are self-marked against a model answer and a rubric; points are pre-ticked by keyword matching and you confirm or correct them. You get a score against a 70% pass mark and a breakdown by module and question type.
 - Past attempts and the questions you have seen are saved in your browser.
@@ -52,7 +52,7 @@ npm start          # python3 -m http.server 8000 → http://localhost:8000
 npm test           # node --test (Node 20+)
 ```
 
-For Quiz 2, the tests check that the bank is well formed, that every model answer earns full marks under its rubric, that each module is about half of the bank, that each length has the right questions in the right order, that the module split varies between attempts, that 7 real attempts cover the bank, that consecutive attempts never share a question, and that scoring and partial credit work. The legacy midterm keeps its own tests. CI runs them on every push.
+For Quiz 2, the tests check that the bank is well formed, that every model answer earns full marks under its rubric, that each module is about half of the bank, that each length has the right questions in the right order, that selection is deterministic and an unfinished attempt repeats, that every real attempt mixes both modules, that 7 real attempts cover the bank, that consecutive attempts never share a question, and that scoring and partial credit work. The legacy midterm keeps its own tests. CI runs them on every push.
 
 ## Project structure
 
