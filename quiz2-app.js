@@ -3,7 +3,7 @@
 
 const app = document.getElementById("app");
 const HISTORY_KEY = "mlquiz.quiz2.history";
-const INSTANT_KEY = "mlquiz.quiz2.instant"; // remembers the "Instant feedback" choice
+const INSTANT_KEY = "mlquiz.quiz2.feedback"; // remembers the "Instant feedback" choice (on by default)
 const SEEN_KEY = "mlquiz.quiz2.seen"; // question id → { n, at }: times completed and when, so attempts walk the bank
 const PASS_MARK = 70;
 const LETTERS = "ABCD";
@@ -62,7 +62,7 @@ function renderSetup(format = "quick") {
             <span><strong>${f.title}</strong>${k === "quick" ? ' <span class="pill">Default</span>' : ""}<br>
             <span class="muted small">${f.detail}</span></span></label>`).join("")}
       </fieldset>
-      <label class="mode" style="margin-bottom: 16px"><input type="checkbox" id="instant" ${load(INSTANT_KEY, false) ? "checked" : ""}>
+      <label class="mode" style="margin-bottom: 16px"><input type="checkbox" id="instant" ${load(INSTANT_KEY, true) ? "checked" : ""}>
         <span><strong>Instant feedback</strong><br><span class="muted small">See if each answer is right, with the explanation,
         as soon as you pick it (answers lock once chosen). Short answers get a "Show model answer" button.</span></span></label>
       <div class="bar-row" style="margin-bottom: 16px">
