@@ -19,6 +19,7 @@ Questions come from a bank of 69: 59 multiple choice (28 on Module 7, 31 on Modu
 
 - **Always a different attempt, never random:** each attempt takes the questions you have completed the fewest times, then the ones done longest ago, following a fixed walk through the bank that alternates Module 7 and Module 8. Nothing repeats until you have done every question (7 Real Quiz 2 attempts cover the whole bank), and every attempt mixes both modules. The start screen shows how much of the bank you have seen.
 - **Unfinished attempts come back:** an attempt counts only once you submit it, so if you leave one unfinished, the next start gives you the same questions.
+- **Instant feedback (optional):** tick it on the start screen to see whether each multiple-choice answer is right, with its explanation, as soon as you pick it (the answer then locks). Short answers get a "Show model answer" button. The choice is remembered.
 - **During the attempt:** a question navigator, flags, a clock showing the time used (no time limit has been announced), and shortcuts (`1`–`4` / `A`–`D` to answer, `←` `→` to move, `F` to flag).
 - **Marking:** multiple-choice answers are marked automatically, with an explanation for each question. Short answers are self-marked against a model answer and a rubric; points are pre-ticked by keyword matching and you confirm or correct them. You get a score against a 70% pass mark and a breakdown by module and question type.
 - Past attempts and the questions you have seen are saved in your browser.

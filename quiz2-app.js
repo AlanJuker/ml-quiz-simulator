@@ -3,6 +3,7 @@
 
 const app = document.getElementById("app");
 const HISTORY_KEY = "mlquiz.quiz2.history";
+const INSTANT_KEY = "mlquiz.quiz2.instant"; // remembers the "Instant feedback" choice
 const SEEN_KEY = "mlquiz.quiz2.seen"; // question id → { n, at }: times completed and when, so attempts walk the bank
 const PASS_MARK = 70;
 const LETTERS = "ABCD";
@@ -17,7 +18,7 @@ const FORMATS = {
 // Each format has a different number of questions, so an attempt's length tells its format.
 const formatName = (total) => Object.values(FORMATS).find((f) => f.mc + f.open === total)?.title ?? `${total} questions`;
 
-let state = null; // { screen, format, items, index, startedAt, finishedAt, timerId, saved }
+let state = null; // { screen, format, instant, items, index, startedAt, finishedAt, timerId, saved }
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const fmt = (sec) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
@@ -61,6 +62,9 @@ function renderSetup(format = "quick") {
             <span><strong>${f.title}</strong>${k === "quick" ? ' <span class="pill">Default</span>' : ""}<br>
             <span class="muted small">${f.detail}</span></span></label>`).join("")}
       </fieldset>
+      <label class="mode" style="margin-bottom: 16px"><input type="checkbox" id="instant" ${load(INSTANT_KEY, false) ? "checked" : ""}>
+        <span><strong>Instant feedback</strong><br><span class="muted small">See if each answer is right, with the explanation,
+        as soon as you pick it (answers lock once chosen). Short answers get a "Show model answer" button.</span></span></label>
       <div class="bar-row" style="margin-bottom: 16px">
         <span>Seen ${seenCount} / ${QUIZ2.length}</span>
         <div class="bar"><span style="width: ${seenPct}%"></span></div>
@@ -87,10 +91,10 @@ function renderSetup(format = "quick") {
 }
 
 // Questions are recorded only when the attempt is submitted, so an unfinished attempt comes back unchanged.
-function startQuiz(format) {
+function startQuiz(format, instant) {
   const f = FORMATS[format];
   const items = buildQuiz(QUIZ2, { mcCount: f.mc, openCount: f.open, seen: load(SEEN_KEY, {}) });
-  state = { screen: "quiz", format, items, index: 0, startedAt: Date.now(), saved: false };
+  state = { screen: "quiz", format, instant, items, index: 0, startedAt: Date.now(), saved: false };
   state.timerId = setInterval(tick, 1000);
   renderQuestion();
 }
@@ -118,6 +122,7 @@ function renderQuestion() {
   const it = items[index];
   const q = it.q;
   const last = index === items.length - 1;
+  const feedback = state.instant && q.type === "mc" && it.choice !== null; // instant mode: answer locked, show the verdict
   app.innerHTML = `
     <div class="topbar">
       <strong>Question ${index + 1} of ${items.length}</strong>
@@ -139,10 +144,17 @@ function renderQuestion() {
       ${q.type === "mc"
         ? `<div class="options" role="radiogroup" aria-labelledby="prompt">
             ${it.order.map((orig, i) => `
-              <label class="option"><input type="radio" name="opt" value="${i}" ${it.choice === i ? "checked" : ""}>
+              <label class="option ${feedback ? (orig === q.answer ? "right" : it.choice === i ? "wrong" : "") : ""}">
+              <input type="radio" name="opt" value="${i}" ${it.choice === i ? "checked" : ""} ${feedback ? "disabled" : ""}>
               <span class="letter">${LETTERS[i]}</span><span>${esc(q.options[orig])}</span></label>`).join("")}
-          </div>`
-        : `<textarea id="open-answer" aria-labelledby="prompt" placeholder="Write your answer as you would in the quiz…">${esc(it.text)}</textarea>`}
+          </div>
+          ${feedback ? `<div class="feedback ${it.order[it.choice] === q.answer ? "right" : "wrong"}" role="status">
+            <strong>${it.order[it.choice] === q.answer ? "✓ Correct" : `✗ Not quite. The answer is ${LETTERS[it.order.indexOf(q.answer)]}.`}</strong>
+            <p>${esc(q.explanation)}</p></div>` : ""}`
+        : `<textarea id="open-answer" aria-labelledby="prompt" placeholder="Write your answer as you would in the quiz…">${esc(it.text)}</textarea>
+          ${state.instant ? `<details class="feedback"><summary>Show model answer</summary>
+            <p>${esc(q.modelAnswer)}</p>
+            <ul>${q.keyPoints.map((p) => `<li>${esc(p.text)}</li>`).join("")}</ul></details>` : ""}`}
     </section>
     <div class="row spread">
       <div class="row">
@@ -285,7 +297,11 @@ app.addEventListener("click", (e) => {
   const goto = e.target.closest("[data-goto]");
   if (goto) return go(Number(goto.dataset.goto));
   const act = e.target.closest("[data-act]")?.dataset.act;
-  if (act === "start") startQuiz(document.querySelector('input[name="format"]:checked')?.value ?? "quick");
+  if (act === "start") {
+    const instant = document.getElementById("instant").checked;
+    save(INSTANT_KEY, instant);
+    startQuiz(document.querySelector('input[name="format"]:checked')?.value ?? "quick", instant);
+  }
   else if (act === "prev") go(state.index - 1);
   else if (act === "next") go(state.index + 1);
   else if (act === "flag") {
@@ -293,7 +309,7 @@ app.addEventListener("click", (e) => {
     renderQuestion();
   } else if (act === "submit") submit();
   else if (act === "results") renderResults();
-  else if (act === "retake") startQuiz(state.format);
+  else if (act === "retake") startQuiz(state.format, state.instant);
   else if (act === "home") renderSetup(state.format);
   else if (act === "clear-history" && confirm("Delete all saved attempts?")) {
     save(HISTORY_KEY, []);
@@ -305,7 +321,8 @@ app.addEventListener("change", (e) => {
   const t = e.target;
   if (t.name === "opt") {
     state.items[state.index].choice = Number(t.value);
-    updateProgress();
+    if (state.instant) renderQuestion(); // show the verdict and explanation
+    else updateProgress();
   } else if (t.dataset.point !== undefined) {
     state.items[Number(t.dataset.item)].points[Number(t.dataset.point)] = t.checked;
   } else if (t.id === "only-mistakes") {
@@ -330,7 +347,7 @@ document.addEventListener("keydown", (e) => {
   } else if (key === "f") {
     it.flagged = !it.flagged;
     renderQuestion();
-  } else if (it.q.type === "mc" && opt >= 0) {
+  } else if (it.q.type === "mc" && opt >= 0 && !(state.instant && it.choice !== null)) {
     it.choice = opt;
     renderQuestion();
   }

@@ -367,3 +367,13 @@ svg text { fill: var(--muted); font: 12px system-ui, -apple-system, "Segoe UI", 
 svg .t-strong { fill: var(--text); font-weight: 700; }
 svg .t-big { font-size: 14px; }
 svg .t-in { fill: #fff; font-weight: 700; }
+
+/* Instant feedback mode */
+.options .option.right { border-color: var(--good); background: var(--good-soft); }
+.options .option.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.option:has(input:disabled) { cursor: default; }
+.feedback { margin-top: 12px; padding: 12px 14px; border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; }
+.feedback.right { border-left-color: var(--good); background: var(--good-soft); }
+.feedback.wrong { border-left-color: var(--bad); background: var(--bad-soft); }
+.feedback p { margin: 6px 0 0; }
+.feedback summary { cursor: pointer; font-weight: 600; }
