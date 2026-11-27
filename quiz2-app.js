@@ -116,7 +116,8 @@ function navClass(it, i) {
 function updateProgress() {
   const { items } = state;
   document.querySelector(".progress > span").style.width = `${(items.filter(isAnswered).length / items.length) * 100}%`;
-  document.querySelector(`[data-goto="${state.index}"]`).className = navClass(items[state.index], state.index);
+  const btn = document.querySelector(`[data-goto="${state.index}"]`); // no navigator in the Marathon
+  if (btn) btn.className = navClass(items[state.index], state.index);
 }
 
 function renderQuestion() {
@@ -131,10 +132,10 @@ function renderQuestion() {
       <span class="timer" id="timer" role="timer">${timerText()}</span>
     </div>
     <div class="progress" aria-hidden="true"><span style="width: ${(items.filter(isAnswered).length / items.length) * 100}%"></span></div>
-    <nav class="nav" aria-label="Question navigator">
+    ${items.length > 12 ? "" : `<nav class="nav" aria-label="Question navigator">
       ${items.map((x, i) => `<button type="button" data-goto="${i}" class="${navClass(x, i)}"
         aria-label="Question ${i + 1}${isAnswered(x) ? ", answered" : ""}${x.flagged ? ", flagged" : ""}">${i + 1}</button>`).join("")}
-    </nav>
+    </nav>`}
     <section class="card">
       <div class="badges">
         <span class="badge">Module ${q.module}</span>
@@ -161,14 +162,14 @@ function renderQuestion() {
     <div class="row spread">
       <div class="row">
         <button data-act="prev" ${index === 0 ? "disabled" : ""}>← Previous</button>
-        <button data-act="flag">${it.flagged ? "Unflag" : "Flag for review"}</button>
+        ${items.length > 12 ? "" : `<button data-act="flag">${it.flagged ? "Unflag" : "Flag for review"}</button>`}
       </div>
       <div class="row">
         ${last ? "" : '<button class="primary" data-act="next">Next →</button>'}
         <button data-act="submit" class="${last ? "primary" : ""}">Submit quiz</button>
       </div>
     </div>
-    <p class="muted small kbd-hint">Shortcuts outside the answer box: 1–4 or A–D to answer · ← → to move · F to flag</p>`;
+    <p class="muted small kbd-hint">Shortcuts outside the answer box: 1–4 or A–D to answer · ← → to move${items.length > 12 ? "" : " · F to flag"}</p>`;
 }
 
 function go(i) {
