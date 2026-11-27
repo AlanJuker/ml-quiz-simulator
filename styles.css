@@ -383,3 +383,6 @@ svg .t-in { fill: #fff; font-weight: 700; }
 .modes .mode.best:has(input:checked) { background: var(--good-soft); }
 .mode.best input { accent-color: var(--good); }
 .mode .pill.good { background: var(--good); color: var(--bg); }
+
+/* Marathon: retry the wrong questions */
+.retry-card { display: grid; gap: 6px; justify-items: start; margin: 14px 0; padding: 14px 16px; border: 2px solid var(--good); border-radius: 10px; background: var(--good-soft); }

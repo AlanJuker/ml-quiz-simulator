@@ -4,6 +4,9 @@
 const app = document.getElementById("app");
 const HISTORY_KEY = "mlquiz.quiz2.history";
 const INSTANT_KEY = "mlquiz.quiz2.feedback"; // remembers the "Instant feedback" choice (on by default)
+// The last Marathon's still-wrong questions: { date, total, ids }. Retry rounds ask only these, and the
+// Marathon's score (in "Your attempts") updates as they are fixed.
+const MISSED_KEY = "mlquiz.quiz2.missed";
 const SEEN_KEY = "mlquiz.quiz2.seen"; // question id → { n, at }: times completed and when, so attempts walk the bank
 const PASS_MARK = 70;
 const LETTERS = "ABCD";
@@ -20,7 +23,7 @@ const FORMATS = {
 // Each format has a different number of questions, so an attempt's length tells its format.
 const formatName = (total) => Object.values(FORMATS).find((f) => f.mc + f.open === total)?.title ?? `${total} questions`;
 
-let state = null; // { screen, format, instant, items, index, startedAt, finishedAt, timerId, saved }
+let state = null; // { screen, format, instant, items, index, startedAt, finishedAt, timerId, saved, retry, marathon }
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const fmt = (sec) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
@@ -49,6 +52,7 @@ function renderSetup(format = "quick") {
   const seen = load(SEEN_KEY, {});
   const seenCount = QUIZ2.filter((q) => seen[q.id]).length;
   const seenPct = Math.round((seenCount / QUIZ2.length) * 100);
+  const missed = load(MISSED_KEY, { ids: [] });
   app.innerHTML = `
     <section class="card">
       <h2>Quiz 2 practice</h2>
@@ -72,6 +76,10 @@ function renderSetup(format = "quick") {
         <div class="bar"><span style="width: ${seenPct}%"></span></div>
         <span class="small">${seenPct}%</span>
       </div>
+      ${missed.ids.length ? `<div class="retry-card">
+        <strong>Your last Marathon: ${missed.ids.length} question${missed.ids.length > 1 ? "s" : ""} still wrong</strong>
+        <span class="muted small">Score so far ${marathonPercent(missed)}%. Retry only those; your Marathon score updates as you fix them.</span>
+        <button data-act="retry-missed">Retry the ${missed.ids.length} I got wrong</button></div>` : ""}
       <button class="primary" data-act="start">Start</button>
       <p class="muted small" style="margin: 14px 0 0">Revise first with the <a href="study.html">Quiz 2 study guide</a>.</p>
     </section>
@@ -98,6 +106,18 @@ function startQuiz(format, instant) {
   let items = buildQuiz(QUIZ2, { mcCount: f.mc, openCount: f.open, seen: load(SEEN_KEY, {}) });
   if (format === "marathon") items = shuffle(items); // it holds every MC question anyway, so a random order is safe
   state = { screen: "quiz", format, instant, items, index: 0, startedAt: Date.now(), saved: false };
+  state.timerId = setInterval(tick, 1000);
+  renderQuestion();
+}
+
+const marathonPercent = (m) => Math.round(((m.total - m.ids.length) / m.total) * 100);
+
+// A retry round: only the last Marathon's wrong questions, in a random order.
+function startRetry() {
+  const missed = load(MISSED_KEY, { ids: [] });
+  const items = shuffle(QUIZ2.filter((q) => missed.ids.includes(q.id)))
+    .map((q) => ({ q, order: shuffle([0, 1, 2, 3]), choice: null, flagged: false }));
+  state = { screen: "quiz", format: "marathon", instant: load(INSTANT_KEY, true), items, index: 0, startedAt: Date.now(), saved: false, retry: missed };
   state.timerId = setInterval(tick, 1000);
   renderQuestion();
 }
@@ -229,23 +249,44 @@ function renderResults() {
   const g = grade(state.items);
   const seconds = Math.round((state.finishedAt - state.startedAt) / 1000);
   if (!state.saved) {
-    save(HISTORY_KEY, [{ date: new Date().toISOString(), total: g.total, percent: g.percent }, ...load(HISTORY_KEY, [])].slice(0, 20));
+    const history = load(HISTORY_KEY, []);
+    if (state.format === "marathon") {
+      // Save what is still wrong. A retry round keeps the Marathon's date and total, so its score is the latest one.
+      const ids = state.items.filter((it) => itemScore(it) === 0).map((it) => it.q.id);
+      state.marathon = state.retry ? { ...state.retry, ids } : { date: new Date().toISOString(), total: g.total, ids };
+      save(MISSED_KEY, state.marathon);
+      const entry = { date: state.marathon.date, total: state.marathon.total, percent: marathonPercent(state.marathon) };
+      const i = history.findIndex((h) => h.date === entry.date);
+      if (i >= 0) history[i] = entry;
+      else history.unshift(entry);
+    } else {
+      history.unshift({ date: new Date().toISOString(), total: g.total, percent: g.percent });
+    }
+    save(HISTORY_KEY, history.slice(0, 20));
     state.saved = true;
   }
-  const pass = g.percent >= PASS_MARK;
+  const m = state.marathon;
+  const percent = m ? marathonPercent(m) : g.percent;
+  const pass = percent >= PASS_MARK;
   app.innerHTML = `
     <section class="card">
       <div class="row spread">
         <div>
-          <div class="score">${g.percent}%</div>
+          <div class="score">${percent}%</div>
           <div class="verdict ${pass ? "pass" : "fail"}">${pass ? "Pass" : "Below the pass mark"} (${PASS_MARK}%)</div>
         </div>
         <div class="muted small">
-          ${FORMATS[state.format].title}<br>
-          ${Math.round(g.earned * 10) / 10} / ${g.total} points<br>
+          ${FORMATS[state.format].title}${state.retry ? " · retry round" : ""}<br>
+          ${m ? `${m.total - m.ids.length} / ${m.total} correct` : `${Math.round(g.earned * 10) / 10} / ${g.total} points`}<br>
           Time used: ${fmt(seconds)}
         </div>
       </div>
+      ${state.retry ? `<p>This round you fixed <strong>${g.total - m.ids.length} of ${g.total}</strong>. Your Marathon score is now ${percent}%.</p>` : ""}
+      ${m ? (m.ids.length
+        ? `<div class="retry-card"><strong>${m.ids.length} question${m.ids.length > 1 ? "s" : ""} still wrong. Give them another go?</strong>
+            <span class="muted small">Only those questions, in a new order. Your Marathon score updates with what you fix.</span>
+            <button class="primary" data-act="retry-missed">Retry the ${m.ids.length} I got wrong</button></div>`
+        : '<div class="retry-card"><strong>Every Marathon question is now correct. 🎉</strong></div>') : ""}
       <h3>Breakdown</h3>
       <div class="bars">
         ${Object.entries(g.groups).sort().map(([k, v]) => {
@@ -254,7 +295,7 @@ function renderResults() {
         }).join("")}
       </div>
       <div class="row" style="margin-top: 18px">
-        <button class="primary" data-act="retake">New ${FORMATS[state.format].title.toLowerCase()} attempt</button>
+        <button class="${m?.ids.length ? "" : "primary"}" data-act="retake">New ${FORMATS[state.format].title.toLowerCase()} attempt</button>
         <button data-act="home">Back to start</button>
       </div>
     </section>
@@ -314,6 +355,7 @@ app.addEventListener("click", (e) => {
   } else if (act === "submit") submit();
   else if (act === "results") renderResults();
   else if (act === "retake") startQuiz(state.format, state.instant);
+  else if (act === "retry-missed") startRetry();
   else if (act === "home") renderSetup(state.format);
   else if (act === "clear-history" && confirm("Delete all saved attempts?")) {
     save(HISTORY_KEY, []);
