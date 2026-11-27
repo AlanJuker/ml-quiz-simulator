@@ -100,11 +100,25 @@ function renderSetup(format = "quick") {
     </details>`;
 }
 
+// The user asked for this question to open every attempt. If the selection skipped it, it takes the place of
+// the last theory question, so the attempt keeps its length and code share.
+const PINNED = "q8-30";
+function pinFirst(items) {
+  let i = items.findIndex((it) => it.q.id === PINNED);
+  if (i < 0) {
+    i = items.findLastIndex((it) => it.q.type === "mc" && it.q.kind !== "code");
+    if (i < 0) return items; // Quick open has no multiple-choice slot
+    items[i] = { q: QUIZ2.find((q) => q.id === PINNED), order: shuffle([0, 1, 2, 3]), choice: null, flagged: false };
+  }
+  return [items[i], ...items.filter((_, j) => j !== i)];
+}
+
 // Questions are recorded only when the attempt is submitted, so an unfinished attempt comes back unchanged.
 function startQuiz(format, instant) {
   const f = FORMATS[format];
   let items = buildQuiz(QUIZ2, { mcCount: f.mc, openCount: f.open, seen: load(SEEN_KEY, {}) });
   if (format === "marathon") items = shuffle(items); // it holds every MC question anyway, so a random order is safe
+  items = pinFirst(items);
   state = { screen: "quiz", format, instant, items, index: 0, startedAt: Date.now(), saved: false };
   state.timerId = setInterval(tick, 1000);
   renderQuestion();
