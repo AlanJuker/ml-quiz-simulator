@@ -641,6 +641,13 @@ Explained variance:  0.690   0.193`,
     explanation: "Dimensionality reduction keeps most of the information (here 95% of the variance) but never all of it. The trade-off is a small loss of information for faster training, less storage and less noise.",
   },
   {
+    id: "q8-30", module: 8, type: "mc", kind: "theory",
+    prompt: "A dataset has 3 classes and 30 features. What is the maximum number of PCA components?",
+    options: ["30", "2", "3", "29"],
+    answer: 0,
+    explanation: "PCA can build up to as many components as there are original features (30 here), because it ignores the classes. LDA on the same data would give at most C − 1 = 2.",
+  },
+  {
     id: "q8-c8", module: 8, type: "mc", kind: "code",
     prompt: "In the lab, why does LDA's fit_transform receive y while PCA's does not?",
     code: `pca = PCA(n_components=2)

@@ -8,7 +8,7 @@ Practice and a **study guide** for Machine Learning (MCAI/CSAI 500) **Quiz 2**: 
 
 ## Quiz 2 practice
 
-Questions come from a bank of 84: 74 multiple choice (36 on Module 7, 38 on Module 8) and 10 short answers (5 per module). The questions are written from the Cascade readings, the teaching demos and the in-class activities, and about 1 in 5 multiple-choice questions asks you to read scikit-learn code or a model output from class (penguins, breast cancer, MNIST).
+Questions come from a bank of 85: 75 multiple choice (36 on Module 7, 39 on Module 8) and 10 short answers (5 per module). The questions are written from the Cascade readings, the teaching demos and the in-class activities, and about 1 in 5 multiple-choice questions asks you to read scikit-learn code or a model output from class (penguins, breast cancer, MNIST).
 
 | Length | Questions |
 | --- | --- |
@@ -16,7 +16,7 @@ Questions come from a bank of 84: 74 multiple choice (36 on Module 7, 38 on Modu
 | Multiple choice | 5 multiple choice |
 | Quick open | 1 short answer |
 | Real Quiz 2 | 10 multiple choice + 2 short answer |
-| Marathon | all 74 multiple-choice questions in one go, in a random order |
+| Marathon | all 75 multiple-choice questions in one go, in a random order |
 
 - **Always a different attempt, never random:** each attempt takes the questions you have completed the fewest times, then the ones done longest ago, following a fixed walk through the bank that alternates Module 7 and Module 8. Nothing repeats until you have done every question (9 Real Quiz 2 attempts cover the whole bank), and every attempt mixes both modules. The start screen shows how much of the bank you have seen.
 - **Unfinished attempts come back:** an attempt counts only once you submit it, so if you leave one unfinished, the next start gives you the same questions.
