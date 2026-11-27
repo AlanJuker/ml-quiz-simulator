@@ -16,6 +16,7 @@ Questions come from a bank of 69: 59 multiple choice (28 on Module 7, 31 on Modu
 | Multiple choice | 5 multiple choice |
 | Quick open | 1 short answer |
 | Real Quiz 2 | 10 multiple choice + 2 short answer |
+| Marathon | all 59 multiple-choice questions in one go |
 
 - **Always a different attempt, never random:** each attempt takes the questions you have completed the fewest times, then the ones done longest ago, following a fixed walk through the bank that alternates Module 7 and Module 8. Nothing repeats until you have done every question (7 Real Quiz 2 attempts cover the whole bank), and every attempt mixes both modules. The start screen shows how much of the bank you have seen.
 - **Unfinished attempts come back:** an attempt counts only once you submit it, so if you leave one unfinished, the next start gives you the same questions.

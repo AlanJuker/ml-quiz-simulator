@@ -9,11 +9,13 @@ const PASS_MARK = 70;
 const LETTERS = "ABCD";
 // Quiz 2 is 10 multiple choice + 2 short answer on Modules 7 and 8. Quick is the default. No time limit has
 // been announced, so the clock shows the time used instead of counting down.
+const MC_TOTAL = QUIZ2.filter((q) => q.type === "mc").length;
 const FORMATS = {
   quick: { title: "Quick", detail: "5 multiple choice + 1 short answer", mc: 5, open: 1 },
   mc: { title: "Multiple choice", detail: "5 multiple-choice questions", mc: 5, open: 0 },
   open: { title: "Quick open", detail: "1 short-answer question", mc: 0, open: 1 },
   real: { title: "Real Quiz 2", detail: "10 multiple choice + 2 short answer", mc: 10, open: 2 },
+  marathon: { title: "Marathon", detail: `All ${MC_TOTAL} multiple-choice questions in the bank`, mc: MC_TOTAL, open: 0 },
 };
 // Each format has a different number of questions, so an attempt's length tells its format.
 const formatName = (total) => Object.values(FORMATS).find((f) => f.mc + f.open === total)?.title ?? `${total} questions`;
