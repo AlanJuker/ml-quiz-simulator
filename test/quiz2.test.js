@@ -83,8 +83,16 @@ function attempts(n, size) {
   });
 }
 
-test("attempts walk through the bank: 7 real attempts cover every question", () => {
-  const shown = new Set(attempts(7, REAL).flat());
+test("attempts walk through the bank: enough real attempts cover every question", () => {
+  // Each real attempt takes 8 theory MC, 2 code MC and 2 short answers, so the scarcest bucket sets the count.
+  const count = (f) => QUIZ2.filter(f).length;
+  const needed = Math.ceil(Math.max(
+    count((q) => q.type === "mc" && q.kind !== "code") / 8,
+    count((q) => q.type === "mc" && q.kind === "code") / 2,
+    count((q) => q.type === "open") / 2,
+  ));
+  assert.ok(needed <= 9, `${needed} real attempts to see the whole bank`);
+  const shown = new Set(attempts(needed, REAL).flat());
   assert.deepEqual(QUIZ2.filter((q) => !shown.has(q.id)).map((q) => q.id), []);
 });
 

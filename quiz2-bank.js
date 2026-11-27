@@ -235,6 +235,72 @@ roc = roc_auc_score(y_test, prob)`,
     explanation: "By default SVC gives labels and decision scores, not probabilities. probability=True enables predict_proba, which the lab uses to compute ROC-AUC.",
   },
   {
+    id: "q7-22", module: 7, type: "mc", kind: "theory",
+    prompt: "The reading lists a fourth kernel, sigmoid. What does it say about it?",
+    options: ["Rarely used; usually worse than RBF", "The default kernel for text data", "The only kernel that needs no scaling", "Best for perfectly separable classes"],
+    answer: 0,
+    explanation: "The sigmoid kernel is available in scikit-learn but less common: its results are sensitive to the hyperparameters and are generally worse than RBF. Text data → linear kernel, and no kernel removes the need for scaling.",
+  },
+  {
+    id: "q7-23", module: 7, type: "mc", kind: "theory",
+    prompt: "In an RBF SVM, what does a SMALL gamma do?",
+    options: ["Each point's influence reaches far: smoother boundary", "Each point only affects its close neighbours", "It narrows the margin and lowers regularization", "It switches the RBF kernel to a linear one"],
+    answer: 0,
+    explanation: "Gamma sets how far each training point's influence reaches. Small gamma → wide influence → smooth, simple boundary (too small can underfit). Large gamma → very local influence → complex boundary that may overfit.",
+  },
+  {
+    id: "q7-24", module: 7, type: "mc", kind: "theory",
+    prompt: "What is the typical effect of a LARGE value of C?",
+    options: ["Narrower margin, fewer violations, may overfit", "Wider margin, more regularization, may underfit", "Smoother boundary from each point's wider reach", "No effect once the features are standardized"],
+    answer: 0,
+    explanation: "A large C punishes margin violations heavily, so the SVM fits the training data closely with a narrow margin and weak regularization, which can overfit. A small C does the opposite.",
+  },
+  {
+    id: "q7-25", module: 7, type: "mc", kind: "theory",
+    prompt: "Your team replaces a Random Forest with an SVM on the same data. Which preprocessing step becomes essential?",
+    options: ["Standardizing the features", "Removing all correlated features", "One-hot encoding the target", "Balancing the classes by oversampling"],
+    answer: 0,
+    explanation: "Trees split one feature at a time, so feature scale does not matter to them. SVMs rely on distances, so features in large units would dominate: standardize them (inside a pipeline).",
+  },
+  {
+    id: "q7-26", module: 7, type: "mc", kind: "theory",
+    prompt: "A bank must explain each credit decision to its customers. Why might an RBF SVM be a poor fit?",
+    options: ["Its decisions are hard to interpret", "It cannot handle two classes", "It needs more data than any tree", "It always overfits small datasets"],
+    answer: 0,
+    explanation: "The reading lists limited interpretability as an SVM limitation, especially with nonlinear kernels: there is no readable rule like a decision tree's splits or logistic regression's coefficients.",
+  },
+  {
+    id: "q7-27", module: 7, type: "mc", kind: "theory",
+    prompt: "The lab compared SVMs by accuracy \"for simplicity\". With strongly imbalanced classes, which metrics does the reading say are often preferred?",
+    options: ["F1-score or ROC-AUC", "Training accuracy", "Number of support vectors", "Mean squared error"],
+    answer: 0,
+    explanation: "With imbalance, a model that always predicts the majority class still gets a high accuracy. F1 balances precision and recall, and ROC-AUC measures how well the model ranks the classes. (The class demos used balanced accuracy for the same reason.)",
+  },
+  {
+    id: "q7-c8", module: 7, type: "mc", kind: "code",
+    prompt: "In the lab's scaling step, why is the test set only transformed, never fitted?",
+    code: `scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled  = scaler.transform(X_test)`,
+    options: ["So it is scaled with the training mean and SD (no leakage)", "Because fitting twice would remove the support vectors", "Because the test set is smaller than the training set", "Because transform() also trains the SVM on the test data"],
+    answer: 0,
+    explanation: "fit learns the mean and standard deviation; transform applies them. Learning them from the test set would leak test information into preprocessing and scale the two sets differently.",
+  },
+  {
+    id: "q7-c9", module: 7, type: "mc", kind: "code",
+    prompt: "The lab's grid search prints this. What is the 0.9799?",
+    code: `grid = GridSearchCV(SVC(probability=True), param_grid, cv=5, scoring="accuracy")
+grid.fit(X_train_scaled, y_train)
+print(grid.best_params_)
+print(round(grid.best_score_, 4))
+
+{'C': 10, 'degree': 2, 'gamma': 0.01, 'kernel': 'rbf'}
+0.9799`,
+    options: ["Mean CV accuracy of the best setting on the training data", "Accuracy of the best model on the held-out test set", "Training accuracy of the best model on all its data", "Share of the 144 settings that beat the baseline model"],
+    answer: 0,
+    explanation: "best_score_ is the mean 5-fold cross-validation accuracy of the best combination, computed on the training data only. The test set is untouched; the lab evaluates best_estimator_ on it afterwards.",
+  },
+  {
     id: "q7-o1", module: 7, type: "open", kind: "theory",
     prompt: "What are support vectors, and why do they matter?",
     modelAnswer: "Support vectors are the training points closest to the decision boundary, on or inside the margin. They define the position and width of the margin, so they determine the boundary. Points far from the boundary have little or no influence: removing them does not change the model.",
@@ -538,6 +604,62 @@ Explained variance:  0.690   0.193`,
     options: ["Overall body size", "Bill depth only", "The species label", "Random noise"],
     answer: 0,
     explanation: "PC1 rises with flipper length, body mass and bill length (and falls with bill depth), so it is roughly a body-size axis. PC2 is mostly bill shape.",
+  },
+  {
+    id: "q8-25", module: 8, type: "mc", kind: "theory",
+    prompt: "How does feature selection differ from feature extraction?",
+    options: ["Selection keeps some original features, with their meaning", "Selection creates new features by combining the old ones", "Selection needs class labels, while extraction never does", "Selection is only used to draw 2-D plots of the data"],
+    answer: 0,
+    explanation: "Feature selection keeps a subset of the original variables, so they stay interpretable. Feature extraction (PCA, LDA) builds new variables from combinations of the originals.",
+  },
+  {
+    id: "q8-26", module: 8, type: "mc", kind: "theory",
+    prompt: "The classes in your data lie on curved, nonlinear structures. Why may PCA miss them?",
+    options: ["PCA assumes linear relationships among features", "PCA needs class labels to find the structure", "PCA can only keep a single component", "PCA only works on fewer than 30 features"],
+    answer: 0,
+    explanation: "PCA builds linear combinations of the features (straight axes), so nonlinear structure can be lost. t-SNE, a nonlinear method, is better at revealing it in a plot.",
+  },
+  {
+    id: "q8-27", module: 8, type: "mc", kind: "theory",
+    prompt: "Compared with PCA, which statement about t-SNE is true?",
+    options: ["It is nonlinear and slower, and keeps local structure", "It is linear and fast, and keeps global structure", "It uses class labels to separate the groups", "It is the usual preprocessing step before a model"],
+    answer: 0,
+    explanation: "From the reading's table: PCA is linear, fast, preserves global structure and can transform new data, so it is used before models. t-SNE is nonlinear, computationally expensive, preserves local neighbourhoods and is mainly for visualization.",
+  },
+  {
+    id: "q8-28", module: 8, type: "mc", kind: "theory",
+    prompt: "Why may LDA struggle when two classes are separated by a ring-shaped (curved) boundary?",
+    options: ["LDA assumes the classes separate roughly linearly", "LDA ignores the class labels when it projects", "LDA can produce only as many axes as features", "LDA needs the features to be left unscaled"],
+    answer: 0,
+    explanation: "LDA projects onto straight directions that best separate the class centres. With a curved boundary, no linear projection separates the classes well. Its other limits: it needs labels and gives at most C − 1 components.",
+  },
+  {
+    id: "q8-29", module: 8, type: "mc", kind: "theory",
+    prompt: "The breast cancer data are reduced from 30 features to 10 PCA components (95% of the variance). What is the main cost?",
+    options: ["Some information is lost", "The model can no longer predict", "The target classes are changed", "Training becomes slower"],
+    answer: 0,
+    explanation: "Dimensionality reduction keeps most of the information (here 95% of the variance) but never all of it. The trade-off is a small loss of information for faster training, less storage and less noise.",
+  },
+  {
+    id: "q8-c8", module: 8, type: "mc", kind: "code",
+    prompt: "In the lab, why does LDA's fit_transform receive y while PCA's does not?",
+    code: `pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
+
+lda = LinearDiscriminantAnalysis(n_components=1)
+X_lda = lda.fit_transform(X_scaled, y)`,
+    options: ["LDA uses the class labels; PCA is unsupervised", "y tells LDA how many components to keep", "PCA reads the labels from X_scaled itself", "LDA needs y only to draw the scatter plot"],
+    answer: 0,
+    explanation: "LDA is supervised: it needs the labels to find the directions that separate the classes. PCA ignores labels and only looks for maximum variance in X.",
+  },
+  {
+    id: "q8-c9", module: 8, type: "mc", kind: "code",
+    prompt: "Why is random_state set in the lab's t-SNE code?",
+    code: `tsne = TSNE(n_components=2, random_state=42, perplexity=30)
+X_tsne = tsne.fit_transform(X_scaled)`,
+    options: ["t-SNE is random; it makes the plot reproducible", "It sets how many neighbours each point considers", "It keeps 42% of the variance in the 2-D plot", "It lets t-SNE transform new data later on"],
+    answer: 0,
+    explanation: "t-SNE starts from a random layout, so different runs give different-looking plots. Fixing random_state gives the same plot every time. (perplexity, not random_state, relates to the neighbourhood size.)",
   },
   {
     id: "q8-o1", module: 8, type: "open", kind: "theory",

@@ -8,7 +8,7 @@ Practice and a **study guide** for Machine Learning (MCAI/CSAI 500) **Quiz 2**: 
 
 ## Quiz 2 practice
 
-Questions come from a bank of 69: 59 multiple choice (28 on Module 7, 31 on Module 8) and 10 short answers (5 per module). The questions are written from the Cascade readings, the teaching demos and the in-class activities, and about 1 in 5 multiple-choice questions asks you to read scikit-learn code or a model output from class (penguins, breast cancer, MNIST).
+Questions come from a bank of 84: 74 multiple choice (36 on Module 7, 38 on Module 8) and 10 short answers (5 per module). The questions are written from the Cascade readings, the teaching demos and the in-class activities, and about 1 in 5 multiple-choice questions asks you to read scikit-learn code or a model output from class (penguins, breast cancer, MNIST).
 
 | Length | Questions |
 | --- | --- |
@@ -16,9 +16,9 @@ Questions come from a bank of 69: 59 multiple choice (28 on Module 7, 31 on Modu
 | Multiple choice | 5 multiple choice |
 | Quick open | 1 short answer |
 | Real Quiz 2 | 10 multiple choice + 2 short answer |
-| Marathon | all 59 multiple-choice questions in one go, in a random order |
+| Marathon | all 74 multiple-choice questions in one go, in a random order |
 
-- **Always a different attempt, never random:** each attempt takes the questions you have completed the fewest times, then the ones done longest ago, following a fixed walk through the bank that alternates Module 7 and Module 8. Nothing repeats until you have done every question (7 Real Quiz 2 attempts cover the whole bank), and every attempt mixes both modules. The start screen shows how much of the bank you have seen.
+- **Always a different attempt, never random:** each attempt takes the questions you have completed the fewest times, then the ones done longest ago, following a fixed walk through the bank that alternates Module 7 and Module 8. Nothing repeats until you have done every question (9 Real Quiz 2 attempts cover the whole bank), and every attempt mixes both modules. The start screen shows how much of the bank you have seen.
 - **Unfinished attempts come back:** an attempt counts only once you submit it, so if you leave one unfinished, the next start gives you the same questions.
 - **Instant feedback (on by default):** see whether each multiple-choice answer is right, with its explanation, as soon as you pick it (the answer then locks). Short answers get a "Show model answer" button. Untick it on the start screen to get feedback only after you submit; the choice is remembered.
 - **During the attempt:** a question navigator, flags, a clock showing the time used (no time limit has been announced), and shortcuts (`1`–`4` / `A`–`D` to answer, `←` `→` to move, `F` to flag).
@@ -54,7 +54,7 @@ npm start          # python3 -m http.server 8000 → http://localhost:8000
 npm test           # node --test (Node 20+)
 ```
 
-For Quiz 2, the tests check that the bank is well formed, that every model answer earns full marks under its rubric, that each module is about half of the bank, that each length has the right questions in the right order, that selection is deterministic and an unfinished attempt repeats, that every real attempt mixes both modules, that 7 real attempts cover the bank, that consecutive attempts never share a question, and that scoring and partial credit work. The legacy midterm keeps its own tests. CI runs them on every push.
+For Quiz 2, the tests check that the bank is well formed, that every model answer earns full marks under its rubric, that each module is about half of the bank, that each length has the right questions in the right order, that selection is deterministic and an unfinished attempt repeats, that every real attempt mixes both modules, that enough real attempts cover the whole bank, that consecutive attempts never share a question, and that scoring and partial credit work. The legacy midterm keeps its own tests. CI runs them on every push.
 
 ## Project structure
 
