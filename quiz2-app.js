@@ -1,4 +1,4 @@
-/* global QUIZ2, buildQuiz, markDone, suggestPoints, itemScore, grade */
+/* global QUIZ2, shuffle, buildQuiz, markDone, suggestPoints, itemScore, grade */
 // UI layer for Quiz 2: renders the four screens (setup → quiz → self-grading → results) into #app.
 
 const app = document.getElementById("app");
@@ -95,7 +95,8 @@ function renderSetup(format = "quick") {
 // Questions are recorded only when the attempt is submitted, so an unfinished attempt comes back unchanged.
 function startQuiz(format, instant) {
   const f = FORMATS[format];
-  const items = buildQuiz(QUIZ2, { mcCount: f.mc, openCount: f.open, seen: load(SEEN_KEY, {}) });
+  let items = buildQuiz(QUIZ2, { mcCount: f.mc, openCount: f.open, seen: load(SEEN_KEY, {}) });
+  if (format === "marathon") items = shuffle(items); // it holds every MC question anyway, so a random order is safe
   state = { screen: "quiz", format, instant, items, index: 0, startedAt: Date.now(), saved: false };
   state.timerId = setInterval(tick, 1000);
   renderQuestion();
