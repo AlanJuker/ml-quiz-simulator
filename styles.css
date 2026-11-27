@@ -377,3 +377,9 @@ svg .t-in { fill: #fff; font-weight: 700; }
 .feedback.wrong { border-left-color: var(--bad); background: var(--bad-soft); }
 .feedback p { margin: 6px 0 0; }
 .feedback summary { cursor: pointer; font-weight: 600; }
+
+/* Marathon: the exam-ready check */
+.modes .mode.best { border: 2px solid var(--good); }
+.modes .mode.best:has(input:checked) { background: var(--good-soft); }
+.mode.best input { accent-color: var(--good); }
+.mode .pill.good { background: var(--good); color: var(--bg); }

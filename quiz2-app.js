@@ -15,7 +15,7 @@ const FORMATS = {
   mc: { title: "Multiple choice", detail: "5 multiple-choice questions", mc: 5, open: 0 },
   open: { title: "Quick open", detail: "1 short-answer question", mc: 0, open: 1 },
   real: { title: "Real Quiz 2", detail: "10 multiple choice + 2 short answer", mc: 10, open: 2 },
-  marathon: { title: "Marathon", detail: `All ${MC_TOTAL} multiple-choice questions in the bank`, mc: MC_TOTAL, open: 0 },
+  marathon: { title: "Marathon", detail: `All ${MC_TOTAL} multiple-choice questions. Pass it (${PASS_MARK}%+) and you are ready for Quiz 2.`, mc: MC_TOTAL, open: 0 },
 };
 // Each format has a different number of questions, so an attempt's length tells its format.
 const formatName = (total) => Object.values(FORMATS).find((f) => f.mc + f.open === total)?.title ?? `${total} questions`;
@@ -60,8 +60,8 @@ function renderSetup(format = "quick") {
       next time. After you submit, you mark your short answers against a model answer and a rubric.</p>
       <fieldset class="modes"><legend>Choose a length</legend>
         ${Object.entries(FORMATS).map(([k, f]) => `
-          <label class="mode"><input type="radio" name="format" value="${k}" ${k === format ? "checked" : ""}>
-            <span><strong>${f.title}</strong>${k === "quick" ? ' <span class="pill">Default</span>' : ""}<br>
+          <label class="mode ${k === "marathon" ? "best" : ""}"><input type="radio" name="format" value="${k}" ${k === format ? "checked" : ""}>
+            <span><strong>${f.title}</strong>${k === "quick" ? ' <span class="pill">Default</span>' : ""}${k === "marathon" ? ' <span class="pill good">Exam-ready check</span>' : ""}<br>
             <span class="muted small">${f.detail}</span></span></label>`).join("")}
       </fieldset>
       <label class="mode" style="margin-bottom: 16px"><input type="checkbox" id="instant" ${load(INSTANT_KEY, true) ? "checked" : ""}>
